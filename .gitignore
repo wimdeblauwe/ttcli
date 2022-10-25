@@ -4,7 +4,9 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 .sdkmanrc
-ttcli.log
+spring-shell.log
+ttcli.log*
+todo.adoc
 
 ### STS ###
 .apt_generated

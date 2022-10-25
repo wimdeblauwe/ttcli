@@ -15,12 +15,16 @@
 	<description>CLI interface to make working with Thymeleaf projects easier</description>
 	<properties>
 		<java.version>17</java.version>
-		<spring-shell.version>3.0.0-M1</spring-shell.version>
+		<spring-shell.version>3.0.0-M2</spring-shell.version>
 	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.shell</groupId>
 			<artifactId>spring-shell-starter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jdom</groupId>
+			<artifactId>jdom2</artifactId>
 		</dependency>
 
 		<dependency>
