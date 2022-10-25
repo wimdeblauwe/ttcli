@@ -1,5 +1,6 @@
 package io.github.wimdeblauwe.ttcli;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,6 +18,11 @@ public abstract class AbstractNpmBasedLiveReloadInitStrategy implements LiveRelo
         copyPostcssConfigJs(base);
         insertPackageJsonScripts(base);
         createApplicationCss(base);
+        postExecuteNpmPart(base);
+    }
+
+    protected void postExecuteNpmPart(Path base) throws IOException, InterruptedException {
+
     }
 
     protected abstract List<String> npmDependencies();
@@ -29,6 +35,7 @@ public abstract class AbstractNpmBasedLiveReloadInitStrategy implements LiveRelo
 
     private void createApplicationCss(Path base) throws IOException {
         Path path = base.resolve("src/main/resources/static/css/application.css");
+        Files.createDirectories(path.getParent());
         Files.writeString(path, applicationCssContent());
     }
 

@@ -1,5 +1,9 @@
 package io.github.wimdeblauwe.ttcli;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -44,5 +48,26 @@ public class TailwindCssLiveReloadInitStrategy extends AbstractNpmBasedLiveReloa
     @Override
     protected String postcssConfigJsSourceFile() {
         return "/files/tailwindcss/postcss.config.js";
+    }
+
+    @Override
+    protected void postExecuteNpmPart(Path base) throws IOException, InterruptedException {
+        initializeTailwindConfig(base);
+
+        // Point tailwind to Thymeleaf templates
+        Path tailwindConfigFilePath = base.resolve("tailwind.config.js");
+        byte[] bytes = Files.readAllBytes(tailwindConfigFilePath);
+        String s = new String(bytes);
+        s = s.replaceFirst("content: \\[]", "content: ['./src/main/resources/templates/**/*.html']");
+        Files.writeString(tailwindConfigFilePath, s);
+    }
+
+    private static void initializeTailwindConfig(Path base) throws InterruptedException, IOException {
+        ProcessBuilder builder = new ProcessBuilder("npx", "tailwindcss", "init");
+        builder.directory(base.toFile());
+        int exitValue = builder.start().waitFor();
+        if (exitValue != 0) {
+            throw new RuntimeException("unable to init tailwind css");
+        }
     }
 }
