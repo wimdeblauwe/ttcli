@@ -17,6 +17,7 @@
 		<java.version>17</java.version>
 		<spring-shell.version>3.0.0-M2</spring-shell.version>
 		<xmlprojector.version>1.4.23</xmlprojector.version>
+		<jsoup.version>1.15.3</jsoup.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -27,6 +28,11 @@
 			<groupId>org.xmlbeam</groupId>
 			<artifactId>xmlprojector</artifactId>
 			<version>${xmlprojector.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<version>${jsoup.version}</version>
 		</dependency>
 
 		<dependency>
