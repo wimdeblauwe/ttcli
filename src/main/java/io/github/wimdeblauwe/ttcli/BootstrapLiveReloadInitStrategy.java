@@ -1,9 +1,15 @@
 package io.github.wimdeblauwe.ttcli;
 
+import org.xmlbeam.XBProjector;
+
 import java.util.LinkedHashMap;
 import java.util.List;
 
 public class BootstrapLiveReloadInitStrategy extends AbstractNpmBasedLiveReloadInitStrategy {
+
+    public BootstrapLiveReloadInitStrategy(XBProjector xbProjector) {
+        super(xbProjector);
+    }
 
     @Override
     protected List<String> npmDependencies() {
@@ -40,6 +46,6 @@ public class BootstrapLiveReloadInitStrategy extends AbstractNpmBasedLiveReloadI
 
     @Override
     protected String postcssConfigJsSourceFile() {
-        return "/files/boostrap/postcss.config.js";
+        return "/files/bootstrap/postcss.config.js";
     }
 }

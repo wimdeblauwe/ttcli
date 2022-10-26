@@ -1,13 +1,18 @@
 package io.github.wimdeblauwe.ttcli;
 
+import org.xmlbeam.XBProjector;
+
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.List;
 
 public class TailwindCssLiveReloadInitStrategy extends AbstractNpmBasedLiveReloadInitStrategy {
+    public TailwindCssLiveReloadInitStrategy(XBProjector xbProjector) {
+        super(xbProjector);
+    }
+
     @Override
     protected List<String> npmDependencies() {
         return List.of("@babel/cli", "autoprefixer", "browser-sync", "cssnano",

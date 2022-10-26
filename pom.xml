@@ -16,6 +16,7 @@
 	<properties>
 		<java.version>17</java.version>
 		<spring-shell.version>3.0.0-M2</spring-shell.version>
+		<xmlprojector.version>1.4.23</xmlprojector.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -23,8 +24,9 @@
 			<artifactId>spring-shell-starter</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.jdom</groupId>
-			<artifactId>jdom2</artifactId>
+			<groupId>org.xmlbeam</groupId>
+			<artifactId>xmlprojector</artifactId>
+			<version>${xmlprojector.version}</version>
 		</dependency>
 
 		<dependency>

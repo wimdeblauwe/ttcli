@@ -5,6 +5,7 @@ import org.springframework.shell.component.flow.ComponentFlow;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
+import org.xmlbeam.XBProjector;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -16,6 +17,8 @@ public class LiveReloadInit {
     private static final String CSS_FRAMEWORK_TAILWIND_CSS = "tailwindcss";
     @Autowired
     private ComponentFlow.Builder flowBuilder;
+    @Autowired
+    private XBProjector xbProjector;
 
     @ShellMethod
     public void liveReloadInit(@ShellOption(defaultValue = ".") String baseDir) throws IOException, InterruptedException {
@@ -31,10 +34,10 @@ public class LiveReloadInit {
         LiveReloadInitStrategy strategy;
         if (cssFrameworkSelection.equals(CSS_FRAMEWORK_BOOTSTRAP)) {
             System.out.println("\uD83D\uDC85 Going with Bootstrap");
-            strategy = new BootstrapLiveReloadInitStrategy();
+            strategy = new BootstrapLiveReloadInitStrategy(xbProjector);
         } else if (cssFrameworkSelection.equals(CSS_FRAMEWORK_TAILWIND_CSS)) {
             System.out.println("\uD83D\uDC85 Going with Tailwind CSS");
-            strategy = new TailwindCssLiveReloadInitStrategy();
+            strategy = new TailwindCssLiveReloadInitStrategy(xbProjector);
         } else {
             throw new IllegalArgumentException("unknown css framework: " + cssFrameworkSelection);
         }

@@ -1,12 +1,21 @@
 package io.github.wimdeblauwe.ttcli;
 
-import java.io.File;
+import org.xmlbeam.XBProjector;
+import org.xmlbeam.io.FileIO;
+
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
 public abstract class AbstractNpmBasedLiveReloadInitStrategy implements LiveReloadInitStrategy {
+    private final XBProjector xbProjector;
+
+    protected AbstractNpmBasedLiveReloadInitStrategy(XBProjector xbProjector) {
+        this.xbProjector = xbProjector;
+    }
+
     @Override
     public void execute(LiveReloadInitParameters parameters) throws IOException, InterruptedException {
         checkIfNodeAndNpmAreInstalled();
@@ -79,11 +88,18 @@ public abstract class AbstractNpmBasedLiveReloadInitStrategy implements LiveRelo
     }
 
     private void copyPostcssConfigJs(Path base) throws IOException {
-        Files.copy(Objects.requireNonNull(getClass().getResourceAsStream(postcssConfigJsSourceFile())), base.resolve("postcss.config.js"));
+        try (InputStream stream = getClass().getResourceAsStream(postcssConfigJsSourceFile())) {
+            Files.copy(Objects.requireNonNull(stream, () -> "Could not find " + postcssConfigJsSourceFile()),
+                       base.resolve("postcss.config.js"));
+        }
     }
 
     private void copyCopyFilesJs(Path base) throws IOException {
-        Files.copy(Objects.requireNonNull(getClass().getResourceAsStream("/files/copy-files.js")), base.resolve("copy-files.js"));
+        String source = "/files/copy-files.js";
+        try (InputStream stream = getClass().getResourceAsStream(source)) {
+            Files.copy(Objects.requireNonNull(stream, () -> "Could not find " + source),
+                       base.resolve("copy-files.js"));
+        }
     }
 
     private void installNpmDependencies(Path base) throws IOException, InterruptedException {
@@ -101,11 +117,13 @@ public abstract class AbstractNpmBasedLiveReloadInitStrategy implements LiveRelo
 
     private void createEmptyPackageJson(Path base) throws IOException {
         Path path = base.resolve("package.json");
+        FileIO file = xbProjector.io().file(base.resolve("pom.xml").toFile());
+        MavenPom mavenPom = file.read(MavenPom.class);
         Files.writeString(path, """
                 {
-                  "name": "my-application"
+                  "name": "%s"
                 }
-                """); // TODO read artifactId from pom.xml
+                """.formatted(mavenPom.getArtifactId()));
     }
 
     private void checkIfNodeAndNpmAreInstalled() throws IOException, InterruptedException {
