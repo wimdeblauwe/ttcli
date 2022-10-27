@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
 
 public abstract class AbstractNpmBasedLiveReloadInitStrategy implements LiveReloadInitStrategy {
@@ -29,6 +30,7 @@ public abstract class AbstractNpmBasedLiveReloadInitStrategy implements LiveRelo
         postExecuteNpmPart(base);
 
         updateMavenPom(mavenPomReaderWriter, versions);
+        updateSpringApplicationProperties(base);
     }
 
     protected void postExecuteNpmPart(Path base) throws IOException, InterruptedException {
@@ -238,5 +240,19 @@ public abstract class AbstractNpmBasedLiveReloadInitStrategy implements LiveRelo
         });
 
         mavenPomReaderWriter.write();
+    }
+
+    private void updateSpringApplicationProperties(Path base) throws IOException {
+        Path propertiesFile = base.resolve("src/main/resources/application-local.properties");
+        Files.createDirectories(propertiesFile.getParent());
+        String s = """
+                spring.thymeleaf.cache=false
+                spring.web.resources.chain.cache=false
+                """;
+        if (!Files.exists(propertiesFile)) {
+            Files.writeString(propertiesFile, s, StandardOpenOption.CREATE);
+        } else {
+            Files.writeString(propertiesFile, s, StandardOpenOption.APPEND);
+        }
     }
 }
