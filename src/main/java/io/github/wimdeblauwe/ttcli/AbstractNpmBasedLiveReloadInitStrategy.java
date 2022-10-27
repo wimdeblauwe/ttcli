@@ -6,26 +6,17 @@ package io.github.wimdeblauwe.ttcli;
 //import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 //import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.parser.Parser;
-import org.xmlbeam.XBProjector;
-import org.xmlbeam.io.FileIO;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
 public abstract class AbstractNpmBasedLiveReloadInitStrategy implements LiveReloadInitStrategy {
-    private final XBProjector xbProjector;
 
-    protected AbstractNpmBasedLiveReloadInitStrategy(XBProjector xbProjector) {
-        this.xbProjector = xbProjector;
+    protected AbstractNpmBasedLiveReloadInitStrategy() {
     }
 
     @Override
@@ -33,7 +24,9 @@ public abstract class AbstractNpmBasedLiveReloadInitStrategy implements LiveRelo
         checkIfNodeAndNpmAreInstalled();
 
         Path base = parameters.baseDir();
-        createEmptyPackageJson(base);
+        MavenPomReaderWriter mavenPomReaderWriter = MavenPomReaderWriter.readFrom(base);
+
+        createEmptyPackageJson(base, mavenPomReaderWriter.getProjectArtifactId());
         installNpmDependencies(base);
         copyCopyFilesJs(base);
         copyPostcssConfigJs(base);
@@ -41,7 +34,7 @@ public abstract class AbstractNpmBasedLiveReloadInitStrategy implements LiveRelo
         createApplicationCss(base);
         postExecuteNpmPart(base);
 
-        updateMavenPom(base);
+        updateMavenPom(mavenPomReaderWriter);
     }
 
     protected void postExecuteNpmPart(Path base) throws IOException, InterruptedException {
@@ -63,7 +56,7 @@ public abstract class AbstractNpmBasedLiveReloadInitStrategy implements LiveRelo
     }
 
     private void insertPackageJsonScripts(Path base) throws IOException, InterruptedException {
-        System.out.println("\uD83D\uDC77\u200D♂️ Adding build scripts");
+        System.out.println("\uD83D\uDC77\u200D♂️ Adding npm build scripts");
         installNpmAddScriptDependency(base);
 
         addBuildScriptsToPackageJson(base);
@@ -129,16 +122,14 @@ public abstract class AbstractNpmBasedLiveReloadInitStrategy implements LiveRelo
         }
     }
 
-    private void createEmptyPackageJson(Path base) throws IOException {
-        // TODO replace with JSoup and remove xmlbean dependency
+    private void createEmptyPackageJson(Path base,
+                                        String projectArtifactId) throws IOException {
         Path path = base.resolve("package.json");
-        FileIO file = xbProjector.io().file(base.resolve("pom.xml").toFile());
-        MavenPom mavenPom = file.read(MavenPom.class);
         Files.writeString(path, """
                 {
                   "name": "%s"
                 }
-                """.formatted(mavenPom.getArtifactId()));
+                """.formatted(projectArtifactId));
     }
 
     private void checkIfNodeAndNpmAreInstalled() throws IOException, InterruptedException {
@@ -157,99 +148,97 @@ public abstract class AbstractNpmBasedLiveReloadInitStrategy implements LiveRelo
         }
     }
 
-    private static void updateMavenPom(Path base) throws IOException {
-        Path path = base.resolve("pom.xml");
-        Document document = Jsoup.parse(path.toFile(), StandardCharsets.UTF_8.name(), "", Parser.xmlParser());
-        Element project = document.getElementsByTag("project").first();
-        Element build = project.getElementsByTag("build").first();
-        build.prependElement("resources")
-             .append("""
-                     <resource>
-                         <directory>src/main/resources</directory>
-                         <excludes>
-                             <exclude>**/*.html</exclude>
-                             <exclude>**/*.css</exclude>
-                             <exclude>**/*.js</exclude>
-                             <exclude>**/*.svg</exclude>
-                         </excludes>
-                     </resource>
-                                         """);
+    private void updateMavenPom(MavenPomReaderWriter mavenPomReaderWriter) throws IOException {
+        System.out.println("\uD83D\uDC77\uD83C\uDFFB\u200D♀️ Updating Maven pom.xml");
+        mavenPomReaderWriter.updateResources(resources -> resources.append("""
+                                                                                   <resource>
+                                                                                       <directory>src/main/resources</directory>
+                                                                                       <excludes>
+                                                                                           <exclude>**/*.html</exclude>
+                                                                                           <exclude>**/*.css</exclude>
+                                                                                           <exclude>**/*.js</exclude>
+                                                                                           <exclude>**/*.svg</exclude>
+                                                                                       </excludes>
+                                                                                   </resource>
+                                                                                                       """));
+        mavenPomReaderWriter.updateProperties(properties -> {
+            properties.appendChild(new Comment(" Maven plugins "));
+            // TODO get versions from actual npm installation
+            properties.appendElement("frontend-maven-plugin.version").text("1.10.0");
+            properties.appendElement("frontend-maven-plugin.nodeVersion").text("v16.13.1");
+            properties.appendElement("frontend-maven-plugin.npmVersion").text("8.1.2");
+        });
 
-        Element properties = project.getElementsByTag("properties").get(0);
+        mavenPomReaderWriter.updatePluginManagementPlugins(plugins -> {
+            plugins.append("""
+                                   <plugin>
+                                       <groupId>com.github.eirslett</groupId>
+                                       <artifactId>frontend-maven-plugin</artifactId>
+                                       <version>${frontend-maven-plugin.version}</version>
+                                       <executions>
+                                           <execution>
+                                               <id>install-frontend-tooling</id>
+                                               <goals>
+                                                   <goal>install-node-and-npm</goal>
+                                               </goals>
+                                               <configuration>
+                                                   <nodeVersion>${frontend-maven-plugin.nodeVersion}</nodeVersion>
+                                                   <npmVersion>${frontend-maven-plugin.npmVersion}</npmVersion>
+                                               </configuration>
+                                           </execution>
+                                           <execution>
+                                               <id>run-npm-install</id>
+                                               <goals>
+                                                   <goal>npm</goal>
+                                               </goals>
+                                           </execution>
+                                           <execution>
+                                               <id>run-npm-build</id>
+                                               <goals>
+                                                   <goal>npm</goal>
+                                               </goals>
+                                               <configuration>
+                                                   <arguments>run build</arguments>
+                                               </configuration>
+                                           </execution>
+                                       </executions>
+                                   </plugin>""");
+        });
 
-        properties.appendChild(new Comment(" Maven plugins "));
-        // TODO get versions from actual npm installation
-        properties.appendElement("frontend-maven-plugin.version").text("1.10.0");
-        properties.appendElement("frontend-maven-plugin.nodeVersion").text("v16.13.1");
-        properties.appendElement("frontend-maven-plugin.npmVersion").text("8.1.2");
+        mavenPomReaderWriter.updateBuildPlugins(plugins -> {
+            plugins.append("""
+                                   <plugin>
+                                       <groupId>com.github.eirslett</groupId>
+                                       <artifactId>frontend-maven-plugin</artifactId>
+                                   </plugin>""");
+        });
 
-        build.appendElement("pluginManagement")
-             .appendElement("plugins")
-             .append("""
-                             <plugin>
-                                 <groupId>com.github.eirslett</groupId>
-                                 <artifactId>frontend-maven-plugin</artifactId>
-                                 <version>${frontend-maven-plugin.version}</version>
-                                 <executions>
-                                     <execution>
-                                         <id>install-frontend-tooling</id>
-                                         <goals>
-                                             <goal>install-node-and-npm</goal>
-                                         </goals>
-                                         <configuration>
-                                             <nodeVersion>${frontend-maven-plugin.nodeVersion}</nodeVersion>
-                                             <npmVersion>${frontend-maven-plugin.npmVersion}</npmVersion>
-                                         </configuration>
-                                     </execution>
-                                     <execution>
-                                         <id>run-npm-install</id>
-                                         <goals>
-                                             <goal>npm</goal>
-                                         </goals>
-                                     </execution>
-                                     <execution>
-                                         <id>run-npm-build</id>
-                                         <goals>
-                                             <goal>npm</goal>
-                                         </goals>
-                                         <configuration>
-                                             <arguments>run build</arguments>
-                                         </configuration>
-                                     </execution>
-                                 </executions>
-                             </plugin>""");
-        Element plugins = build.getElementsByTag("plugins").first();
-        plugins.append("""
-                               <plugin>
-                                   <groupId>com.github.eirslett</groupId>
-                                   <artifactId>frontend-maven-plugin</artifactId>
-                               </plugin>""");
+        mavenPomReaderWriter.updateProfiles(profiles -> {
+            profiles.append("""
+                                    <profile>
+                                        <id>release</id>
+                                        <build>
+                                            <plugins>
+                                                <plugin>
+                                                    <groupId>com.github.eirslett</groupId>
+                                                    <artifactId>frontend-maven-plugin</artifactId>
+                                                    <executions>
+                                                        <execution>
+                                                            <id>run-npm-build</id>
+                                                            <goals>
+                                                                <goal>npm</goal>
+                                                            </goals>
+                                                            <configuration>
+                                                                <arguments>run build-prod</arguments>
+                                                            </configuration>
+                                                        </execution>
+                                                    </executions>
+                                                </plugin>
+                                            </plugins>
+                                        </build>
+                                    </profile>""");
+        });
 
-        project.appendElement("profiles")
-               .append("""
-                               <profile>
-                                   <id>release</id>
-                                   <build>
-                                       <plugins>
-                                           <plugin>
-                                               <groupId>com.github.eirslett</groupId>
-                                               <artifactId>frontend-maven-plugin</artifactId>
-                                               <executions>
-                                                   <execution>
-                                                       <id>run-npm-build</id>
-                                                       <goals>
-                                                           <goal>npm</goal>
-                                                       </goals>
-                                                       <configuration>
-                                                           <arguments>run build-prod</arguments>
-                                                       </configuration>
-                                                   </execution>
-                                               </executions>
-                                           </plugin>
-                                       </plugins>
-                                   </build>
-                               </profile>""");
-
-        Files.writeString(path, document.outerHtml());
+        mavenPomReaderWriter.write();
     }
 }

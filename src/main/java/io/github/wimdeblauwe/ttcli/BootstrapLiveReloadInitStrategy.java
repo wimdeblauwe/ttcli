@@ -1,15 +1,9 @@
 package io.github.wimdeblauwe.ttcli;
 
-import org.xmlbeam.XBProjector;
-
 import java.util.LinkedHashMap;
 import java.util.List;
 
 public class BootstrapLiveReloadInitStrategy extends AbstractNpmBasedLiveReloadInitStrategy {
-
-    public BootstrapLiveReloadInitStrategy(XBProjector xbProjector) {
-        super(xbProjector);
-    }
 
     @Override
     protected List<String> npmDependencies() {
