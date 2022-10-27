@@ -1,11 +1,5 @@
 package io.github.wimdeblauwe.ttcli;
 
-//import org.apache.maven.model.Model;
-//import org.apache.maven.model.Resource;
-//import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-//import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
-//import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-
 import org.jsoup.nodes.Comment;
 
 import java.io.IOException;
@@ -21,7 +15,7 @@ public abstract class AbstractNpmBasedLiveReloadInitStrategy implements LiveRelo
 
     @Override
     public void execute(LiveReloadInitParameters parameters) throws IOException, InterruptedException {
-        checkIfNodeAndNpmAreInstalled();
+        InstalledApplicationVersions versions = checkIfNodeAndNpmAreInstalled();
 
         Path base = parameters.baseDir();
         MavenPomReaderWriter mavenPomReaderWriter = MavenPomReaderWriter.readFrom(base);
@@ -34,7 +28,7 @@ public abstract class AbstractNpmBasedLiveReloadInitStrategy implements LiveRelo
         createApplicationCss(base);
         postExecuteNpmPart(base);
 
-        updateMavenPom(mavenPomReaderWriter);
+        updateMavenPom(mavenPomReaderWriter, versions);
     }
 
     protected void postExecuteNpmPart(Path base) throws IOException, InterruptedException {
@@ -132,23 +126,28 @@ public abstract class AbstractNpmBasedLiveReloadInitStrategy implements LiveRelo
                 """.formatted(projectArtifactId));
     }
 
-    private void checkIfNodeAndNpmAreInstalled() throws IOException, InterruptedException {
-        checkIfNpmIsInstalled("node");
-        checkIfNpmIsInstalled("npm");
+    private InstalledApplicationVersions checkIfNodeAndNpmAreInstalled() throws IOException, InterruptedException {
+        String nodeVersion = checkIfApplicationIsInstalled("node");
+        String npmVersion = checkIfApplicationIsInstalled("npm");
+        return new InstalledApplicationVersions(nodeVersion,
+                                                npmVersion);
     }
 
-    private void checkIfNpmIsInstalled(String application) throws IOException, InterruptedException {
+    private String checkIfApplicationIsInstalled(String application) throws IOException, InterruptedException {
         ProcessBuilder builder = new ProcessBuilder(application, "-v");
         Process process = builder.start();
         int exitValue = process.waitFor();
-        String version = new String(process.getInputStream().readAllBytes());
-        System.out.println("\uD83D\uDEE0️  Using " + application + " " + version.trim());
+        String version = new String(process.getInputStream().readAllBytes()).trim();
+        System.out.println("\uD83D\uDEE0️  Using " + application + " " + version);
         if (exitValue != 0) {
             throw new IllegalArgumentException(application + " is not installed");
         }
+
+        return version;
     }
 
-    private void updateMavenPom(MavenPomReaderWriter mavenPomReaderWriter) throws IOException {
+    private void updateMavenPom(MavenPomReaderWriter mavenPomReaderWriter,
+                                InstalledApplicationVersions versions) throws IOException {
         System.out.println("\uD83D\uDC77\uD83C\uDFFB\u200D♀️ Updating Maven pom.xml");
         mavenPomReaderWriter.updateResources(resources -> resources.append("""
                                                                                    <resource>
@@ -163,10 +162,9 @@ public abstract class AbstractNpmBasedLiveReloadInitStrategy implements LiveRelo
                                                                                                        """));
         mavenPomReaderWriter.updateProperties(properties -> {
             properties.appendChild(new Comment(" Maven plugins "));
-            // TODO get versions from actual npm installation
-            properties.appendElement("frontend-maven-plugin.version").text("1.10.0");
-            properties.appendElement("frontend-maven-plugin.nodeVersion").text("v16.13.1");
-            properties.appendElement("frontend-maven-plugin.npmVersion").text("8.1.2");
+            properties.appendElement("frontend-maven-plugin.version").text("1.12.1");
+            properties.appendElement("frontend-maven-plugin.nodeVersion").text(versions.nodeVersion());
+            properties.appendElement("frontend-maven-plugin.npmVersion").text(versions.npmVersion());
         });
 
         mavenPomReaderWriter.updatePluginManagementPlugins(plugins -> {
