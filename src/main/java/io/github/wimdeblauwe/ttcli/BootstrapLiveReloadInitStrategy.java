@@ -47,4 +47,16 @@ public class BootstrapLiveReloadInitStrategy extends AbstractNpmBasedLiveReloadI
     protected void doAddMavenDependencies(MavenPomReaderWriter mavenPomReaderWriter) {
         mavenPomReaderWriter.addDependency("org.webjars", "bootstrap", "5.2.2");
     }
+
+    @Override
+    protected String getCssLinksForLayoutTemplate() {
+        return """
+                <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">""";
+    }
+
+    @Override
+    protected String getJsLinksForLayoutTemplate() {
+        return """
+                <script defer th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>""";
+    }
 }

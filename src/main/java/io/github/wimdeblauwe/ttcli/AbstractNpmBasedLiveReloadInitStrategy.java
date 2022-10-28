@@ -32,6 +32,7 @@ public abstract class AbstractNpmBasedLiveReloadInitStrategy implements LiveRelo
         updateMavenPom(mavenPomReaderWriter, versions);
         updateSpringApplicationProperties(base);
         addMavenDependencies(mavenPomReaderWriter);
+        createDefaultTemplates(base);
     }
 
     protected void postExecuteNpmPart(Path base) throws IOException, InterruptedException {
@@ -47,6 +48,14 @@ public abstract class AbstractNpmBasedLiveReloadInitStrategy implements LiveRelo
     protected abstract String postcssConfigJsSourceFile();
 
     protected void doAddMavenDependencies(MavenPomReaderWriter mavenPomReaderWriter) {
+    }
+
+    protected String getCssLinksForLayoutTemplate() {
+        return "";
+    }
+
+    protected String getJsLinksForLayoutTemplate() {
+        return "";
     }
 
     private void createApplicationCss(Path base) throws IOException {
@@ -270,4 +279,48 @@ public abstract class AbstractNpmBasedLiveReloadInitStrategy implements LiveRelo
 
         mavenPomReaderWriter.write();
     }
+
+    private void createDefaultTemplates(Path base) throws IOException {
+        createDefaultLayoutTemplate(base);
+        createDefaultIndexTemplate(base);
+    }
+
+    private void createDefaultLayoutTemplate(Path base) throws IOException {
+        Path layoutTemplate = base.resolve("src/main/resources/templates/layout/main.html");
+        Files.createDirectories(layoutTemplate.getParent());
+        String source = "/files/templates/layout/main.html";
+        try (InputStream stream = getClass().getResourceAsStream(source)) {
+            Files.copy(Objects.requireNonNull(stream, () -> "Could not find " + source),
+                       layoutTemplate);
+        }
+        insertCssLinksToLayoutTemplate(layoutTemplate, getCssLinksForLayoutTemplate());
+        insertJsLinksToLayoutTemplate(layoutTemplate, getJsLinksForLayoutTemplate());
+    }
+
+    private void insertCssLinksToLayoutTemplate(Path layoutTemplate,
+                                                String cssLinksForLayoutTemplate) throws IOException {
+        String layoutTemplateContent = Files.readString(layoutTemplate);
+        String result = layoutTemplateContent.replace("<!-- REPLACE WITH CSS LINKS -->",
+                                                      cssLinksForLayoutTemplate);
+        Files.writeString(layoutTemplate, result);
+    }
+
+    private void insertJsLinksToLayoutTemplate(Path layoutTemplate,
+                                               String jsLinksForLayoutTemplate) throws IOException {
+        String layoutTemplateContent = Files.readString(layoutTemplate);
+        String result = layoutTemplateContent.replace("<!-- REPLACE WITH JS LINKS -->",
+                                                      jsLinksForLayoutTemplate);
+        Files.writeString(layoutTemplate, result);
+    }
+
+    private void createDefaultIndexTemplate(Path base) throws IOException {
+        Path indexTemplate = base.resolve("src/main/resources/templates/index.html");
+        Files.createDirectories(indexTemplate.getParent());
+        String source = "/files/templates/index.html";
+        try (InputStream stream = getClass().getResourceAsStream(source)) {
+            Files.copy(Objects.requireNonNull(stream, () -> "Could not find " + source),
+                       indexTemplate);
+        }
+    }
+
 }
