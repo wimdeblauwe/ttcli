@@ -31,6 +31,7 @@ public abstract class AbstractNpmBasedLiveReloadInitStrategy implements LiveRelo
 
         updateMavenPom(mavenPomReaderWriter, versions);
         updateSpringApplicationProperties(base);
+        addMavenDependencies(mavenPomReaderWriter);
     }
 
     protected void postExecuteNpmPart(Path base) throws IOException, InterruptedException {
@@ -44,6 +45,9 @@ public abstract class AbstractNpmBasedLiveReloadInitStrategy implements LiveRelo
     protected abstract String applicationCssContent();
 
     protected abstract String postcssConfigJsSourceFile();
+
+    protected void doAddMavenDependencies(MavenPomReaderWriter mavenPomReaderWriter) {
+    }
 
     private void createApplicationCss(Path base) throws IOException {
         Path path = base.resolve("src/main/resources/static/css/application.css");
@@ -254,5 +258,16 @@ public abstract class AbstractNpmBasedLiveReloadInitStrategy implements LiveRelo
         } else {
             Files.writeString(propertiesFile, s, StandardOpenOption.APPEND);
         }
+    }
+
+    private void addMavenDependencies(MavenPomReaderWriter mavenPomReaderWriter) throws IOException {
+        mavenPomReaderWriter.addDependency("nz.net.ultraq.thymeleaf", "thymeleaf-layout-dialect");
+        mavenPomReaderWriter.updateDependencies(dependencies -> {
+            dependencies.appendChild(new Comment(" Web dependencies "));
+        });
+        mavenPomReaderWriter.addDependency("org.webjars", "webjars-locator", "0.41");
+        doAddMavenDependencies(mavenPomReaderWriter);
+
+        mavenPomReaderWriter.write();
     }
 }

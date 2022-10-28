@@ -42,4 +42,9 @@ public class BootstrapLiveReloadInitStrategy extends AbstractNpmBasedLiveReloadI
     protected String postcssConfigJsSourceFile() {
         return "/files/bootstrap/postcss.config.js";
     }
+
+    @Override
+    protected void doAddMavenDependencies(MavenPomReaderWriter mavenPomReaderWriter) {
+        mavenPomReaderWriter.addDependency("org.webjars", "bootstrap", "5.2.2");
+    }
 }

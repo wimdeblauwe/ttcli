@@ -63,6 +63,40 @@ public class MavenPomReaderWriter {
         profiles.accept(profilesEl);
     }
 
+    public void updateDependencies(Consumer<Element> dependencies) {
+        Element dependenciesEl = getProject().getElementsByTag("dependencies").get(0);
+        dependencies.accept(dependenciesEl);
+    }
+
+    public void addDependency(String groupId,
+                              String artifactId,
+                              String version) {
+        updateDependencies(dependencies -> {
+            dependencies.append("""
+                                        <dependency>
+                                            <groupId>%s</groupId>
+                                            <artifactId>%s</artifactId>
+                                            <version>%s</version>
+                                        </dependency>"""
+                                        .formatted(groupId,
+                                                   artifactId,
+                                                   version));
+        });
+    }
+
+    public void addDependency(String groupId,
+                              String artifactId) {
+        updateDependencies(dependencies -> {
+            dependencies.append("""
+                                        <dependency>
+                                            <groupId>%s</groupId>
+                                            <artifactId>%s</artifactId>
+                                        </dependency>"""
+                                        .formatted(groupId,
+                                                   artifactId));
+        });
+    }
+
     public void write() throws IOException {
         Files.writeString(pomPath, document.outerHtml());
     }
