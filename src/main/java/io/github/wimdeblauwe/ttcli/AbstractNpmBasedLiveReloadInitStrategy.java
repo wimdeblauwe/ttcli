@@ -23,7 +23,6 @@ public abstract class AbstractNpmBasedLiveReloadInitStrategy implements LiveRelo
 
         createEmptyPackageJson(base, mavenPomReaderWriter.getProjectArtifactId());
         installNpmDependencies(base);
-        copyCopyFilesJs(base);
         copyPostcssConfigJs(base);
         insertPackageJsonScripts(base);
         createApplicationCss(base);
@@ -107,14 +106,6 @@ public abstract class AbstractNpmBasedLiveReloadInitStrategy implements LiveRelo
         try (InputStream stream = getClass().getResourceAsStream(postcssConfigJsSourceFile())) {
             Files.copy(Objects.requireNonNull(stream, () -> "Could not find " + postcssConfigJsSourceFile()),
                        base.resolve("postcss.config.js"));
-        }
-    }
-
-    private void copyCopyFilesJs(Path base) throws IOException {
-        String source = "/files/copy-files.js";
-        try (InputStream stream = getClass().getResourceAsStream(source)) {
-            Files.copy(Objects.requireNonNull(stream, () -> "Could not find " + source),
-                       base.resolve("copy-files.js"));
         }
     }
 
