@@ -1,0 +1,28 @@
+= Taming Thymeleaf CLI
+
+== Building
+
+=== Regular JVM build
+
+[source]
+----
+mvn verify
+----
+
+=== Native build
+
+Use GraalVM JDK:
+
+[source]
+----
+sdk use java 22.3.r19-grl
+----
+
+Run native compilation:
+
+[source]
+----
+mvn -Pnative native:compile
+----
+
+
