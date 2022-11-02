@@ -23,7 +23,7 @@ public class MavenPomReaderWriter {
     }
 
     public String getProjectArtifactId() {
-        return Xsoup.compile("/project/artifactId").evaluate(document).get();
+        return Xsoup.compile("/project/artifactId/text()").evaluate(document).get();
     }
 
     public static MavenPomReaderWriter readFrom(Path base) throws IOException {
