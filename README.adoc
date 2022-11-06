@@ -25,4 +25,29 @@ Run native compilation:
 mvn -Pnative native:compile
 ----
 
+=== Releasing
+
+[NOTE]
+====
+You need to configure a https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token[GitHub access token]. Put it in `~/.jreleaser/config.properties` with for example:
+
+[source,properties]
+----
+JRELEASER_GITHUB_TOKEN=<github-token-value>
+----
+====
+
+Check JReleaser configuration:
+
+[source]
+----
+mvn -Djreleaser.dry.run -Prelease jreleaser:config
+----
+
+Posting a release from a local environment only when binaries for the current platform are available:
+
+[source]
+----
+mvn -Prelease jreleaser:release -Djreleaser.select.current.platform
+----
 
