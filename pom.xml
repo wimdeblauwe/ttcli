@@ -149,6 +149,17 @@
 			</build>
 		</profile>
 		<profile>
+			<id>dist-windows</id>
+			<activation>
+				<os>
+					<family>windows</family>
+				</os>
+			</activation>
+			<properties>
+				<executable-suffix>.exe</executable-suffix>
+			</properties>
+		</profile>
+		<profile>
 			<id>release</id>
 			<build>
 				<plugins>
