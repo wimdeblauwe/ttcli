@@ -27,6 +27,12 @@ mvn -Pnative native:compile
 
 === Releasing
 
+==== Github
+
+An official release is done via a https://github.com/wimdeblauwe/ttcli/actions/workflows/release.yml[manual action on Github Actions].
+
+==== Local
+
 [NOTE]
 ====
 You need to configure a https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token[GitHub access token]. Put it in `~/.jreleaser/config.properties` with for example:
