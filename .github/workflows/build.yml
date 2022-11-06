@@ -1,0 +1,33 @@
+name: Build
+
+on:
+  pull_request:
+    branches: [ main ]
+
+env:
+  JAVA_VERSION: '17'
+  JAVA_DISTRO: 'temurin'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 'Check out repository'
+        uses: actions/checkout@v3
+
+      - name: 'Set up Java'
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRO }}
+
+      - name: 'Cache Maven packages'
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
+
+      - name: 'Build'
+        run: ./mvnw -B -ntp --file pom.xml verify
