@@ -1,5 +1,33 @@
 = Taming Thymeleaf CLI
 
+The goal of this project is to provide a command line tool to helps to setup a Spring Boot with Thymeleaf project.
+
+== Usage
+
+. As a first step, generate a Spring Boot project via https://start.spring.io. Be sure to add at least the Spring MVC and Thymeleaf dependencies.
+. Copy the `ttcli` (macOS/Linux) or `ttcli.exe` (Windows) to the root of your generated project.
++
+[NOTE]
+====
+You can download the appropriate executable from https://github.com/wimdeblauwe/ttcli/releases
+====
+. Run `./ttcli help` (macOS/Linux) or `ttcli.exe help` (Windows) to see the options of the tool.
+
+=== Initialize live reload
+
+Run `ttcli live-reload-init` to have the tool update your Spring Boot project with an NPM based live-reload setup.
+
+You can choose between Bootstrap or Tailwind CSS as your CSS framework of choice.
+
+The tool applies the following changes:
+
+* Add NPM dependencies and NPM scripts needed to have a live reload setup
+* Add an `index.html` and `layout.html` page as a starting point for your Thymeleaf application.
+* Setup Tailwind CSS when selected.
+* Setup Bootstrap when selected.
+* Adds webjars to the Maven dependencies.
+* Adds an `application-local.properties` with Thymeleaf template caching disabled.
+
 == Building
 
 === Regular JVM build
