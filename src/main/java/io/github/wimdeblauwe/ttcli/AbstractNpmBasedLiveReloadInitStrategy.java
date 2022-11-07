@@ -111,6 +111,7 @@ public abstract class AbstractNpmBasedLiveReloadInitStrategy implements LiveRelo
     private InstalledApplicationVersions checkIfNodeAndNpmAreInstalled() throws IOException, InterruptedException {
         String nodeVersion = checkIfApplicationIsInstalled("node");
         String npmVersion = checkIfApplicationIsInstalled("npm");
+        System.out.println("\uD83D\uDEE0️  Using node " + nodeVersion + " with npm " + npmVersion);
         return new InstalledApplicationVersions(nodeVersion,
                                                 npmVersion);
     }
@@ -120,7 +121,6 @@ public abstract class AbstractNpmBasedLiveReloadInitStrategy implements LiveRelo
         Process process = builder.start();
         int exitValue = process.waitFor();
         String version = new String(process.getInputStream().readAllBytes()).trim();
-        System.out.println("\uD83D\uDEE0️  Using " + application + " " + version);
         if (exitValue != 0) {
             throw new IllegalArgumentException(application + " is not installed");
         }
