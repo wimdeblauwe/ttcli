@@ -1,9 +1,15 @@
 package io.github.wimdeblauwe.ttcli;
 
+import io.github.wimdeblauwe.ttcli.deps.WebDependency;
+
 import java.util.LinkedHashMap;
 import java.util.List;
 
 public class BootstrapLiveReloadInitStrategy extends AbstractNpmBasedLiveReloadInitStrategy {
+
+    public BootstrapLiveReloadInitStrategy(List<WebDependency> webDependencies) {
+        super(webDependencies);
+    }
 
     @Override
     protected List<String> npmDependencies() {

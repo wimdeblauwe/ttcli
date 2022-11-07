@@ -1,5 +1,7 @@
 package io.github.wimdeblauwe.ttcli;
 
+import io.github.wimdeblauwe.ttcli.deps.WebDependency;
+import io.github.wimdeblauwe.ttcli.maven.MavenDependency;
 import io.github.wimdeblauwe.ttcli.npm.PackageJsonReaderWriter;
 import org.jsoup.nodes.Comment;
 
@@ -15,7 +17,10 @@ import java.util.Objects;
 
 public abstract class AbstractNpmBasedLiveReloadInitStrategy implements LiveReloadInitStrategy {
 
-    protected AbstractNpmBasedLiveReloadInitStrategy() {
+    private final List<WebDependency> webDependencies;
+
+    protected AbstractNpmBasedLiveReloadInitStrategy(List<WebDependency> webDependencies) {
+        this.webDependencies = webDependencies;
     }
 
     @Override
@@ -243,6 +248,12 @@ public abstract class AbstractNpmBasedLiveReloadInitStrategy implements LiveRelo
         });
         mavenPomReaderWriter.addDependency("org.webjars", "webjars-locator", "0.41");
         doAddMavenDependencies(mavenPomReaderWriter);
+        for (WebDependency webDependency : webDependencies) {
+            List<MavenDependency> mavenDependencies = webDependency.getMavenDependencies();
+            for (MavenDependency mavenDependency : mavenDependencies) {
+                mavenPomReaderWriter.addDependency(mavenDependency);
+            }
+        }
 
         mavenPomReaderWriter.write();
     }
@@ -260,8 +271,28 @@ public abstract class AbstractNpmBasedLiveReloadInitStrategy implements LiveRelo
             Files.copy(Objects.requireNonNull(stream, () -> "Could not find " + source),
                        layoutTemplate);
         }
-        insertCssLinksToLayoutTemplate(layoutTemplate, getCssLinksForLayoutTemplate());
-        insertJsLinksToLayoutTemplate(layoutTemplate, getJsLinksForLayoutTemplate());
+
+        StringBuilder cssLinksForLayoutTemplate = new StringBuilder(getCssLinksForLayoutTemplate());
+        for (WebDependency webDependency : webDependencies) {
+            String cssForDependency = webDependency.getCssLinksForLayoutTemplate();
+            if( cssForDependency != null) {
+                cssLinksForLayoutTemplate
+                        .append('\n')
+                        .append(cssForDependency);
+            }
+        }
+        insertCssLinksToLayoutTemplate(layoutTemplate, cssLinksForLayoutTemplate.toString());
+
+        StringBuilder jsLinksForLayoutTemplate = new StringBuilder(getJsLinksForLayoutTemplate());
+        for (WebDependency webDependency : webDependencies) {
+            String jsForDependency = webDependency.getJsLinksForLayoutTemplate();
+            if( jsForDependency != null) {
+                jsLinksForLayoutTemplate
+                        .append('\n')
+                        .append(jsForDependency);
+            }
+        }
+        insertJsLinksToLayoutTemplate(layoutTemplate, jsLinksForLayoutTemplate.toString());
     }
 
     private void insertCssLinksToLayoutTemplate(Path layoutTemplate,

@@ -1,5 +1,6 @@
 package io.github.wimdeblauwe.ttcli;
 
+import io.github.wimdeblauwe.ttcli.maven.MavenDependency;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -66,6 +67,12 @@ public class MavenPomReaderWriter {
     public void updateDependencies(Consumer<Element> dependencies) {
         Element dependenciesEl = getProject().getElementsByTag("dependencies").get(0);
         dependencies.accept(dependenciesEl);
+    }
+
+    public void addDependency(MavenDependency mavenDependency) {
+        addDependency(mavenDependency.groupId(),
+                      mavenDependency.artifactId(),
+                      mavenDependency.version());
     }
 
     public void addDependency(String groupId,

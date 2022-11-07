@@ -38,9 +38,17 @@
     <artifactId>webjars-locator</artifactId>
     <version>0.41</version>
 </dependency><dependency>
-    <groupId>org.webjars</groupId>
-    <artifactId>bootstrap</artifactId>
-    <version>5.2.2</version>
+    <groupId>org.webjars.npm</groupId>
+    <artifactId>alpinejs</artifactId>
+    <version>3.9.1</version>
+</dependency><dependency>
+    <groupId>org.webjars.npm</groupId>
+    <artifactId>htmx.org</artifactId>
+    <version>1.8.0</version>
+</dependency><dependency>
+    <groupId>io.github.wimdeblauwe</groupId>
+    <artifactId>htmx-spring-boot-thymeleaf</artifactId>
+    <version>0.2.0</version>
 </dependency></dependencies>
 
 	<build><resources><resource>

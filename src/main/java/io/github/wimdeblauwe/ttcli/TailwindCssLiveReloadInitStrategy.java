@@ -1,5 +1,7 @@
 package io.github.wimdeblauwe.ttcli;
 
+import io.github.wimdeblauwe.ttcli.deps.WebDependency;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -7,6 +9,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 public class TailwindCssLiveReloadInitStrategy extends AbstractNpmBasedLiveReloadInitStrategy {
+
+    public TailwindCssLiveReloadInitStrategy(List<WebDependency> webDependencies) {
+        super(webDependencies);
+    }
 
     @Override
     protected List<String> npmDependencies() {
