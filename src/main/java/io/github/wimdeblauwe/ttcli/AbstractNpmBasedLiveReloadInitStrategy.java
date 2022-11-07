@@ -1,5 +1,6 @@
 package io.github.wimdeblauwe.ttcli;
 
+import io.github.wimdeblauwe.ttcli.npm.PackageJsonReaderWriter;
 import org.jsoup.nodes.Comment;
 
 import java.io.IOException;
@@ -7,7 +8,10 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Objects;
 
 public abstract class AbstractNpmBasedLiveReloadInitStrategy implements LiveReloadInitStrategy {
 
@@ -65,41 +69,13 @@ public abstract class AbstractNpmBasedLiveReloadInitStrategy implements LiveRelo
 
     private void insertPackageJsonScripts(Path base) throws IOException, InterruptedException {
         System.out.println("\uD83D\uDC77\u200D♂️ Adding npm build scripts");
-        installNpmAddScriptDependency(base);
-
         addBuildScriptsToPackageJson(base);
-
-        uninstallNpmAddScriptDependency(base);
     }
 
-    private void addBuildScriptsToPackageJson(Path base) throws IOException, InterruptedException {
-        for (Map.Entry<String, String> entry : npmScripts().entrySet()) {
-            ProcessBuilder builder = new ProcessBuilder("npx", "npmAddScript", "-k", entry.getKey(), "-v", entry.getValue());
-            builder.directory(base.toFile());
-            Process process = builder.start();
-            int exitValue = process.waitFor();
-            if (exitValue != 0) {
-                throw new RuntimeException("unable to add script entry " + entry + "\n" + new String(process.getErrorStream().readAllBytes()));
-            }
-        }
-    }
-
-    private void installNpmAddScriptDependency(Path base) throws InterruptedException, IOException {
-        ProcessBuilder builder = new ProcessBuilder("npm", "install", "-D", "npm-add-script");
-        builder.directory(base.toFile());
-        int exitValue = builder.start().waitFor();
-        if (exitValue != 0) {
-            throw new RuntimeException("unable to install npm-add-script");
-        }
-    }
-
-    private void uninstallNpmAddScriptDependency(Path base) throws InterruptedException, IOException {
-        ProcessBuilder builder = new ProcessBuilder("npm", "remove", "-D", "npm-add-script");
-        builder.directory(base.toFile());
-        int exitValue = builder.start().waitFor();
-        if (exitValue != 0) {
-            throw new RuntimeException("unable to remove npm-add-script");
-        }
+    private void addBuildScriptsToPackageJson(Path base) throws IOException {
+        PackageJsonReaderWriter packageJsonReaderWriter = PackageJsonReaderWriter.readFrom(base.resolve("package.json"));
+        packageJsonReaderWriter.addScripts(npmScripts());
+        packageJsonReaderWriter.write();
     }
 
     private void copyPostcssConfigJs(Path base) throws IOException {
