@@ -2,9 +2,9 @@ package io.github.wimdeblauwe.ttcli;
 
 import io.github.wimdeblauwe.ttcli.boot.IdAndName;
 import io.github.wimdeblauwe.ttcli.boot.SpringBootInitializrClient;
+import io.github.wimdeblauwe.ttcli.boot.SpringBootProjectCreationParameters;
 import io.github.wimdeblauwe.ttcli.deps.WebDependency;
 import io.github.wimdeblauwe.ttcli.util.FileUtil;
-import io.github.wimdeblauwe.ttcli.util.ZipUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.component.context.ComponentContext;
 import org.springframework.shell.component.flow.ComponentFlow;
@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @ShellComponent
@@ -31,6 +30,8 @@ public class Init {
     private List<WebDependency> webDependencies;
     @Autowired
     private SpringBootInitializrClient initializrClient;
+    @Autowired
+    private InitService initService;
 
     @ShellMethod
     public void init(@ShellOption(defaultValue = ".") String baseDir) throws IOException, InterruptedException {
@@ -59,14 +60,12 @@ public class Init {
         String projectName = context.get("project-name");
         String springBootVersion = context.get("spring-boot-version");
 
-        System.out.println("\uD83C\uDF43 Generating Spring Boot project");
-        byte[] generatedProjectZip = initializrClient.generateProject("maven-project",
-                                                                      springBootVersion,
-                                                                      groupId,
-                                                                      artifactId,
-                                                                      projectName,
-                                                                      Set.of("web", "thymeleaf"));
-        ZipUtil.unzip(generatedProjectZip, basePath);
+        initService.initialize(new InitParameters(basePath,
+                                                  new SpringBootProjectCreationParameters(groupId,
+                                                                                          artifactId,
+                                                                                          projectName,
+                                                                                          springBootVersion)));
+
 
         String cssFrameworkSelection = context.get("css-framework");
         List<String> selectedWebDependencyOptions = context.get("web-dependencies");
