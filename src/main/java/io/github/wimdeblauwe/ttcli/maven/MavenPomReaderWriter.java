@@ -1,6 +1,5 @@
-package io.github.wimdeblauwe.ttcli;
+package io.github.wimdeblauwe.ttcli.maven;
 
-import io.github.wimdeblauwe.ttcli.maven.MavenDependency;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;

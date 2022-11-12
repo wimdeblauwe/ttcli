@@ -1,24 +1,59 @@
-package io.github.wimdeblauwe.ttcli;
+package io.github.wimdeblauwe.ttcli.livereload.npm;
 
-import io.github.wimdeblauwe.ttcli.deps.WebDependency;
+import io.github.wimdeblauwe.ttcli.ProjectInitializationParameters;
+import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceException;
+import io.github.wimdeblauwe.ttcli.npm.NodeService;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-public class TailwindCssLiveReloadInitStrategy extends AbstractNpmBasedLiveReloadInitStrategy {
-
-    public TailwindCssLiveReloadInitStrategy(List<WebDependency> webDependencies) {
-        super(webDependencies);
+@Component
+@Order(2)
+public class NpmBasedWithTailwindCssLiveReloadInitService extends NpmBasedLiveReloadInitService {
+    public NpmBasedWithTailwindCssLiveReloadInitService(NodeService nodeService) {
+        super(nodeService);
     }
 
     @Override
-    protected List<String> npmDependencies() {
-        return List.of("@babel/cli", "autoprefixer", "browser-sync", "cssnano",
-                       "mkdirp", "ncp", "npm-run-all", "onchange", "postcss", "postcss-cli", "recursive-copy-cli", "path-exists-cli",
-                       "tailwindcss");
+    public String getId() {
+        return "npm-based-with-tailwind-css";
+    }
+
+    @Override
+    public String getName() {
+        return "NPM based with Tailwind CSS";
+    }
+
+    @Override
+    public void generate(ProjectInitializationParameters projectInitializationParameters) {
+        try {
+            super.generate(projectInitializationParameters);
+
+            createApplicationCss(projectInitializationParameters.basePath());
+            setupTailwindConfig(projectInitializationParameters.basePath());
+        } catch (IOException e) {
+            throw new LiveReloadInitServiceException(e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new LiveReloadInitServiceException(e);
+        }
+    }
+
+    protected String postcssConfigFilePath() {
+        return "/files/livereload/npm/npm-based-with-tailwind-css/postcss.config.js";
+    }
+
+    @Override
+    protected List<String> npmDevDependencies() {
+        List<String> dependencies = new ArrayList<>(super.npmDevDependencies());
+        dependencies.add("tailwindcss");
+        return dependencies;
     }
 
     @Override
@@ -43,21 +78,7 @@ public class TailwindCssLiveReloadInitStrategy extends AbstractNpmBasedLiveReloa
         return scripts;
     }
 
-    @Override
-    protected String applicationCssContent() {
-        return """
-                @tailwind base;
-                @tailwind components;
-                @tailwind utilities;""";
-    }
-
-    @Override
-    protected String postcssConfigJsSourceFile() {
-        return "/files/tailwindcss/postcss.config.js";
-    }
-
-    @Override
-    protected void postExecuteNpmPart(Path base) throws IOException, InterruptedException {
+    private void setupTailwindConfig(Path base) throws IOException, InterruptedException {
         initializeTailwindConfig(base);
 
         // Point tailwind to Thymeleaf templates
@@ -75,5 +96,18 @@ public class TailwindCssLiveReloadInitStrategy extends AbstractNpmBasedLiveReloa
         if (exitValue != 0) {
             throw new RuntimeException("unable to init tailwind css");
         }
+    }
+
+    private void createApplicationCss(Path base) throws IOException {
+        Path path = base.resolve("src/main/resources/static/css/application.css");
+        Files.createDirectories(path.getParent());
+        Files.writeString(path, applicationCssContent());
+    }
+
+    private String applicationCssContent() {
+        return """
+                @tailwind base;
+                @tailwind components;
+                @tailwind utilities;""";
     }
 }
