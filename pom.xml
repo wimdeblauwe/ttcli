@@ -197,20 +197,18 @@
                                         <overwrite>true</overwrite>
                                         <owner>wimdeblauwe</owner>
                                         <tagName>{{projectVersion}}</tagName>
-                                        <!--
-                                                                                <changelog>
-                                                                                    <formatted>ALWAYS</formatted>
-                                                                                    <format>- {{commitShortHash}} {{commitTitle}}</format>
-                                                                                    <preset>conventional-commits</preset>
-                                                                                    <contributors>
-                                                                                        <format>- {{contributorName}}</format>
-                                                                                    </contributors>
-                                                                                    <hide>
-                                                                                        <categories>merge</categories>
-                                                                                        <contributors>GitHub,dependabot</contributors>
-                                                                                    </hide>
-                                                                                </changelog>
-                                        -->
+                                        <changelog>
+                                            <formatted>ALWAYS</formatted>
+                                            <format>- {{commitShortHash}} {{commitTitle}}</format>
+                                            <preset>conventional-commits</preset>
+                                            <contributors>
+                                                <format>- {{contributorName}}</format>
+                                            </contributors>
+                                            <hide>
+                                                <categories>merge</categories>
+                                                <contributors>GitHub,dependabot</contributors>
+                                            </hide>
+                                        </changelog>
                                     </github>
                                 </release>
                                 <distributions>
