@@ -2,6 +2,7 @@ package io.github.wimdeblauwe.ttcli.boot;
 
 
 import io.github.wimdeblauwe.ttcli.util.ZipUtil;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.support.WebClientAdapter;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Set;
 
+@Disabled // To be run manually
 class SpringBootInitializrClientManualTest {
 
     @Test
