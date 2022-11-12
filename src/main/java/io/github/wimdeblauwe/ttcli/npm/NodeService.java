@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 @Component
@@ -22,11 +23,13 @@ public class NodeService {
     public void createEmptyPackageJson(Path base,
                                        String projectName) throws IOException {
         Path path = base.resolve("package.json");
+        // The name field in package.json can only be lowercase and cannot contain spaces
+        String name = projectName.toLowerCase(Locale.ROOT).replace(' ', '-');
         Files.writeString(path, """
                 {
                   "name": "%s"
                 }
-                """.formatted(projectName));
+                """.formatted(name));
     }
 
     public void installNpmDevDependencies(Path base,
