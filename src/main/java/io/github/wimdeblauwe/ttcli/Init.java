@@ -5,7 +5,6 @@ import io.github.wimdeblauwe.ttcli.deps.WebDependency;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitService;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceFactory;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceParameters;
-import io.github.wimdeblauwe.ttcli.util.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.component.context.ComponentContext;
 import org.springframework.shell.component.flow.ComponentFlow;
@@ -35,11 +34,6 @@ public class Init {
 
     @ShellMethod
     public void init(@ShellOption(defaultValue = ".") String baseDir) throws IOException {
-        Path basePath = Path.of(baseDir);
-        if (!FileUtil.isEmpty(basePath)) {
-            System.out.println("The directory is not empty! Unable to generate project in " + basePath.toAbsolutePath());
-            return;
-        }
 
         ComponentFlow.Builder builder = flowBuilder.clone().reset();
 
@@ -61,6 +55,7 @@ public class Init {
         List<String> selectedWebDependencyOptions = context.get("web-dependencies");
         List<WebDependency> selectedWebDependencies = webDependencies.stream().filter(webDependency -> selectedWebDependencyOptions.contains(webDependency.id())).toList();
 
+        Path basePath = Path.of(baseDir).resolve(artifactId);
         projectInitializationService.initialize(new ProjectInitializationParameters(basePath,
                                                                                     new SpringBootProjectCreationParameters(groupId,
                                                                                                                             artifactId,

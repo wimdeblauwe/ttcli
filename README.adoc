@@ -4,29 +4,33 @@ The goal of this project is to provide a command line tool to helps to setup a S
 
 == Usage
 
-. As a first step, generate a Spring Boot project via https://start.spring.io. Be sure to add at least the Spring MVC and Thymeleaf dependencies.
-. Copy the `ttcli` (macOS/Linux) or `ttcli.exe` (Windows) to the root of your generated project.
-+
-[NOTE]
-====
-You can download the appropriate executable from https://github.com/wimdeblauwe/ttcli/releases
-====
+. Download the release from https://github.com/wimdeblauwe/ttcli/releases
+. Unzip the release
 . Run `./ttcli help` (macOS/Linux) or `ttcli.exe help` (Windows) to see the options of the tool.
 
-=== Initialize live reload
+=== Initialize
 
-Run `ttcli live-reload-init` to have the tool update your Spring Boot project with an NPM based live-reload setup.
+Run `ttcli init` to have the tool update your Spring Boot project with an NPM based live-reload setup.
 
-You can choose between Bootstrap or Tailwind CSS as your CSS framework of choice.
+The tool will ask the following questions:
 
-The tool applies the following changes:
+. GroupId: the Maven `groupId` that should be used for the project.
+. ArtifactId: the Maven `artifactId` that should be used for the project.
+. Name: the project name
+. Live reload setup: Select how you want to have your live reload setup
+. Web dependencies: Select from various CSS and/or JavaScript libraries to be added to your project.
 
+The tool will create a new project in a sub-directory of the current directory with the name of the `artifactId` and apply the following changes:
+
+* Generate a Spring Boot project
 * Add NPM dependencies and NPM scripts needed to have a live reload setup
 * Add an `index.html` and `layout.html` page as a starting point for your Thymeleaf application.
 * Setup Tailwind CSS when selected.
 * Setup Bootstrap when selected.
 * Adds webjars to the Maven dependencies.
 * Adds an `application-local.properties` with Thymeleaf template caching disabled.
+
+NOTE: You can choose a different base directory that the tool should use via `ttcli --baseDir <otherdir>`
 
 == Building
 

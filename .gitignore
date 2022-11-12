@@ -7,7 +7,6 @@ target/
 spring-shell.log
 ttcli.log*
 todo.adoc
-clean-start/
 
 ### STS ###
 .apt_generated
