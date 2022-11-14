@@ -240,6 +240,15 @@
                                                 <platform>osx-x86_64</platform>
                                             </artifact>
                                         </artifacts>
+                                        <brew>
+                                            <active>ALWAYS</active>
+                                            <templateDirectory>etc/jreleaser/distributions/brew</templateDirectory>
+                                            <tap>
+                                                <name>homebrew-ttcli</name>
+                                                <commitMessage>Bump ttcli to {{tagName}}.</commitMessage>
+                                            </tap>
+                                            <formulaName>ttcli</formulaName>
+                                        </brew>
                                     </ttcli>
                                 </distributions>
                             </jreleaser>
