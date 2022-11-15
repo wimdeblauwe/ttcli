@@ -227,12 +227,14 @@
                                                 </path>
                                                 <platform>linux-x86_64</platform>
                                             </artifact>
+<!-- Temp disabled until fix for Windows build is available
                                             <artifact>
                                                 <path>
                                                     {{artifactsDir}}/{{distributionName}}-{{projectVersion}}-windows-x86_64.zip
                                                 </path>
                                                 <platform>windows-x86_64</platform>
                                             </artifact>
+-->
                                             <artifact>
                                                 <path>
                                                     {{artifactsDir}}/{{distributionName}}-{{projectVersion}}-osx-x86_64.zip
