@@ -130,7 +130,7 @@ jobs:
 
       - name: 'Release with JReleaser'
         env:
-          JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          JRELEASER_GITHUB_TOKEN: ${{ secrets.JRELEASER_GITHUB_TOKEN }}
         run: ./mvnw -B -ntp --file pom.xml -Prelease -DartifactsDir=artifacts jreleaser:full-release
 
       - name: 'Set next version'
