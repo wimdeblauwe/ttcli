@@ -244,7 +244,7 @@
                                         </artifacts>
                                         <brew>
                                             <active>ALWAYS</active>
-                                            <templateDirectory>etc/jreleaser/distributions/brew</templateDirectory>
+                                            <templateDirectory>src/main/jreleaser/distributions/brew</templateDirectory>
                                             <tap>
                                                 <name>homebrew-ttcli</name>
                                                 <commitMessage>Bump ttcli to {{tagName}}.</commitMessage>
