@@ -47,7 +47,7 @@ Use GraalVM JDK:
 
 [source]
 ----
-sdk use java 22.3.r19-grl
+sdk use java 22.3.r17-grl
 ----
 
 Run native compilation:
