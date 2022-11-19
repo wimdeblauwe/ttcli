@@ -1,6 +1,8 @@
 package io.github.wimdeblauwe.ttcli;
 
 import io.github.wimdeblauwe.ttcli.boot.SpringBootInitializrService;
+import io.github.wimdeblauwe.ttcli.help.HelpTextInitService;
+import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitService;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceFactory;
 import io.github.wimdeblauwe.ttcli.maven.MavenInitService;
 import io.github.wimdeblauwe.ttcli.thymeleaf.ThymeleafTemplatesInitService;
@@ -17,15 +19,18 @@ public class ProjectInitializationService {
     private final LiveReloadInitServiceFactory liveReloadInitServiceFactory;
     private final ThymeleafTemplatesInitService thymeleafTemplatesInitService;
     private final MavenInitService mavenInitService;
+    private final HelpTextInitService helpTextInitService;
 
     public ProjectInitializationService(SpringBootInitializrService initializrService,
                                         LiveReloadInitServiceFactory liveReloadInitServiceFactory,
                                         ThymeleafTemplatesInitService thymeleafTemplatesInitService,
-                                        MavenInitService mavenInitService) {
+                                        MavenInitService mavenInitService,
+                                        HelpTextInitService helpTextInitService) {
         this.initializrService = initializrService;
         this.liveReloadInitServiceFactory = liveReloadInitServiceFactory;
         this.thymeleafTemplatesInitService = thymeleafTemplatesInitService;
         this.mavenInitService = mavenInitService;
+        this.helpTextInitService = helpTextInitService;
     }
 
     public void initialize(ProjectInitializationParameters parameters) throws IOException {
@@ -41,8 +46,9 @@ public class ProjectInitializationService {
         initializrService.generate(basePath,
                                    parameters.springBootProjectCreationParameters());
 
-        liveReloadInitServiceFactory.getInitService(parameters.liveReloadInitServiceParameters().initServiceId())
-                                    .generate(parameters);
+        LiveReloadInitService liveReloadInitService = liveReloadInitServiceFactory.getInitService(parameters.liveReloadInitServiceParameters().initServiceId());
+        liveReloadInitService.generate(parameters);
+        helpTextInitService.addHelpText(basePath, liveReloadInitService.getHelpText());
 
         mavenInitService.generate(parameters);
         thymeleafTemplatesInitService.generate(parameters);

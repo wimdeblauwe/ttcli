@@ -64,7 +64,9 @@ public class Init {
                                                                                     new LiveReloadInitServiceParameters(context.get("live-reload")),
                                                                                     selectedWebDependencies));
 
-        System.out.println("✅ Done");
+        System.out.println("✅ Done generating project at " + basePath.toAbsolutePath());
+        System.out.println("");
+        System.out.println("See HELP.md in the generated project for additional information.");
     }
 
     private Map<String, String> convertToMap(List<IdAndName> springBootVersions) {

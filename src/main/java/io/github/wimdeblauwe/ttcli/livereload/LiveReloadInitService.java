@@ -7,5 +7,7 @@ public interface LiveReloadInitService {
 
     String getName();
 
+    String getHelpText();
+
     void generate(ProjectInitializationParameters projectInitializationParameters) throws LiveReloadInitServiceException;
 }

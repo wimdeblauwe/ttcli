@@ -39,6 +39,26 @@ public class NpmBasedLiveReloadInitService implements LiveReloadInitService {
     }
 
     @Override
+    public String getHelpText() {
+        return """
+                # Live reload setup
+                                
+                This project uses NPM to have live reloading.
+                                
+                Use the following steps to get it working:
+                                
+                1. Run the Spring Boot application with the `local` profile
+                2. From a terminal, run `npm run build && npm run watch` (You can also run `npm run --silent build && npm run --silent watch` if you want less output in the terminal)
+                3. Your default browser will open at http://localhost:3000
+                                
+                You should now be able to change any HTML or CSS and have the browser reload upon saving the file.
+                                
+                NOTE: If you use a separate authentication server (e.g. social logins, or Keycloak) then after login,
+                you might get redirected to http://localhost:8080 as opposed to http://localhost:3000.
+                Be sure to set the port back to `3000` in your browser to have live reload.""";
+    }
+
+    @Override
     public void generate(ProjectInitializationParameters projectInitializationParameters) throws LiveReloadInitServiceException {
         try {
             InstalledApplicationVersions installedApplicationVersions = nodeService.checkIfNodeAndNpmAreInstalled();
