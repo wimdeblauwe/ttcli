@@ -235,14 +235,12 @@
                                                 </path>
                                                 <platform>linux-x86_64</platform>
                                             </artifact>
-<!-- Temp disabled until fix for Windows build is available
                                             <artifact>
                                                 <path>
                                                     {{artifactsDir}}/{{distributionName}}-{{projectVersion}}-windows-x86_64.zip
                                                 </path>
                                                 <platform>windows-x86_64</platform>
                                             </artifact>
--->
                                             <artifact>
                                                 <path>
                                                     {{artifactsDir}}/{{distributionName}}-{{projectVersion}}-osx-x86_64.zip
@@ -268,53 +266,5 @@
             </build>
         </profile>
 
-        <!-- Temp added for debugging native build on Windows -->
-        <profile>
-            <id>native</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-maven-plugin</artifactId>
-                        <configuration>
-                            <image>
-                                <builder>paketobuildpacks/builder:tiny</builder>
-                                <env>
-                                    <BP_NATIVE_IMAGE>true</BP_NATIVE_IMAGE>
-                                </env>
-                            </image>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>process-aot</id>
-                                <goals>
-                                    <goal>process-aot</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.graalvm.buildtools</groupId>
-                        <artifactId>native-maven-plugin</artifactId>
-                        <configuration>
-                            <classesDirectory>${project.build.outputDirectory}</classesDirectory>
-                            <metadataRepository>
-                                <enabled>true</enabled>
-                            </metadataRepository>
-                            <requiredVersion>22.3</requiredVersion>
-                            <buildArgs>--trace-class-initialization=org.slf4j.LoggerFactory</buildArgs>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>add-reachability-metadata</id>
-                                <goals>
-                                    <goal>add-reachability-metadata</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
     </profiles>
 </project>
