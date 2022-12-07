@@ -25,7 +25,7 @@ public class MavenInitService {
         mavenPomReaderWriter.updateDependencies(dependencies -> {
             dependencies.appendChild(new Comment(" Web dependencies "));
         });
-        mavenPomReaderWriter.addDependency("org.webjars", "webjars-locator", "0.41");
+        mavenPomReaderWriter.addDependency("org.webjars", "webjars-locator", "0.46");
         for (WebDependency webDependency : webDependencies) {
             List<MavenDependency> mavenDependencies = webDependency.getMavenDependencies();
             for (MavenDependency mavenDependency : mavenDependencies) {
