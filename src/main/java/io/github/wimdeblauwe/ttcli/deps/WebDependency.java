@@ -9,7 +9,7 @@ public interface WebDependency {
 
     String displayName();
 
-    List<MavenDependency> getMavenDependencies();
+    List<MavenDependency> getMavenDependencies(String springBootVersion);
 
     String getCssLinksForLayoutTemplate();
 

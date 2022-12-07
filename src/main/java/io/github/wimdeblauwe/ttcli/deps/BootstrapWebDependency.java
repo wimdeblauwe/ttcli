@@ -19,7 +19,7 @@ public class BootstrapWebDependency implements WebDependency {
     }
 
     @Override
-    public List<MavenDependency> getMavenDependencies() {
+    public List<MavenDependency> getMavenDependencies(String springBootVersion) {
         return Collections.singletonList(new MavenDependency("org.webjars", "bootstrap", "5.2.2"));
     }
 

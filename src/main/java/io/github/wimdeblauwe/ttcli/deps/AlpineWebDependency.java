@@ -19,7 +19,7 @@ public class AlpineWebDependency implements WebDependency {
     }
 
     @Override
-    public List<MavenDependency> getMavenDependencies() {
+    public List<MavenDependency> getMavenDependencies(String springBootVersion) {
         return Collections.singletonList(new MavenDependency("org.webjars.npm", "alpinejs", "3.9.1"));
     }
 

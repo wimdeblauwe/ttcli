@@ -13,21 +13,23 @@ public class MavenInitService {
     public void generate(ProjectInitializationParameters parameters) {
         try {
             addMavenDependencies(MavenPomReaderWriter.readFrom(parameters.basePath()),
-                                 parameters.webDependencies());
+                                 parameters.webDependencies(),
+                                 parameters.springBootProjectCreationParameters().springBootVersion());
         } catch (IOException e) {
             throw new MavenInitServiceException(e);
         }
     }
 
     private void addMavenDependencies(MavenPomReaderWriter mavenPomReaderWriter,
-                                      List<WebDependency> webDependencies) throws IOException {
+                                      List<WebDependency> webDependencies,
+                                      String springBootVersion) throws IOException {
         mavenPomReaderWriter.addDependency("nz.net.ultraq.thymeleaf", "thymeleaf-layout-dialect");
         mavenPomReaderWriter.updateDependencies(dependencies -> {
             dependencies.appendChild(new Comment(" Web dependencies "));
         });
         mavenPomReaderWriter.addDependency("org.webjars", "webjars-locator", "0.46");
         for (WebDependency webDependency : webDependencies) {
-            List<MavenDependency> mavenDependencies = webDependency.getMavenDependencies();
+            List<MavenDependency> mavenDependencies = webDependency.getMavenDependencies(springBootVersion);
             for (MavenDependency mavenDependency : mavenDependencies) {
                 mavenPomReaderWriter.addDependency(mavenDependency);
             }
