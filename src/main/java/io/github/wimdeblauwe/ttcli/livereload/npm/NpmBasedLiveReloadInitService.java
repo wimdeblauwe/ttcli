@@ -95,7 +95,7 @@ public class NpmBasedLiveReloadInitService implements LiveReloadInitService {
     protected LinkedHashMap<String, String> npmScripts() {
         LinkedHashMap<String, String> scripts = new LinkedHashMap<>();
         scripts.put("build", "npm-run-all --parallel build:*");
-        scripts.put("build:html", "recursive-copy \"src/main/resources/templates\" target/classes/templates -w -f \"**/*.html\"");
+        scripts.put("build:html", "recursive-copy \"src/main/resources/templates\" target/classes/templates -w");
         scripts.put("build:css", "mkdirp target/classes/static/css && postcss src/main/resources/static/css/*.css -d target/classes/static/css");
         scripts.put("build:js", "path-exists src/main/resources/static/js && (mkdirp target/classes/static/js && babel src/main/resources/static/js/ --out-dir target/classes/static/js/) || echo \"No 'src/main/resources/static/js' directory found.\"");
         scripts.put("build:svg", "path-exists src/main/resources/static/svg && recursive-copy \"src/main/resources/static/svg\" target/classes/static/svg -w -f \"**/*.svg\" || echo \"No 'src/main/resources/static/svg' directory found.\"");
