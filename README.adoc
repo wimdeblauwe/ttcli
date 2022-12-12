@@ -10,7 +10,7 @@ The goal of this project is to provide a command line tool to helps to setup a S
 
 === Initialize
 
-Run `ttcli init` to have the tool update your Spring Boot project with an NPM based live-reload setup.
+Run `ttcli init` to have the tool create a new Spring Boot project with an NPM based live-reload setup.
 
 The tool will ask the following questions:
 
