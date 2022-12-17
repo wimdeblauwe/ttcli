@@ -4,7 +4,7 @@ The goal of this project is to provide a command line tool to helps to setup a S
 
 == Usage
 
-. Download the release from https://github.com/wimdeblauwe/ttcli/releases
+. Download the release from https://github.com/wimdeblauwe/ttcli/releases or install via Homebrew using `brew install wimdeblauwe/homebrew-ttcli/ttcli`
 . Unzip the release
 . Run `./ttcli help` (macOS/Linux) or `ttcli.exe help` (Windows) to see the options of the tool.
 
