@@ -23,7 +23,7 @@ public class HtmxWebDependency implements WebDependency {
         String htmxSpringBootThymeleafVersion = getHtmxSpringBootThymeleafVersion(springBootVersion);
 
         return List.of(
-                new MavenDependency("org.webjars.npm", "htmx.org", "1.8.4"),
+                new MavenDependency("org.webjars.npm", "htmx.org", "1.8.5"),
                 new MavenDependency("io.github.wimdeblauwe", "htmx-spring-boot-thymeleaf", htmxSpringBootThymeleafVersion)
         );
     }
