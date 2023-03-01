@@ -22,7 +22,7 @@
         <xsoup.version>0.3.6</xsoup.version>
 
         <!-- Maven plugins -->
-        <assembly-plugin.version>3.4.2</assembly-plugin.version>
+        <assembly-plugin.version>3.5.0</assembly-plugin.version>
         <os-plugin.version>1.7.1</os-plugin.version>
         <jreleaser-plugin.version>1.5.0</jreleaser-plugin.version>
 
