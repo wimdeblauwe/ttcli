@@ -57,5 +57,7 @@ public class ProjectInitializationService {
 
         mavenInitService.generate(parameters);
         thymeleafTemplatesInitService.generate(parameters);
+
+        liveReloadInitService.runBuild(parameters);
     }
 }

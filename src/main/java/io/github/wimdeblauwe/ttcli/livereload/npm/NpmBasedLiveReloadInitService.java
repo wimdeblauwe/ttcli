@@ -83,6 +83,24 @@ public class NpmBasedLiveReloadInitService implements LiveReloadInitService {
         }
     }
 
+    @Override
+    public void runBuild(ProjectInitializationParameters projectInitializationParameters) throws LiveReloadInitServiceException {
+        ProcessBuilder builder = new ProcessBuilder("npm", "run", "build");
+        builder.directory(projectInitializationParameters.basePath().toFile());
+        int exitValue;
+        try {
+            exitValue = builder.start().waitFor();
+        } catch (IOException e) {
+            throw new LiveReloadInitServiceException(e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new LiveReloadInitServiceException(e);
+        }
+        if (exitValue != 0) {
+            throw new RuntimeException("unable to init tailwind css");
+        }
+    }
+
     protected String postcssConfigFilePath() {
         return "/files/livereload/npm/npm-based/postcss.config.js";
     }

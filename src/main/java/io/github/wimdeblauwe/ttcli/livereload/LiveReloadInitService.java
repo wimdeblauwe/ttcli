@@ -10,4 +10,6 @@ public interface LiveReloadInitService {
     String getHelpText();
 
     void generate(ProjectInitializationParameters projectInitializationParameters) throws LiveReloadInitServiceException;
+
+    void runBuild(ProjectInitializationParameters projectInitializationParameters) throws LiveReloadInitServiceException;
 }
