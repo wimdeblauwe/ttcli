@@ -2,6 +2,7 @@ package io.github.wimdeblauwe.ttcli;
 
 import io.github.wimdeblauwe.ttcli.boot.SpringBootInitializrService;
 import io.github.wimdeblauwe.ttcli.help.HelpTextInitService;
+import io.github.wimdeblauwe.ttcli.java.JavaCodeInitService;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitService;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceFactory;
 import io.github.wimdeblauwe.ttcli.maven.MavenInitService;
@@ -16,17 +17,20 @@ import java.nio.file.Path;
 @Component
 public class ProjectInitializationService {
     private final SpringBootInitializrService initializrService;
+    private final JavaCodeInitService javaCodeInitService;
     private final LiveReloadInitServiceFactory liveReloadInitServiceFactory;
     private final ThymeleafTemplatesInitService thymeleafTemplatesInitService;
     private final MavenInitService mavenInitService;
     private final HelpTextInitService helpTextInitService;
 
     public ProjectInitializationService(SpringBootInitializrService initializrService,
+                                        JavaCodeInitService javaCodeInitService,
                                         LiveReloadInitServiceFactory liveReloadInitServiceFactory,
                                         ThymeleafTemplatesInitService thymeleafTemplatesInitService,
                                         MavenInitService mavenInitService,
                                         HelpTextInitService helpTextInitService) {
         this.initializrService = initializrService;
+        this.javaCodeInitService = javaCodeInitService;
         this.liveReloadInitServiceFactory = liveReloadInitServiceFactory;
         this.thymeleafTemplatesInitService = thymeleafTemplatesInitService;
         this.mavenInitService = mavenInitService;
@@ -45,6 +49,7 @@ public class ProjectInitializationService {
 
         initializrService.generate(basePath,
                                    parameters.springBootProjectCreationParameters());
+        javaCodeInitService.generate(parameters);
 
         LiveReloadInitService liveReloadInitService = liveReloadInitServiceFactory.getInitService(parameters.liveReloadInitServiceParameters().initServiceId());
         liveReloadInitService.generate(parameters);
