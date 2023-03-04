@@ -227,7 +227,7 @@
                                 </release>
                                 <distributions>
                                     <ttcli>
-                                        <type>NATIVE_IMAGE</type>
+                                        <type>BINARY</type>
                                         <artifacts>
                                             <artifact>
                                                 <path>
