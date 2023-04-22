@@ -40,8 +40,7 @@ public class ProjectInitializationService {
     public void initialize(ProjectInitializationParameters parameters) throws IOException {
         Path basePath = parameters.basePath();
         if (!FileUtil.isEmpty(basePath)) {
-            System.out.println("The directory is not empty! Unable to generate project in " + basePath.toAbsolutePath());
-            return;
+            throw new ProjectInitializationServiceException("The directory is not empty! Unable to generate project in " + basePath.toAbsolutePath());
         }
         if (!Files.exists(basePath)) {
             Files.createDirectories(basePath);

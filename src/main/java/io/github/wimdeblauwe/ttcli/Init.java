@@ -56,17 +56,21 @@ public class Init {
         List<WebDependency> selectedWebDependencies = webDependencies.stream().filter(webDependency -> selectedWebDependencyOptions.contains(webDependency.id())).toList();
 
         Path basePath = Path.of(baseDir).resolve(artifactId);
-        projectInitializationService.initialize(new ProjectInitializationParameters(basePath,
-                                                                                    new SpringBootProjectCreationParameters(groupId,
-                                                                                                                            artifactId,
-                                                                                                                            projectName,
-                                                                                                                            springBootVersion),
-                                                                                    new LiveReloadInitServiceParameters(context.get("live-reload")),
-                                                                                    selectedWebDependencies));
+        try {
+            projectInitializationService.initialize(new ProjectInitializationParameters(basePath,
+                                                                                        new SpringBootProjectCreationParameters(groupId,
+                                                                                                                                artifactId,
+                                                                                                                                projectName,
+                                                                                                                                springBootVersion),
+                                                                                        new LiveReloadInitServiceParameters(context.get("live-reload")),
+                                                                                        selectedWebDependencies));
 
-        System.out.println("✅ Done generating project at " + basePath.toAbsolutePath());
-        System.out.println("");
-        System.out.println("See HELP.md in the generated project for additional information.");
+            System.out.println("✅ Done generating project at " + basePath.toAbsolutePath());
+            System.out.println();
+            System.out.println("See HELP.md in the generated project for additional information.");
+        } catch (IOException | ProjectInitializationServiceException e) {
+            System.err.println("❌ Error during project generation: " + e.getMessage());
+        }
     }
 
     private Map<String, String> convertToMap(List<IdAndName> springBootVersions) {
