@@ -101,6 +101,14 @@ jobs:
             target/distributions/*.zip
             target/distributions/*.tar.gz
 
+      - name: 'Upload jar build artifact'
+        uses: actions/upload-artifact@v3
+        if: matrix.os == 'ubuntu-latest'
+        with:
+          name: artifacts
+          path: |
+            target/*.jar
+
   # Collect all executables and release
   release:
     needs: [ precheck, build ]
