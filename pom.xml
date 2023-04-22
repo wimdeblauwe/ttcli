@@ -253,7 +253,7 @@
                                         <type>SINGLE_JAR</type>
                                         <artifacts>
                                             <artifact>
-                                                <path>target/ttcli-{{projectVersion}}.jar</path>
+                                                <path>${project.build.directory}/ttcli-{{projectVersion}}.jar</path>
                                             </artifact>
                                         </artifacts>
                                     </ttcli-single-jar>
