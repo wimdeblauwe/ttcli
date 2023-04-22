@@ -193,15 +193,6 @@
                         <groupId>org.jreleaser</groupId>
                         <artifactId>jreleaser-maven-plugin</artifactId>
                         <version>${jreleaser-plugin.version}</version>
-                        <!--
-                                                <dependencies>
-                                                    <dependency>
-                                                        <groupId>commons-io</groupId>
-                                                        <artifactId>commons-io</artifactId>
-                                                        <version>2.11.0</version>
-                                                    </dependency>
-                                                </dependencies>
-                        -->
                         <configuration>
                             <jreleaser>
                                 <release>
@@ -258,6 +249,14 @@
                                             <formulaName>ttcli</formulaName>
                                         </brew>
                                     </ttcli>
+                                    <ttcli-single-jar>
+                                        <type>SINGLE_JAR</type>
+                                        <artifacts>
+                                            <artifact>
+                                                <path>target/ttcli-{{projectVersion}}.jar</path>
+                                            </artifact>
+                                        </artifacts>
+                                    </ttcli-single-jar>
                                 </distributions>
                             </jreleaser>
                         </configuration>
