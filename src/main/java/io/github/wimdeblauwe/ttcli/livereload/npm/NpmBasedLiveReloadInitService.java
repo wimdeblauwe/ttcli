@@ -74,6 +74,7 @@ public class NpmBasedLiveReloadInitService implements LiveReloadInitService {
             MavenPomReaderWriter mavenPomReaderWriter = MavenPomReaderWriter.readFrom(basePath);
             updateMavenPom(mavenPomReaderWriter, installedApplicationVersions);
             updateSpringApplicationProperties(basePath);
+            updateGitIgnore(basePath);
 
         } catch (IOException e) {
             throw new LiveReloadInitServiceException(e);
@@ -244,6 +245,22 @@ public class NpmBasedLiveReloadInitService implements LiveReloadInitService {
             Files.writeString(propertiesFile, s, StandardOpenOption.CREATE);
         } else {
             Files.writeString(propertiesFile, s, StandardOpenOption.APPEND);
+        }
+    }
+
+    private void updateGitIgnore(Path base) throws IOException {
+        Path path = base.resolve(".gitignore");
+        Files.createDirectories(path.getParent());
+        String s = """
+                
+                # Excludes for npm
+                node_modules
+                node
+                """;
+        if (!Files.exists(path)) {
+            Files.writeString(path, s, StandardOpenOption.CREATE);
+        } else {
+            Files.writeString(path, s, StandardOpenOption.APPEND);
         }
     }
 
