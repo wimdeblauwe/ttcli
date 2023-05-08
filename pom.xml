@@ -233,6 +233,14 @@
                                             </tap>
                                             <formulaName>ttcli</formulaName>
                                         </brew>
+                                        <chocolatey>
+                                            <active>ALWAYS</active>
+                                            <remoteBuild>true</remoteBuild>
+                                            <title>ttcli</title>
+                                            <bucket>
+                                                <active>RELEASE</active>
+                                            </bucket>
+                                        </chocolatey>
                                     </ttcli>
                                     <ttcli-single-jar>
                                         <type>SINGLE_JAR</type>
