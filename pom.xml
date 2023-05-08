@@ -234,6 +234,14 @@
                                             <formulaName>ttcli</formulaName>
                                         </brew>
                                     </ttcli>
+                                    <ttcli-single-jar>
+                                        <type>SINGLE_JAR</type>
+                                        <artifacts>
+                                            <artifact>
+                                                <path>{{artifactsDir}}/ttcli-{{projectVersion}}.jar</path>
+                                            </artifact>
+                                        </artifacts>
+                                    </ttcli-single-jar>
                                 </distributions>
                             </jreleaser>
                         </configuration>
