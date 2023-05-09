@@ -142,6 +142,16 @@ jobs:
           JRELEASER_CHOCOLATEY_API_KEY: ${{ secrets.CHOCOLATEY_API_KEY }}
         run: ./mvnw -B -ntp --file pom.xml -Prelease -DartifactsDir=artifacts jreleaser:full-release
 
+      - name: Capture JReleaser output
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: jreleaser-release-output
+          retention-days: 7
+          path: |
+            target/jreleaser/trace.log
+            target/jreleaser/output.properties
+
       - name: 'Set next version'
         run: |
           ./mvnw -B -ntp versions:set versions:commit -DnewVersion=${{ needs.precheck.outputs.NEXT_VERSION }}
