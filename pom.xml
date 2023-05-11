@@ -180,6 +180,23 @@
                         <version>${jreleaser-plugin.version}</version>
                         <configuration>
                             <jreleaser>
+                                <project>
+                                    <links>
+                                        <bugTracker>https://github.com/wimdeblauwe/ttcli/issues</bugTracker>
+                                        <homepage>https://github.com/wimdeblauwe/ttcli</homepage>
+                                        <documentation>https://github.com/wimdeblauwe/ttcli</documentation>
+                                        <vcsBrowser>https://github.com/wimdeblauwe/ttcli</vcsBrowser>
+                                    </links>
+                                    <authors>
+                                        <author>Wim Deblauwe</author>
+                                    </authors>
+                                    <stereotype>CLI</stereotype>
+                                    <tags>
+                                        <tag>cli</tag>
+                                        <tag>spring</tag>
+                                        <tag>thymeleaf</tag>
+                                    </tags>
+                                </project>
                                 <release>
                                     <github>
                                         <tagName>{{projectVersion}}</tagName>
