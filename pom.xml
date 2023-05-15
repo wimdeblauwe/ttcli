@@ -16,7 +16,7 @@
     <inceptionYear>2022</inceptionYear>
     <properties>
         <java.version>17</java.version>
-        <spring-shell.version>3.0.2</spring-shell.version>
+        <spring-shell.version>3.0.3</spring-shell.version>
         <xmlprojector.version>1.4.23</xmlprojector.version>
         <jsoup.version>1.16.1</jsoup.version>
         <xsoup.version>0.3.6</xsoup.version>
