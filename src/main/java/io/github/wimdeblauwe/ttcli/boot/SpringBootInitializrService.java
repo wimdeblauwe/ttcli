@@ -1,5 +1,6 @@
 package io.github.wimdeblauwe.ttcli.boot;
 
+import io.github.wimdeblauwe.ttcli.util.InetUtil;
 import io.github.wimdeblauwe.ttcli.util.ZipUtil;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +19,9 @@ public class SpringBootInitializrService {
     public void generate(Path basePath,
                          SpringBootProjectCreationParameters parameters) throws IOException {
         System.out.println("\uD83C\uDF43 Generating Spring Boot project");
+
+        InetUtil.checkIfInternetAccessIsAvailable("start.spring.io");
+
         byte[] generatedProjectZip = initializrClient.generateProject("maven-project",
                                                                       parameters.springBootVersion(),
                                                                       parameters.groupId(),

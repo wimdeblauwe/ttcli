@@ -5,6 +5,7 @@ import io.github.wimdeblauwe.ttcli.deps.WebDependency;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitService;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceFactory;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceParameters;
+import io.github.wimdeblauwe.ttcli.util.InetUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.component.context.ComponentContext;
 import org.springframework.shell.component.flow.ComponentFlow;
@@ -35,28 +36,29 @@ public class Init {
     @ShellMethod
     public void init(@ShellOption(defaultValue = ".") String baseDir) throws IOException {
 
-        ComponentFlow.Builder builder = flowBuilder.clone().reset();
-
-        addGroupIdInput(builder);
-        addArtifactIdInput(builder);
-        addProjectNameInput(builder);
-        addSpringBootVersionInput(builder);
-        addLiveReloadInput(builder);
-        addWebDependenciesInput(builder);
-
-        ComponentFlow flow = builder.build();
-        ComponentFlow.ComponentFlowResult flowResult = flow.run();
-
-        ComponentContext<?> context = flowResult.getContext();
-        String groupId = context.get("group-id");
-        String artifactId = context.get("artifact-id");
-        String projectName = context.get("project-name");
-        String springBootVersion = context.get("spring-boot-version");
-        List<String> selectedWebDependencyOptions = context.get("web-dependencies");
-        List<WebDependency> selectedWebDependencies = webDependencies.stream().filter(webDependency -> selectedWebDependencyOptions.contains(webDependency.id())).toList();
-
-        Path basePath = Path.of(baseDir).resolve(artifactId);
         try {
+            ComponentFlow.Builder builder = flowBuilder.clone().reset();
+
+            addGroupIdInput(builder);
+            addArtifactIdInput(builder);
+            addProjectNameInput(builder);
+            addSpringBootVersionInput(builder);
+            addLiveReloadInput(builder);
+            addWebDependenciesInput(builder);
+
+            ComponentFlow flow = builder.build();
+            ComponentFlow.ComponentFlowResult flowResult = flow.run();
+
+            ComponentContext<?> context = flowResult.getContext();
+            String groupId = context.get("group-id");
+            String artifactId = context.get("artifact-id");
+            String projectName = context.get("project-name");
+            String springBootVersion = context.get("spring-boot-version");
+            List<String> selectedWebDependencyOptions = context.get("web-dependencies");
+            List<WebDependency> selectedWebDependencies = webDependencies.stream().filter(webDependency -> selectedWebDependencyOptions.contains(webDependency.id())).toList();
+
+            Path basePath = Path.of(baseDir).resolve(artifactId);
+
             projectInitializationService.initialize(new ProjectInitializationParameters(basePath,
                                                                                         new SpringBootProjectCreationParameters(groupId,
                                                                                                                                 artifactId,
@@ -105,17 +107,22 @@ public class Init {
     }
 
     private void addSpringBootVersionInput(ComponentFlow.Builder builder) {
-        InitializrMetadata metadata = initializrClient.getMetadata();
-        BootVersion bootVersion = metadata.getBootVersion();
-        List<IdAndName> springBootVersions = bootVersion.getValues();
+        try {
+            InetUtil.checkIfInternetAccessIsAvailable("start.spring.io");
+            InitializrMetadata metadata = initializrClient.getMetadata();
+            BootVersion bootVersion = metadata.getBootVersion();
+            List<IdAndName> springBootVersions = bootVersion.getValues();
 
-        Map<String, String> selectItems = convertToMap(springBootVersions);
-        String defaultName = bootVersion.getDefaultName();
-        builder.withSingleItemSelector("spring-boot-version")
-               .name("Select Spring Boot version")
-               .selectItems(selectItems)
-               .defaultSelect(defaultName)
-               .and();
+            Map<String, String> selectItems = convertToMap(springBootVersions);
+            String defaultName = bootVersion.getDefaultName();
+            builder.withSingleItemSelector("spring-boot-version")
+                   .name("Select Spring Boot version")
+                   .selectItems(selectItems)
+                   .defaultSelect(defaultName)
+                   .and();
+        } catch (IllegalStateException e) {
+            throw new ProjectInitializationServiceException(e.getMessage());
+        }
     }
 
     private void addLiveReloadInput(ComponentFlow.Builder builder) {
