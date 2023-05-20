@@ -1,5 +1,6 @@
 package io.github.wimdeblauwe.ttcli.npm;
 
+import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceException;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -60,16 +61,20 @@ public class NodeService {
     }
 
 
-    private String checkIfApplicationIsInstalled(String application) throws IOException, InterruptedException {
-        ProcessBuilder builder = new ProcessBuilder(application, "-v");
-        Process process = builder.start();
-        int exitValue = process.waitFor();
-        String version = new String(process.getInputStream().readAllBytes()).trim();
-        if (exitValue != 0) {
-            throw new IllegalArgumentException(application + " is not installed");
-        }
+    private String checkIfApplicationIsInstalled(String application) throws InterruptedException {
+        try {
+            ProcessBuilder builder = new ProcessBuilder(application, "-v");
+            Process process = builder.start();
+            int exitValue = process.waitFor();
+            String version = new String(process.getInputStream().readAllBytes()).trim();
+            if (exitValue != 0) {
+                throw new IllegalArgumentException(application + " is not installed");
+            }
 
-        return version;
+            return version;
+        } catch (IOException e) {
+            throw new LiveReloadInitServiceException(String.format("Seems the application '%s' is not installed, which is a prerequisite for the ttcli tool.", application));
+        }
     }
 
 }
