@@ -6,6 +6,7 @@ import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceException;
 import io.github.wimdeblauwe.ttcli.maven.MavenPomReaderWriter;
 import io.github.wimdeblauwe.ttcli.npm.InstalledApplicationVersions;
 import io.github.wimdeblauwe.ttcli.npm.NodeService;
+import io.github.wimdeblauwe.ttcli.util.ProcessBuilderFactory;
 import org.jsoup.nodes.Comment;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -86,7 +87,7 @@ public class NpmBasedLiveReloadInitService implements LiveReloadInitService {
 
     @Override
     public void runBuild(ProjectInitializationParameters projectInitializationParameters) throws LiveReloadInitServiceException {
-        ProcessBuilder builder = new ProcessBuilder("npm", "run", "build");
+        ProcessBuilder builder = ProcessBuilderFactory.create(List.of("npm", "run", "build"));
         builder.directory(projectInitializationParameters.basePath().toFile());
         int exitValue;
         try {

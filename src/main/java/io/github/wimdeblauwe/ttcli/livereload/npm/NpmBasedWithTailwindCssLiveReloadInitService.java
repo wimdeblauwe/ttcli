@@ -3,6 +3,7 @@ package io.github.wimdeblauwe.ttcli.livereload.npm;
 import io.github.wimdeblauwe.ttcli.ProjectInitializationParameters;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceException;
 import io.github.wimdeblauwe.ttcli.npm.NodeService;
+import io.github.wimdeblauwe.ttcli.util.ProcessBuilderFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -110,7 +111,7 @@ public class NpmBasedWithTailwindCssLiveReloadInitService extends NpmBasedLiveRe
     }
 
     private static void initializeTailwindConfig(Path base) throws InterruptedException, IOException {
-        ProcessBuilder builder = new ProcessBuilder("npx", "tailwindcss", "init");
+        ProcessBuilder builder = ProcessBuilderFactory.create(List.of("npx", "tailwindcss", "init"));
         builder.directory(base.toFile());
         int exitValue = builder.start().waitFor();
         if (exitValue != 0) {
