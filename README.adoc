@@ -4,9 +4,14 @@ The goal of this project is to provide a command line tool to helps to setup a S
 
 == Usage
 
-. Download the release from https://github.com/wimdeblauwe/ttcli/releases or install via Homebrew using `brew install wimdeblauwe/homebrew-ttcli/ttcli`
+. Download the release from https://github.com/wimdeblauwe/ttcli/releases
 . Unzip the release
 . Run `./ttcli help` (macOS/Linux) or `ttcli.exe help` (Windows) to see the options of the tool.
+
+The application is also available via the following package managers:
+
+* https://brew.sh/[Homebrew] (Linux/macOS): `brew install wimdeblauwe/homebrew-ttcli/ttcli`
+* https://chocolatey.org/[Chocolatey] (Windows): `choco install ttcli`
 
 === Initialize
 
