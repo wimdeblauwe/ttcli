@@ -24,7 +24,7 @@
         <!-- Maven plugins -->
         <assembly-plugin.version>3.5.0</assembly-plugin.version>
         <os-plugin.version>1.7.1</os-plugin.version>
-        <jreleaser-plugin.version>1.5.1</jreleaser-plugin.version>
+        <jreleaser-plugin.version>1.7.0</jreleaser-plugin.version>
 
         <!-- -->
         <executable-suffix/>
