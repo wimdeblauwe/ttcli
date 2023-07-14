@@ -7,6 +7,7 @@ target/
 spring-shell.log
 ttcli.log*
 todo.adoc
+demo
 
 ### STS ###
 .apt_generated

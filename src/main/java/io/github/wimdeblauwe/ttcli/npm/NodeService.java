@@ -18,8 +18,12 @@ public class NodeService {
         String nodeVersion = checkIfApplicationIsInstalled("node");
         String npmVersion = checkIfApplicationIsInstalled("npm");
         System.out.println("\uD83D\uDEE0️  Using node " + nodeVersion + " with npm " + npmVersion);
-        return new InstalledApplicationVersions(nodeVersion,
-                                                npmVersion);
+        InstalledApplicationVersions versions = new InstalledApplicationVersions(nodeVersion,
+                                                                                 npmVersion);
+        if (versions.nodeVersionBelowCurrentLtsVersion()) {
+            throw new LiveReloadInitServiceException("Your node version is below the recommended version. Please upgrade to the latest LTS version.");
+        }
+        return versions;
     }
 
     public void createEmptyPackageJson(Path base,
