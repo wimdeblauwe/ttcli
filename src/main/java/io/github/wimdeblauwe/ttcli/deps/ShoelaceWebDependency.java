@@ -23,7 +23,7 @@ public class ShoelaceWebDependency implements WebDependency {
 
     @Override
     public List<MavenDependency> getMavenDependencies(String springBootVersion) {
-        return Collections.singletonList(new MavenDependency("org.webjars.npm", "shoelace-style__shoelace", "2.2.0"));
+        return Collections.singletonList(new MavenDependency("org.webjars.npm", "shoelace-style__shoelace", "2.5.1"));
     }
 
     @Override
@@ -35,6 +35,6 @@ public class ShoelaceWebDependency implements WebDependency {
     @Override
     public String getJsLinksForLayoutTemplate() {
         return """
-                <script type="module" th:src="@{/webjars/shoelace-style__shoelace/dist/shoelace.js}"></script>""";
+                <script type="module" th:src="@{/webjars/shoelace-style__shoelace/cdn/shoelace-autoloader.js}"></script>""";
     }
 }
