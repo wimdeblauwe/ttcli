@@ -6,6 +6,7 @@ import io.github.wimdeblauwe.ttcli.java.JavaCodeInitService;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitService;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceFactory;
 import io.github.wimdeblauwe.ttcli.maven.MavenInitService;
+import io.github.wimdeblauwe.ttcli.tailwind.TailwindDependencyInitService;
 import io.github.wimdeblauwe.ttcli.thymeleaf.ThymeleafTemplatesInitService;
 import io.github.wimdeblauwe.ttcli.util.FileUtil;
 import org.springframework.stereotype.Component;
@@ -21,6 +22,7 @@ public class ProjectInitializationService {
     private final LiveReloadInitServiceFactory liveReloadInitServiceFactory;
     private final ThymeleafTemplatesInitService thymeleafTemplatesInitService;
     private final MavenInitService mavenInitService;
+    private final TailwindDependencyInitService tailwindDependencyInitService;
     private final HelpTextInitService helpTextInitService;
 
     public ProjectInitializationService(SpringBootInitializrService initializrService,
@@ -28,12 +30,14 @@ public class ProjectInitializationService {
                                         LiveReloadInitServiceFactory liveReloadInitServiceFactory,
                                         ThymeleafTemplatesInitService thymeleafTemplatesInitService,
                                         MavenInitService mavenInitService,
+                                        TailwindDependencyInitService tailwindDependencyInitService,
                                         HelpTextInitService helpTextInitService) {
         this.initializrService = initializrService;
         this.javaCodeInitService = javaCodeInitService;
         this.liveReloadInitServiceFactory = liveReloadInitServiceFactory;
         this.thymeleafTemplatesInitService = thymeleafTemplatesInitService;
         this.mavenInitService = mavenInitService;
+        this.tailwindDependencyInitService = tailwindDependencyInitService;
         this.helpTextInitService = helpTextInitService;
     }
 
@@ -55,6 +59,7 @@ public class ProjectInitializationService {
         helpTextInitService.addHelpText(basePath, liveReloadInitService.getHelpText());
 
         mavenInitService.generate(parameters);
+        tailwindDependencyInitService.generate(parameters);
         thymeleafTemplatesInitService.generate(parameters);
 
         liveReloadInitService.runBuild(parameters);

@@ -1,6 +1,7 @@
 package io.github.wimdeblauwe.ttcli;
 
 import io.github.wimdeblauwe.ttcli.boot.*;
+import io.github.wimdeblauwe.ttcli.tailwind.TailwindDependency;
 import io.github.wimdeblauwe.ttcli.deps.WebDependency;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitService;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceFactory;
@@ -26,6 +27,8 @@ public class Init {
     private ComponentFlow.Builder flowBuilder;
     @Autowired
     private List<WebDependency> webDependencies;
+    @Autowired
+    private List<TailwindDependency> tailwindDependencies;
     @Autowired
     private SpringBootInitializrClient initializrClient;
     @Autowired
@@ -54,6 +57,9 @@ public class Init {
             String artifactId = context.get("artifact-id");
             String projectName = context.get("project-name");
             String springBootVersion = context.get("spring-boot-version");
+
+            List<TailwindDependency> selectedTailwindDependencies = allowTailwindDependenciesSelection(context.get("live-reload"));
+
             List<String> selectedWebDependencyOptions = context.get("web-dependencies");
             List<WebDependency> selectedWebDependencies = webDependencies.stream().filter(webDependency -> selectedWebDependencyOptions.contains(webDependency.id())).toList();
 
@@ -65,7 +71,8 @@ public class Init {
                                                                                                                                 projectName,
                                                                                                                                 springBootVersion),
                                                                                         new LiveReloadInitServiceParameters(context.get("live-reload")),
-                                                                                        selectedWebDependencies));
+                                                                                        selectedWebDependencies,
+                                                                                        selectedTailwindDependencies));
 
             System.out.println("✅ Done generating project at " + basePath.toAbsolutePath());
             System.out.println();
@@ -75,14 +82,25 @@ public class Init {
         }
     }
 
-    private Map<String, String> convertToMap(List<IdAndName> springBootVersions) {
-        return springBootVersions.stream().collect(Collectors.toMap(IdAndName::name, IdAndName::id));
+    private List<TailwindDependency> allowTailwindDependenciesSelection(String liveReloadSelection) {
+        boolean tailwindAvailable = "npm-based-with-tailwind-css".equals(liveReloadSelection);
+        if (tailwindAvailable) {
+            ComponentFlow.Builder builder = flowBuilder.clone().reset();
+            addTailwindDependenciesInput(builder);
+            ComponentFlow build = builder.build();
+            ComponentFlow.ComponentFlowResult flowResult = build.run();
+            ComponentContext<?> context = flowResult.getContext();
+            List<String> selectedTailwindDependencyOptions = context.get("tailwind-dependencies");
+            return tailwindDependencies.stream()
+                                       .filter(webDependency -> selectedTailwindDependencyOptions.contains(webDependency.id()))
+                                       .toList();
+        } else {
+            return Collections.emptyList();
+        }
     }
 
-    private List<SelectItem> buildWebDependencyOptions() {
-        return webDependencies.stream()
-                              .map(webDependency -> new DefaultSelectItem(webDependency.displayName(), webDependency.id(), true, false))
-                              .collect(Collectors.toList());
+    private Map<String, String> convertToMap(List<IdAndName> springBootVersions) {
+        return springBootVersions.stream().collect(Collectors.toMap(IdAndName::name, IdAndName::id));
     }
 
     private void addGroupIdInput(ComponentFlow.Builder builder) {
@@ -144,5 +162,24 @@ public class Init {
                .name("Web dependencies")
                .selectItems(buildWebDependencyOptions())
                .and();
+    }
+
+    private List<SelectItem> buildWebDependencyOptions() {
+        return webDependencies.stream()
+                              .map(webDependency -> new DefaultSelectItem(webDependency.displayName(), webDependency.id(), true, false))
+                              .collect(Collectors.toList());
+    }
+
+    private void addTailwindDependenciesInput(ComponentFlow.Builder builder) {
+        builder.withMultiItemSelector("tailwind-dependencies")
+               .name("Tailwind dependencies")
+               .selectItems(buildTailwindDependencyOptions())
+               .and();
+    }
+
+    private List<SelectItem> buildTailwindDependencyOptions() {
+        return tailwindDependencies.stream()
+                                   .map(tailwindDependency -> new DefaultSelectItem(tailwindDependency.displayName(), tailwindDependency.id(), true, false))
+                                   .collect(Collectors.toList());
     }
 }
