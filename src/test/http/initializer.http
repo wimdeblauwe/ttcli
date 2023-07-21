@@ -1,0 +1,3 @@
+### Get metadata
+GET https://start.spring.io/metadata/client
+Accept: application/vnd.initializr.v2.2+json

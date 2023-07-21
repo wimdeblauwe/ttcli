@@ -52,6 +52,7 @@ public class TamingThymeleafCliApplicationConfiguration {
     @Bean
     public SpringBootInitializrClient springBootInitializrClient() {
         WebClient webClient = WebClient.builder()
+                                       .defaultHeader("Accept", "application/vnd.initializr.v2.2+json")
                                        .baseUrl("https://start.spring.io/")
                                        .build();
         HttpServiceProxyFactory factory = HttpServiceProxyFactory.builder()
