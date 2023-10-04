@@ -11,9 +11,8 @@ on:
         required: false
 
 env:
-  GRAAL_VERSION: '22.3.3'
   JAVA_VERSION: '17'
-  JAVA_DISTRO: 'temurin'
+  JAVA_DISTRO: 'graalvm'
 
 jobs:
   precheck:
@@ -75,9 +74,8 @@ jobs:
       - name: 'Set up Graal'
         uses: graalvm/setup-graalvm@v1
         with:
-          version: ${{ env.GRAAL_VERSION }}
           java-version: ${{ env.JAVA_VERSION }}
-          components: 'native-image'
+          distribution: ${{ env.JAVA_DISTRO }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 'Cache Maven packages'
