@@ -52,7 +52,7 @@
         <dependency>
             <groupId>org.jline</groupId>
             <artifactId>jline-terminal-jna</artifactId>
-            <version>3.23.0</version>
+            <version>3.24.1</version>
         </dependency>
         <dependency>
             <groupId>org.jsoup</groupId>
