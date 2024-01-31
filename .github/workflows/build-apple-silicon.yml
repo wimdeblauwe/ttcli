@@ -1,0 +1,45 @@
+name: Build Apple Silicon
+
+
+env:
+  JAVA_VERSION: '21'
+  JAVA_DISTRO: 'temurin'
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+
+    steps:
+      - name: 'Check out repository'
+        uses: actions/checkout@v4
+
+      - name: 'Set up Graal'
+        uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'graalvm'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 'Cache Maven packages'
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
+
+      - name: 'Build Native Image'
+        run: ./mvnw -B -ntp --file pom.xml -Pnative native:compile
+
+      - name: 'Create distribution'
+        run: ./mvnw -B -ntp --file pom.xml -Pdist package -DskipTests
+
+      - name: 'Upload build artifact'
+        uses: actions/upload-artifact@v3
+        with:
+          name: artifacts
+          path: |
+            target/distributions/*.zip
+            target/distributions/*.tar.gz
