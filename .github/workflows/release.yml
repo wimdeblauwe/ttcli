@@ -123,6 +123,7 @@ jobs:
         with:
           pattern: artifacts-*
           merge-multiple: true
+          path: artifacts
 
       - name: 'Set up Java'
         uses: actions/setup-java@v4
