@@ -94,7 +94,7 @@ jobs:
       - name: 'Upload build artifact'
         uses: actions/upload-artifact@v4
         with:
-          name: artifacts
+          name: artifacts-${{ matrix.os }}
           path: |
             target/distributions/*.zip
             target/distributions/*.tar.gz
@@ -103,7 +103,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: matrix.os == 'ubuntu-latest'
         with:
-          name: artifacts
+          name: artifacts-jar
           path: |
             target/*.jar
 
@@ -120,6 +120,9 @@ jobs:
 
       - name: 'Download all build artifacts'
         uses: actions/download-artifact@v4
+        with:
+          pattern: artifacts-*
+          merge-multiple: true
 
       - name: 'Set up Java'
         uses: actions/setup-java@v4
