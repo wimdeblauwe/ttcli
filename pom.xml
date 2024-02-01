@@ -240,6 +240,12 @@
                                                 </path>
                                                 <platform>osx-x86_64</platform>
                                             </artifact>
+                                            <artifact>
+                                                <path>
+                                                    {{artifactsDir}}/{{distributionName}}-{{projectVersion}}-osx-aarch_64.zip
+                                                </path>
+                                                <platform>osx-aarch_64</platform>
+                                            </artifact>
                                         </artifacts>
                                         <brew>
                                             <active>ALWAYS</active>
