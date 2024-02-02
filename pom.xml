@@ -255,6 +255,7 @@
                                                 <commitMessage>Bump ttcli to {{tagName}}.</commitMessage>
                                             </tap>
                                             <formulaName>ttcli</formulaName>
+                                            <multiPlatform>true</multiPlatform>
                                         </brew>
                                         <chocolatey>
                                             <active>ALWAYS</active>
