@@ -97,7 +97,6 @@ jobs:
           name: artifacts-${{ matrix.os }}
           path: |
             target/distributions/*.zip
-            target/distributions/*.tar.gz
 
       - name: 'Upload jar build artifact'
         uses: actions/upload-artifact@v4
