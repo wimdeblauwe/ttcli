@@ -119,6 +119,9 @@
                     <outputDirectory>${project.build.directory}/distributions</outputDirectory>
                     <workDirectory>${project.build.directory}/assembly/work</workDirectory>
                     <skipAssembly>true</skipAssembly>
+					<compilerArgs>
+						<arg>-march=compatibility</arg>
+					</compilerArgs>
                 </configuration>
                 <executions>
                     <execution>
