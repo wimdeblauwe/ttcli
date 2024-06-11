@@ -5,6 +5,6 @@ public record SpringBootProjectCreationParameters(String groupId,
                                                   String projectName,
                                                   String springBootVersion) {
     public String packageName() {
-        return groupId + "." + artifactId.replace("-", "");
+        return groupId + "." + artifactId.replace("-", "_");
     }
 }
