@@ -157,7 +157,7 @@ public class NpmBasedLiveReloadInitService implements LiveReloadInitService {
                                                                                                        """));
         mavenPomReaderWriter.updateProperties(properties -> {
             properties.appendChild(new Comment(" Maven plugins "));
-            properties.appendElement("frontend-maven-plugin.version").text("1.12.1");
+            properties.appendElement("frontend-maven-plugin.version").text("1.15.0");
             properties.appendElement("frontend-maven-plugin.nodeVersion").text(versions.nodeVersion());
             properties.appendElement("frontend-maven-plugin.npmVersion").text(versions.npmVersion());
         });
