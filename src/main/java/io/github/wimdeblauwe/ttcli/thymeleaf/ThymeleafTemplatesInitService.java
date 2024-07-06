@@ -31,7 +31,7 @@ public class ThymeleafTemplatesInitService {
                        layoutTemplate);
         }
 
-        StringBuilder cssLinksForLayoutTemplate = new StringBuilder(/*getCssLinksForLayoutTemplate()*/);
+        StringBuilder cssLinksForLayoutTemplate = new StringBuilder();
         for (WebDependency webDependency : webDependencies) {
             String cssForDependency = webDependency.getCssLinksForLayoutTemplate();
             if (cssForDependency != null) {
@@ -42,7 +42,7 @@ public class ThymeleafTemplatesInitService {
         }
         insertCssLinksToLayoutTemplate(layoutTemplate, cssLinksForLayoutTemplate.toString());
 
-        StringBuilder jsLinksForLayoutTemplate = new StringBuilder(/*getJsLinksForLayoutTemplate()*/);
+        StringBuilder jsLinksForLayoutTemplate = new StringBuilder();
         for (WebDependency webDependency : webDependencies) {
             String jsForDependency = webDependency.getJsLinksForLayoutTemplate();
             if (jsForDependency != null) {
