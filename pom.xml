@@ -315,7 +315,7 @@
                             <metadataRepository>
                                 <enabled>true</enabled>
                             </metadataRepository>
-                            <buildArgs>--initialize-at-run-time=sun.net.dns.ResolverConfigurationImpl</buildArgs>
+                            <buildArgs>--initialize-at-run-time=sun.net.dns.ResolverConfigurationImpl -march=compatibility</buildArgs>
                         </configuration>
                         <executions>
                             <execution>
