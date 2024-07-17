@@ -61,7 +61,7 @@ public class ProjectInitializationService {
         helpTextInitService.addHelpText(basePath, liveReloadInitService.getHelpText());
 
         mavenInitService.generate(parameters);
-        tailwindDependencyInitService.generate(parameters);
+        tailwindDependencyInitService.generate(liveReloadInitService, parameters);
         thymeleafTemplatesInitService.generate(parameters);
 
         liveReloadInitService.runBuild(parameters);

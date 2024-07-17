@@ -6,6 +6,7 @@ import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceException;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import java.nio.file.Path;
 import java.util.Set;
 
 @Component
@@ -51,5 +52,10 @@ public class DevToolsBasedLiveReloadInitService implements LiveReloadInitService
 
     @Override
     public void runBuild(ProjectInitializationParameters projectInitializationParameters) throws LiveReloadInitServiceException {
+    }
+
+    @Override
+    public Path getTailwindConfigFileParentPath(ProjectInitializationParameters parameters) {
+        return null;
     }
 }

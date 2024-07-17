@@ -101,6 +101,11 @@ public class DevToolsBasedWithTailwindCssLiveReloadInitService implements LiveRe
     public void runBuild(ProjectInitializationParameters projectInitializationParameters) throws LiveReloadInitServiceException {
     }
 
+    @Override
+    public Path getTailwindConfigFileParentPath(ProjectInitializationParameters parameters) {
+        return parameters.basePath().resolve("src/main/frontend");
+    }
+
     private LinkedHashMap<String, String> npmScripts() {
         LinkedHashMap<String, String> scripts = new LinkedHashMap<>();
         scripts.put("build", "tailwindcss -i ./application.css -o ../resources/static/css/application.css");

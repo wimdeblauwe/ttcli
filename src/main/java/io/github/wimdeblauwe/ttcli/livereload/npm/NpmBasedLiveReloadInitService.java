@@ -106,6 +106,11 @@ public class NpmBasedLiveReloadInitService implements LiveReloadInitService {
         }
     }
 
+    @Override
+    public Path getTailwindConfigFileParentPath(ProjectInitializationParameters parameters) {
+        return null;
+    }
+
     protected String postcssConfigFilePath() {
         return "/files/livereload/npm/npm-based/postcss.config.js";
     }

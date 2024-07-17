@@ -8,6 +8,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.*;
 
 @Component
@@ -41,6 +42,11 @@ public class NpmBasedWithTailwindCssLiveReloadInitService extends NpmBasedLiveRe
             Thread.currentThread().interrupt();
             throw new LiveReloadInitServiceException(e);
         }
+    }
+
+    @Override
+    public Path getTailwindConfigFileParentPath(ProjectInitializationParameters parameters) {
+        return parameters.basePath();
     }
 
     protected String postcssConfigFilePath() {
