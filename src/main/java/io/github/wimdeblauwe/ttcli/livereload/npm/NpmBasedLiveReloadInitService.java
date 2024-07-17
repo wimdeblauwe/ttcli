@@ -16,9 +16,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Component
 @Order(1)
@@ -57,6 +55,11 @@ public class NpmBasedLiveReloadInitService implements LiveReloadInitService {
                 NOTE: If you use a separate authentication server (e.g. social logins, or Keycloak) then after login,
                 you might get redirected to http://localhost:8080 as opposed to http://localhost:3000.
                 Be sure to set the port back to `3000` in your browser to have live reload.""";
+    }
+
+    @Override
+    public Set<String> additionalSpringInitializrDependencies() {
+        return Collections.emptySet();
     }
 
     @Override
