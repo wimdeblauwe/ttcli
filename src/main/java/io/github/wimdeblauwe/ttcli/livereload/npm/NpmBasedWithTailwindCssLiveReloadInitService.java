@@ -2,17 +2,14 @@ package io.github.wimdeblauwe.ttcli.livereload.npm;
 
 import io.github.wimdeblauwe.ttcli.ProjectInitializationParameters;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceException;
+import io.github.wimdeblauwe.ttcli.livereload.helper.TailwindCssHelper;
 import io.github.wimdeblauwe.ttcli.npm.NodeService;
-import io.github.wimdeblauwe.ttcli.util.ProcessBuilderFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 
 @Component
 @Order(2)
@@ -32,38 +29,24 @@ public class NpmBasedWithTailwindCssLiveReloadInitService extends NpmBasedLiveRe
     }
 
     @Override
-    public String getHelpText() {
-        return """
-                # Live reload setup
-                                
-                This project uses NPM to have live reloading.
-                                
-                Use the following steps to get it working:
-                                
-                1. Run the Spring Boot application with the `local` profile
-                2. From a terminal, run `npm run build && npm run watch` (You can also run `npm run --silent build && npm run --silent watch` if you want less output in the terminal)
-                3. Your default browser will open at http://localhost:3000
-                                
-                You should now be able to change any HTML or CSS and have the browser reload upon saving the file.
-                                
-                NOTE: If you use a separate authentication server (e.g. social logins, or Keycloak) then after login,
-                you might get redirected to http://localhost:8080 as opposed to http://localhost:3000.
-                Be sure to set the port back to `3000` in your browser to have live reload.""";
-    }
-
-    @Override
     public void generate(ProjectInitializationParameters projectInitializationParameters) {
         try {
             super.generate(projectInitializationParameters);
 
-            createApplicationCss(projectInitializationParameters.basePath());
-            setupTailwindConfig(projectInitializationParameters.basePath());
+            TailwindCssHelper.createApplicationCss(projectInitializationParameters.basePath(),
+                                                   "src/main/resources/static/css/application.css");
+            TailwindCssHelper.setupTailwindConfig(projectInitializationParameters.basePath(), "./src/main/resources/templates/**/*.html");
         } catch (IOException e) {
             throw new LiveReloadInitServiceException(e);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new LiveReloadInitServiceException(e);
         }
+    }
+
+    @Override
+    public Path getTailwindConfigFileParentPath(ProjectInitializationParameters parameters) {
+        return parameters.basePath();
     }
 
     protected String postcssConfigFilePath() {
@@ -97,38 +80,5 @@ public class NpmBasedWithTailwindCssLiveReloadInitService extends NpmBasedLiveRe
         scripts.put("watch:svg", "onchange \"src/main/resources/static/svg/**/*.svg\" -- npm run build:svg");
         scripts.put("watch:serve", "browser-sync start --no-inject-changes --proxy localhost:8080 --files \"target/classes/templates\" \"target/classes/static\"");
         return scripts;
-    }
-
-    private void setupTailwindConfig(Path base) throws IOException, InterruptedException {
-        initializeTailwindConfig(base);
-
-        // Point tailwind to Thymeleaf templates
-        Path tailwindConfigFilePath = base.resolve("tailwind.config.js");
-        byte[] bytes = Files.readAllBytes(tailwindConfigFilePath);
-        String s = new String(bytes);
-        s = s.replaceFirst("content: \\[]", "content: ['./src/main/resources/templates/**/*.html']");
-        Files.writeString(tailwindConfigFilePath, s);
-    }
-
-    private static void initializeTailwindConfig(Path base) throws InterruptedException, IOException {
-        ProcessBuilder builder = ProcessBuilderFactory.create(List.of("npx", "tailwindcss", "init"));
-        builder.directory(base.toFile());
-        int exitValue = builder.start().waitFor();
-        if (exitValue != 0) {
-            throw new RuntimeException("unable to init tailwind css");
-        }
-    }
-
-    private void createApplicationCss(Path base) throws IOException {
-        Path path = base.resolve("src/main/resources/static/css/application.css");
-        Files.createDirectories(path.getParent());
-        Files.writeString(path, applicationCssContent());
-    }
-
-    private String applicationCssContent() {
-        return """
-                @tailwind base;
-                @tailwind components;
-                @tailwind utilities;""";
     }
 }

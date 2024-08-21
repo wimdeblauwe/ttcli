@@ -1,6 +1,7 @@
 package io.github.wimdeblauwe.ttcli.tailwind;
 
 import io.github.wimdeblauwe.ttcli.ProjectInitializationParameters;
+import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitService;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceException;
 import io.github.wimdeblauwe.ttcli.npm.NodeService;
 import org.springframework.stereotype.Component;
@@ -19,16 +20,17 @@ public class TailwindDependencyInitService {
         this.nodeService = nodeService;
     }
 
-    public void generate(ProjectInitializationParameters parameters) {
+    public void generate(LiveReloadInitService liveReloadInitService,
+                         ProjectInitializationParameters parameters) {
         try {
             List<TailwindDependency> tailwindDependencies = parameters.tailwindDependencies();
             if (!tailwindDependencies.isEmpty()) {
                 List<String> npmPackages = tailwindDependencies.stream().map(TailwindDependency::npmPackageName)
                                                                .toList();
-                Path basePath = parameters.basePath();
+                Path basePath = liveReloadInitService.getTailwindConfigFileParentPath(parameters);
                 nodeService.installNpmDevDependencies(basePath, npmPackages);
 
-                updateTailwindConfigFile(parameters);
+                updateTailwindConfigFile(basePath, parameters);
             }
         } catch (IOException e) {
             throw new LiveReloadInitServiceException(e);
@@ -38,8 +40,8 @@ public class TailwindDependencyInitService {
         }
     }
 
-    private void updateTailwindConfigFile(ProjectInitializationParameters parameters) throws IOException {
-        Path basePath = parameters.basePath();
+    private void updateTailwindConfigFile(Path basePath,
+                                          ProjectInitializationParameters parameters) throws IOException {
         Path tailwindConfigFilePath = basePath.resolve("tailwind.config.js");
         byte[] bytes = Files.readAllBytes(tailwindConfigFilePath);
         String s = new String(bytes);

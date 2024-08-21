@@ -50,16 +50,18 @@ public class ProjectInitializationService {
             Files.createDirectories(basePath);
         }
 
+        LiveReloadInitService liveReloadInitService = liveReloadInitServiceFactory.getInitService(parameters.liveReloadInitServiceParameters().initServiceId());
+
         initializrService.generate(basePath,
-                                   parameters.springBootProjectCreationParameters());
+                                   parameters.springBootProjectCreationParameters(),
+                                   liveReloadInitService.additionalSpringInitializrDependencies());
         javaCodeInitService.generate(parameters);
 
-        LiveReloadInitService liveReloadInitService = liveReloadInitServiceFactory.getInitService(parameters.liveReloadInitServiceParameters().initServiceId());
         liveReloadInitService.generate(parameters);
         helpTextInitService.addHelpText(basePath, liveReloadInitService.getHelpText());
 
         mavenInitService.generate(parameters);
-        tailwindDependencyInitService.generate(parameters);
+        tailwindDependencyInitService.generate(liveReloadInitService, parameters);
         thymeleafTemplatesInitService.generate(parameters);
 
         liveReloadInitService.runBuild(parameters);

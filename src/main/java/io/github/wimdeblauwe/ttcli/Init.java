@@ -83,7 +83,8 @@ public class Init {
     }
 
     private List<TailwindDependency> allowTailwindDependenciesSelection(String liveReloadSelection) {
-        boolean tailwindAvailable = "npm-based-with-tailwind-css".equals(liveReloadSelection);
+        boolean tailwindAvailable = "npm-based-with-tailwind-css".equals(liveReloadSelection)
+                || "dev-tools-based-with-tailwind-css".equals(liveReloadSelection);
         if (tailwindAvailable) {
             ComponentFlow.Builder builder = flowBuilder.clone().reset();
             addTailwindDependenciesInput(builder);
