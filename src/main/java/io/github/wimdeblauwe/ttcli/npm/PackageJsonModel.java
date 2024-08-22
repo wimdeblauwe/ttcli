@@ -1,10 +1,15 @@
 package io.github.wimdeblauwe.ttcli.npm;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class PackageJsonModel {
     private String name;
+    @JsonProperty("private")
+    private boolean privateField;
+    private String type;
     private Map<String, String> devDependencies;
     private Map<String, String> scripts;
 
@@ -14,6 +19,22 @@ public class PackageJsonModel {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public boolean isPrivateField() {
+        return privateField;
+    }
+
+    public void setPrivateField(boolean privateField) {
+        this.privateField = privateField;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public Map<String, String> getDevDependencies() {
