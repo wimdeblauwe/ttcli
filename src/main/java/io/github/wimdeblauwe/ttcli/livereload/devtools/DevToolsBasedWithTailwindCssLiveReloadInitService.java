@@ -74,8 +74,8 @@ public class DevToolsBasedWithTailwindCssLiveReloadInitService implements LiveRe
                 Files.createDirectories(frontendBasePath);
             }
 
-            nodeService.createEmptyPackageJson(frontendBasePath,
-                                               projectInitializationParameters.projectName());
+            nodeService.createPackageJson(frontendBasePath,
+                                          projectInitializationParameters.projectName());
             nodeService.installNpmDevDependencies(frontendBasePath,
                                                   List.of("tailwindcss"));
             nodeService.insertPackageJsonScripts(frontendBasePath, npmScripts());

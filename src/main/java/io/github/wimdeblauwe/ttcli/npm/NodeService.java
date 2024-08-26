@@ -26,14 +26,28 @@ public class NodeService {
         return versions;
     }
 
-    public void createEmptyPackageJson(Path base,
-                                       String projectName) throws IOException {
+    public void createPackageJson(Path base,
+                                  String projectName) throws IOException {
         Path path = base.resolve("package.json");
         // The name field in package.json can only be lowercase and cannot contain spaces
         String name = projectName.toLowerCase(Locale.ROOT).replace(' ', '-');
         Files.writeString(path, """
                 {
                   "name": "%s"
+                }
+                """.formatted(name));
+    }
+
+    public void createPackageJsonForModule(Path base,
+                                           String projectName) throws IOException {
+        Path path = base.resolve("package.json");
+        // The name field in package.json can only be lowercase and cannot contain spaces
+        String name = projectName.toLowerCase(Locale.ROOT).replace(' ', '-');
+        Files.writeString(path, """
+                {
+                  "name": "%s",
+                  "private": true,
+                  "type": "module"
                 }
                 """.formatted(name));
     }
