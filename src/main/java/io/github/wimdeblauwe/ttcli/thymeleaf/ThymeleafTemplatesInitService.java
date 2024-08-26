@@ -34,7 +34,8 @@ public class ThymeleafTemplatesInitService {
         }
 
         StringBuilder headTags = new StringBuilder();
-        if (!liveReloadInitServiceParameters.initServiceId().equals("vite")) {
+        if (!liveReloadInitServiceParameters.initServiceId().equals("vite")
+            && !liveReloadInitServiceParameters.initServiceId().equals("vite-with-tailwind-css")) {
             headTags.append("""
                                     <link rel="stylesheet" th:href="@{/css/application.css}">""");
         } else {
