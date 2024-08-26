@@ -66,6 +66,19 @@ public class NodeService {
         }
     }
 
+    public void runNpxCommand(Path base,
+                              List<String> params) throws IOException, InterruptedException {
+        List<String> parameters = new ArrayList<>();
+        parameters.add("npx");
+        parameters.addAll(params);
+        ProcessBuilder builder = ProcessBuilderFactory.create(parameters);
+        builder.directory(base.toFile());
+        int exitValue = builder.start().waitFor();
+        if (exitValue != 0) {
+            throw new RuntimeException("installation of npm dependencies failed");
+        }
+    }
+
     public void insertPackageJsonScripts(Path base,
                                          Map<String, String> scripts) throws IOException, InterruptedException {
         System.out.println("\uD83D\uDC77\u200D♂️ Adding npm build scripts");

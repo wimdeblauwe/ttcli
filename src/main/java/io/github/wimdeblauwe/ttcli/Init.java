@@ -84,7 +84,8 @@ public class Init {
 
     private List<TailwindDependency> allowTailwindDependenciesSelection(String liveReloadSelection) {
         boolean tailwindAvailable = "npm-based-with-tailwind-css".equals(liveReloadSelection)
-                || "dev-tools-based-with-tailwind-css".equals(liveReloadSelection);
+                                    || "dev-tools-based-with-tailwind-css".equals(liveReloadSelection)
+                                    || "vite-with-tailwind-css".equals(liveReloadSelection);
         if (tailwindAvailable) {
             ComponentFlow.Builder builder = flowBuilder.clone().reset();
             addTailwindDependenciesInput(builder);
@@ -155,6 +156,7 @@ public class Init {
                .sort(Comparator.comparingInt(o -> reloadOptionIdsInOrder.indexOf(o.getItem())))
                .name("Select live reload implementation:")
                .selectItems(reloadOptions)
+               .max(reloadOptions.size())
                .and();
     }
 

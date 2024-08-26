@@ -21,7 +21,7 @@ import java.util.Set;
 @Component
 @Order(5)
 public class ViteLiveReloadInitService implements LiveReloadInitService {
-    private final NodeService nodeService;
+    protected final NodeService nodeService;
 
     public ViteLiveReloadInitService(NodeService nodeService) {
         this.nodeService = nodeService;
@@ -156,7 +156,7 @@ public class ViteLiveReloadInitService implements LiveReloadInitService {
         }
     }
 
-    private List<String> npmDevDependencies() {
+    protected List<String> npmDevDependencies() {
         return List.of("vite", "@wim.deblauwe/vite-plugin-spring-boot", "globby");
     }
 
