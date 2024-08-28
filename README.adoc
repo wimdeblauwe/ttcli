@@ -37,6 +37,44 @@ The tool will create a new project in a sub-directory of the current directory w
 
 NOTE: You can choose a different base directory that the tool should use via `ttcli --baseDir <otherdir>`
 
+== Live reload options
+
+The tool allows selecting from various options for having live reload when editing HTML, CSS and JavaScript files.
+
+[IMPORTANT]
+====
+Be sure to always read the instructions in the generated HELP.md to know how to work with your live reload selection.
+====
+
+=== DevTools
+
+This is the simplest option, but it is also the slowest to reload upon change.
+The biggest advantage is that you do not need to have npm installed.
+
+=== DevTools with Tailwind CSS
+
+This is similar to the DevTools option, but uses npm for the Tailwind CSS build step.
+As a result, you need to have npm installed to use this.
+
+=== Npm based scripts
+
+This uses npm to watch the HTML, CSS and JavaScript files and processes them.
+This gives a quicker live reload experience compared to using DevTools.
+
+=== Npm based scripts with Tailwind CSS
+
+Similar to _Npm based scripts_ but supports Tailwind CSS as the CSS framework.
+
+=== Vite
+
+This option uses https://vitejs.dev/[Vite] for live reloading.
+It requires an additional dependency on the Spring Boot side to process the assets and manifest that Vite generates.
+The biggest advantages:
+
+* It is very quick to reload the changes.
+* Vite supports SASS, TypeScript, ... so you can use all that now in your Spring Boot with Thymeleaf project.
+If you add the Vite Vue plugin, you can even write Vue components and have live reloading of them working just fine.
+
 == Building
 
 === Regular JVM build
