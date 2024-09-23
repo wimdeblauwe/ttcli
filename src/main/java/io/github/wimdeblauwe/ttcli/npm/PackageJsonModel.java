@@ -1,10 +1,12 @@
 package io.github.wimdeblauwe.ttcli.npm;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PackageJsonModel {
     private String name;
     @JsonProperty("private")

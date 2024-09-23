@@ -31,6 +31,7 @@ public final class TailwindCssHelper {
     private static void initializeTailwindConfig(Path base) throws InterruptedException, IOException {
         ProcessBuilder builder = ProcessBuilderFactory.create(List.of("npx", "tailwindcss", "init"));
         builder.directory(base.toFile());
+        builder.redirectError(ProcessBuilder.Redirect.INHERIT);
         int exitValue = builder.start().waitFor();
         if (exitValue != 0) {
             throw new RuntimeException("unable to init tailwind css");

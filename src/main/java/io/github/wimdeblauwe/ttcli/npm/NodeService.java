@@ -60,6 +60,7 @@ public class NodeService {
         parameters.addAll(dependencies);
         ProcessBuilder builder = ProcessBuilderFactory.create(parameters);
         builder.directory(base.toFile());
+        builder.redirectError(ProcessBuilder.Redirect.INHERIT);
         int exitValue = builder.start().waitFor();
         if (exitValue != 0) {
             throw new RuntimeException("installation of npm dependencies failed");
@@ -73,6 +74,7 @@ public class NodeService {
         parameters.addAll(params);
         ProcessBuilder builder = ProcessBuilderFactory.create(parameters);
         builder.directory(base.toFile());
+        builder.redirectError(ProcessBuilder.Redirect.INHERIT);
         int exitValue = builder.start().waitFor();
         if (exitValue != 0) {
             throw new RuntimeException("installation of npm dependencies failed");
@@ -95,6 +97,7 @@ public class NodeService {
     private String checkIfApplicationIsInstalled(String application) throws InterruptedException {
         try {
             ProcessBuilder builder = ProcessBuilderFactory.create(List.of(application, "-v"));
+            builder.redirectError(ProcessBuilder.Redirect.INHERIT);
             Process process = builder.start();
             int exitValue = process.waitFor();
             String version = new String(process.getInputStream().readAllBytes()).trim();
