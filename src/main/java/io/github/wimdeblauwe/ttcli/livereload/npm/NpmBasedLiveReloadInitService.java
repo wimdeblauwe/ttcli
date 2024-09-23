@@ -93,6 +93,7 @@ public class NpmBasedLiveReloadInitService implements LiveReloadInitService {
     public void runBuild(ProjectInitializationParameters projectInitializationParameters) throws LiveReloadInitServiceException {
         ProcessBuilder builder = ProcessBuilderFactory.create(List.of("npm", "run", "build"));
         builder.directory(projectInitializationParameters.basePath().toFile());
+        builder.redirectError(ProcessBuilder.Redirect.INHERIT);
         int exitValue;
         try {
             exitValue = builder.start().waitFor();
