@@ -157,7 +157,7 @@ public class ViteLiveReloadInitService implements LiveReloadInitService {
     }
 
     protected List<String> npmDevDependencies() {
-        return List.of("vite", "@wim.deblauwe/vite-plugin-spring-boot", "globby");
+        return List.of("vite", "@wim.deblauwe/vite-plugin-spring-boot");
     }
 
     protected LinkedHashMap<String, String> npmScripts() {
