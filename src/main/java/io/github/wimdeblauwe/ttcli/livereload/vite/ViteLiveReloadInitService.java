@@ -46,11 +46,15 @@ public class ViteLiveReloadInitService implements LiveReloadInitService {
                 
                 Use the following steps to get it working:
                 
-                1. Start the Vite development server with `npm run dev`
-                2. Run the Spring Boot application with the `local` profile
+                1. Start the Vite development server with `npm run dev`.
+                2. Run the Spring Boot application with the `local` profile. You can do this from your IDE,
+                or via the command line using `mvn spring-boot:run -Dspring-boot.run.profiles=local`.
                 3. Open your browser at http://localhost:8080
                 
                 You should now be able to change any HTML or CSS and have the browser reload upon saving the file.
+                
+                PS: It is also possible to use the URL that Vite uses (Usually http://localhost:5173) given the
+                Spring Boot application runs on port 8080. If another port is used, you will need to edit `vite.config.js`.
                 """;
 
     }
@@ -108,7 +112,7 @@ public class ViteLiveReloadInitService implements LiveReloadInitService {
                 
                 export default defineConfig({
                     plugins: [
-                        springBoot(),
+                        springBoot()
                     ],
                     root: path.join(__dirname, './src/main/resources'),
                     build: {
@@ -121,6 +125,19 @@ public class ViteLiveReloadInitService implements LiveReloadInitService {
                         outDir: path.join(__dirname, `./target/classes/static`),
                         copyPublicDir: false,
                         emptyOutDir: true
+                    },
+                    server: {
+                        proxy: {
+                            // Proxy all backend requests to Spring Boot except for static assets
+                            '^/(?!static|assets|.*\\\\.(js|css|png|svg|jpg|jpeg|gif|ico|woff|woff2)$)': {
+                                target: 'http://localhost:8080',  // Proxy to Spring Boot backend
+                                changeOrigin: true,
+                                secure: false
+                            }
+                        },
+                        watch: {
+                            ignored: ['target/**']
+                        }
                     }
                 });
                 """;
