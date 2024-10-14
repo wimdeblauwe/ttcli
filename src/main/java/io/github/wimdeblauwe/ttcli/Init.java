@@ -62,7 +62,7 @@ public class Init {
             List<String> selectedWebDependencyOptions = context.get("web-dependencies");
             List<WebDependency> selectedWebDependencies = webDependencies.stream().filter(webDependency -> selectedWebDependencyOptions.contains(webDependency.id())).toList();
 
-            boolean hasTailwindCssWebDependency = webDependencies.stream().anyMatch(webDependency -> webDependency instanceof TailwindCssWebDependency);
+            boolean hasTailwindCssWebDependency = selectedWebDependencies.stream().anyMatch(webDependency -> webDependency instanceof TailwindCssWebDependency);
             List<TailwindDependency> selectedTailwindDependencies = allowTailwindDependenciesSelection(hasTailwindCssWebDependency);
 
             Path basePath = Path.of(baseDir).resolve(artifactId);
