@@ -78,7 +78,7 @@ public class ViteLiveReloadInitService implements LiveReloadInitService {
             createViteConfig(basePath);
 
             MavenPomReaderWriter mavenPomReaderWriter = MavenPomReaderWriter.readFrom(basePath);
-            mavenPomReaderWriter.addDependency("io.github.wimdeblauwe", "vite-spring-boot-thymeleaf", "0.3.0");
+            mavenPomReaderWriter.addDependency("io.github.wimdeblauwe", "vite-spring-boot-thymeleaf", "0.4.0");
             mavenPomReaderWriter.write();
 
             NpmHelper.updateMavenPom(mavenPomReaderWriter, installedApplicationVersions, false);
