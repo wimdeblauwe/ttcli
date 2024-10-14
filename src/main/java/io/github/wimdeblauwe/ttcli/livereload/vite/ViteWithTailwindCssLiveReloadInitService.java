@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Component
 @Order(6)
@@ -58,8 +59,9 @@ public class ViteWithTailwindCssLiveReloadInitService extends ViteLiveReloadInit
 
     @Override
     protected List<String> npmDevDependencies() {
-        return List.of("vite", "@wim.deblauwe/vite-plugin-spring-boot", "globby",
-                       "tailwindcss", "postcss", "autoprefixer");
+        return Stream.concat(super.npmDevDependencies().stream(),
+                             Stream.of("tailwindcss", "postcss", "autoprefixer"))
+                     .toList();
     }
 
     @Override
