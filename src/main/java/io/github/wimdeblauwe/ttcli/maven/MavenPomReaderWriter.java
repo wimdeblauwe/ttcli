@@ -1,5 +1,6 @@
 package io.github.wimdeblauwe.ttcli.maven;
 
+import io.github.wimdeblauwe.ttcli.util.ProcessBuilderFactory;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -10,6 +11,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class MavenPomReaderWriter {
@@ -103,8 +105,21 @@ public class MavenPomReaderWriter {
         });
     }
 
-    public void write() throws IOException {
+    public void write() throws IOException, InterruptedException {
         Files.writeString(pomPath, document.outerHtml());
+
+        formatPomDotXml();
+    }
+
+    private void formatPomDotXml() throws InterruptedException, IOException {
+        List<String> parameters = List.of("mvn", "au.com.acegi:xml-format-maven-plugin:4.0.1:xml-format", "-DindentSize=4");
+        ProcessBuilder builder = ProcessBuilderFactory.create(parameters);
+        builder.directory(pomPath.toFile().getParentFile());
+        builder.redirectError(ProcessBuilder.Redirect.INHERIT);
+        int exitValue = builder.start().waitFor();
+        if (exitValue != 0) {
+            throw new RuntimeException("installation of npm dependencies failed");
+        }
     }
 
     private Element getProject() {

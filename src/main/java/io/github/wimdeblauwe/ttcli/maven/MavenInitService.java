@@ -11,7 +11,7 @@ import java.util.List;
 
 @Component
 public class MavenInitService {
-    public void generate(ProjectInitializationParameters parameters) {
+    public void generate(ProjectInitializationParameters parameters) throws InterruptedException {
         try {
             addMavenDependencies(MavenPomReaderWriter.readFrom(parameters.basePath()),
                                  parameters.webDependencies(),
@@ -23,7 +23,7 @@ public class MavenInitService {
 
     private void addMavenDependencies(MavenPomReaderWriter mavenPomReaderWriter,
                                       List<WebDependency> webDependencies,
-                                      String springBootVersion) throws IOException {
+                                      String springBootVersion) throws IOException, InterruptedException {
         mavenPomReaderWriter.addDependency("nz.net.ultraq.thymeleaf", "thymeleaf-layout-dialect");
         mavenPomReaderWriter.updateDependencies(dependencies -> {
             dependencies.appendChild(new Comment(" Web dependencies "));

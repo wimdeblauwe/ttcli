@@ -44,7 +44,7 @@ public class ProjectInitializationService {
         this.helpTextInitService = helpTextInitService;
     }
 
-    public void initialize(ProjectInitializationParameters parameters) throws IOException {
+    public void initialize(ProjectInitializationParameters parameters) throws IOException, InterruptedException {
         Path basePath = parameters.basePath();
         if (!FileUtil.isEmpty(basePath)) {
             throw new ProjectInitializationServiceException("The directory is not empty! Unable to generate project in " + basePath.toAbsolutePath());

@@ -115,7 +115,7 @@ public class DevToolsBasedWithTailwindCssLiveReloadInitService implements LiveRe
     }
 
     private void updateMavenPom(MavenPomReaderWriter mavenPomReaderWriter,
-                                InstalledApplicationVersions versions) throws IOException {
+                                InstalledApplicationVersions versions) throws IOException, InterruptedException {
         System.out.println("\uD83D\uDC77\uD83C\uDFFB\u200D♀️ Updating Maven pom.xml");
         mavenPomReaderWriter.updateProperties(properties -> {
             properties.appendChild(new Comment(" Maven plugins "));

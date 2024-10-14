@@ -38,7 +38,7 @@ public class Init {
     private LiveReloadInitServiceFactory liveReloadInitServiceFactory;
 
     @ShellMethod
-    public void init(@ShellOption(defaultValue = ".") String baseDir) throws IOException {
+    public void init(@ShellOption(defaultValue = ".") String baseDir) throws IOException, InterruptedException {
 
         try {
             ComponentFlow.Builder builder = flowBuilder.clone().reset();

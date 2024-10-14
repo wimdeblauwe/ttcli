@@ -13,7 +13,7 @@ public final class NpmHelper {
 
     public static void updateMavenPom(MavenPomReaderWriter mavenPomReaderWriter,
                                       InstalledApplicationVersions versions,
-                                      boolean addReleaseProfile) throws IOException {
+                                      boolean addReleaseProfile) throws IOException, InterruptedException {
         System.out.println("\uD83D\uDC77\uD83C\uDFFB\u200D♀️ Updating Maven pom.xml");
         mavenPomReaderWriter.updateResources(resources -> resources.append("""
                                                                                    <resource>
