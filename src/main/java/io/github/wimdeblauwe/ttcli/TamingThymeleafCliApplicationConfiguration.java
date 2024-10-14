@@ -11,8 +11,8 @@ import org.springframework.shell.style.FigureSettings;
 import org.springframework.shell.style.StyleSettings;
 import org.springframework.shell.style.Theme;
 import org.springframework.shell.style.ThemeSettings;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.support.WebClientAdapter;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
 @Configuration
@@ -51,12 +51,12 @@ public class TamingThymeleafCliApplicationConfiguration {
 
     @Bean
     public SpringBootInitializrClient springBootInitializrClient() {
-        WebClient webClient = WebClient.builder()
-                                       .defaultHeader("Accept", "application/vnd.initializr.v2.2+json")
-                                       .baseUrl("https://start.spring.io/")
-                                       .build();
+        RestClient restClient = RestClient.builder()
+                                          .defaultHeader("Accept", "application/vnd.initializr.v2.2+json")
+                                          .baseUrl("https://start.spring.io/")
+                                          .build();
         HttpServiceProxyFactory factory = HttpServiceProxyFactory.builder()
-                                                                 .clientAdapter(WebClientAdapter.forClient(webClient))
+                                                                 .exchangeAdapter(RestClientAdapter.create(restClient))
                                                                  .build();
         return factory.createClient(SpringBootInitializrClient.class);
     }

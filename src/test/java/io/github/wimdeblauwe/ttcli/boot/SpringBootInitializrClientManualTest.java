@@ -4,8 +4,8 @@ package io.github.wimdeblauwe.ttcli.boot;
 import io.github.wimdeblauwe.ttcli.util.ZipUtil;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.support.WebClientAdapter;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
 import java.io.IOException;
@@ -35,11 +35,11 @@ class SpringBootInitializrClientManualTest {
     }
 
     private SpringBootInitializrClient springBootInitializrClient() {
-        WebClient webClient = WebClient.builder()
-                                       .baseUrl("https://start.spring.io/")
-                                       .build();
+        RestClient webClient = RestClient.builder()
+                                         .baseUrl("https://start.spring.io/")
+                                         .build();
         HttpServiceProxyFactory factory = HttpServiceProxyFactory.builder()
-                                                                 .clientAdapter(WebClientAdapter.forClient(webClient))
+                                                                 .exchangeAdapter(RestClientAdapter.create(webClient))
                                                                  .build();
         return factory.createClient(SpringBootInitializrClient.class);
     }
