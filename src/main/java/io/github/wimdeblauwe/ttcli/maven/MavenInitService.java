@@ -2,6 +2,7 @@ package io.github.wimdeblauwe.ttcli.maven;
 
 import io.github.wimdeblauwe.ttcli.ProjectInitializationParameters;
 import io.github.wimdeblauwe.ttcli.deps.WebDependency;
+import io.github.wimdeblauwe.ttcli.deps.WebjarsBasedWebDependency;
 import org.jsoup.nodes.Comment;
 import org.springframework.stereotype.Component;
 
@@ -29,9 +30,11 @@ public class MavenInitService {
         });
         mavenPomReaderWriter.addDependency("org.webjars", "webjars-locator", "0.46");
         for (WebDependency webDependency : webDependencies) {
-            List<MavenDependency> mavenDependencies = webDependency.getMavenDependencies(springBootVersion);
-            for (MavenDependency mavenDependency : mavenDependencies) {
-                mavenPomReaderWriter.addDependency(mavenDependency);
+            if (webDependency instanceof WebjarsBasedWebDependency webjarsBasedWebDependency) {
+                List<MavenDependency> mavenDependencies = webjarsBasedWebDependency.getMavenDependencies(springBootVersion);
+                for (MavenDependency mavenDependency : mavenDependencies) {
+                    mavenPomReaderWriter.addDependency(mavenDependency);
+                }
             }
         }
 

@@ -1,11 +1,12 @@
 package io.github.wimdeblauwe.ttcli;
 
 import io.github.wimdeblauwe.ttcli.boot.*;
-import io.github.wimdeblauwe.ttcli.tailwind.TailwindDependency;
+import io.github.wimdeblauwe.ttcli.deps.TailwindCssWebDependency;
 import io.github.wimdeblauwe.ttcli.deps.WebDependency;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitService;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceFactory;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceParameters;
+import io.github.wimdeblauwe.ttcli.tailwind.TailwindDependency;
 import io.github.wimdeblauwe.ttcli.util.InetUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.component.context.ComponentContext;
@@ -58,10 +59,11 @@ public class Init {
             String projectName = context.get("project-name");
             String springBootVersion = context.get("spring-boot-version");
 
-            List<TailwindDependency> selectedTailwindDependencies = allowTailwindDependenciesSelection(context.get("live-reload"));
-
             List<String> selectedWebDependencyOptions = context.get("web-dependencies");
             List<WebDependency> selectedWebDependencies = webDependencies.stream().filter(webDependency -> selectedWebDependencyOptions.contains(webDependency.id())).toList();
+
+            boolean hasTailwindCssWebDependency = webDependencies.stream().anyMatch(webDependency -> webDependency instanceof TailwindCssWebDependency);
+            List<TailwindDependency> selectedTailwindDependencies = allowTailwindDependenciesSelection(hasTailwindCssWebDependency);
 
             Path basePath = Path.of(baseDir).resolve(artifactId);
 
@@ -82,11 +84,8 @@ public class Init {
         }
     }
 
-    private List<TailwindDependency> allowTailwindDependenciesSelection(String liveReloadSelection) {
-        boolean tailwindAvailable = "npm-based-with-tailwind-css".equals(liveReloadSelection)
-                                    || "dev-tools-based-with-tailwind-css".equals(liveReloadSelection)
-                                    || "vite-with-tailwind-css".equals(liveReloadSelection);
-        if (tailwindAvailable) {
+    private List<TailwindDependency> allowTailwindDependenciesSelection(boolean hasTailwindCssWebDependency) {
+        if (hasTailwindCssWebDependency) {
             ComponentFlow.Builder builder = flowBuilder.clone().reset();
             addTailwindDependenciesInput(builder);
             ComponentFlow build = builder.build();
@@ -148,7 +147,7 @@ public class Init {
     private void addLiveReloadInput(ComponentFlow.Builder builder) {
         Map<String, String> reloadOptions = new HashMap<>();
         List<String> reloadOptionIdsInOrder = new ArrayList<>();
-        for (LiveReloadInitService initService : liveReloadInitServiceFactory.getInitServices()) {
+        for (LiveReloadInitService initService : liveReloadInitServiceFactory.getNormalServices()) {
             reloadOptions.put(initService.getName(), initService.getId());
             reloadOptionIdsInOrder.add(initService.getId());
         }
@@ -170,6 +169,7 @@ public class Init {
     private List<SelectItem> buildWebDependencyOptions() {
         return webDependencies.stream()
                               .map(webDependency -> new DefaultSelectItem(webDependency.displayName(), webDependency.id(), true, false))
+                              .sorted(Comparator.comparing(DefaultSelectItem::name))
                               .collect(Collectors.toList());
     }
 

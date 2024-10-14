@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class HtmxWebDependency implements WebDependency {
+public class HtmxWebDependency implements WebjarsBasedWebDependency {
 
     @Override
     public String id() {

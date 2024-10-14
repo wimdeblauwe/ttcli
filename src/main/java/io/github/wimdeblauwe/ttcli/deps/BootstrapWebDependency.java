@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Component
-public class BootstrapWebDependency implements WebDependency {
+public class BootstrapWebDependency implements WebjarsBasedWebDependency {
     @Override
     public String id() {
         return "bootstrap";

@@ -1,7 +1,9 @@
 package io.github.wimdeblauwe.ttcli.livereload.vite;
 
 import io.github.wimdeblauwe.ttcli.ProjectInitializationParameters;
+import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitService;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceException;
+import io.github.wimdeblauwe.ttcli.livereload.TailwindCssSpecializedLiveReloadInitService;
 import io.github.wimdeblauwe.ttcli.livereload.helper.TailwindCssHelper;
 import io.github.wimdeblauwe.ttcli.npm.NodeService;
 import org.springframework.core.annotation.Order;
@@ -13,7 +15,7 @@ import java.util.List;
 
 @Component
 @Order(6)
-public class ViteWithTailwindCssLiveReloadInitService extends ViteLiveReloadInitService {
+public class ViteWithTailwindCssLiveReloadInitService extends ViteLiveReloadInitService implements TailwindCssSpecializedLiveReloadInitService {
     public ViteWithTailwindCssLiveReloadInitService(NodeService nodeService) {
         super(nodeService);
     }
@@ -60,4 +62,8 @@ public class ViteWithTailwindCssLiveReloadInitService extends ViteLiveReloadInit
                        "tailwindcss", "postcss", "autoprefixer");
     }
 
+    @Override
+    public boolean isTailwindVersionOf(Class<? extends LiveReloadInitService> liveReloadInitServiceClass) {
+        return liveReloadInitServiceClass.isAssignableFrom(ViteLiveReloadInitService.class);
+    }
 }

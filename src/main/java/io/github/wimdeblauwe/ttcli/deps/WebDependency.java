@@ -8,10 +8,4 @@ public interface WebDependency {
     String id();
 
     String displayName();
-
-    List<MavenDependency> getMavenDependencies(String springBootVersion);
-
-    String getCssLinksForLayoutTemplate();
-
-    String getJsLinksForLayoutTemplate();
 }
