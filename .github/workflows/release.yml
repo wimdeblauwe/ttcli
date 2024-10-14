@@ -11,7 +11,7 @@ on:
         required: false
 
 env:
-  JAVA_VERSION: '21'
+  JAVA_VERSION: '23'
   JAVA_DISTRO: 'temurin'
 
 jobs:

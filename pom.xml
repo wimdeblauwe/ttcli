@@ -15,11 +15,12 @@
     <description>CLI interface to make working with Thymeleaf projects easier</description>
     <inceptionYear>2022</inceptionYear>
     <properties>
-        <java.version>21</java.version>
+        <java.version>23</java.version>
         <spring-shell.version>3.3.3</spring-shell.version>
         <xmlprojector.version>1.4.23</xmlprojector.version>
         <jsoup.version>1.18.1</jsoup.version>
         <xsoup.version>0.3.7</xsoup.version>
+        <jline.version>3.27.0</jline.version>
 
         <!-- Maven plugins -->
         <assembly-plugin.version>3.7.1</assembly-plugin.version>
@@ -47,8 +48,8 @@
         </dependency>
         <dependency>
             <groupId>org.jline</groupId>
-            <artifactId>jline-terminal-jna</artifactId>
-            <version>3.27.0</version>
+            <artifactId>jline</artifactId>
+            <version>${jline.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jsoup</groupId>
