@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Component
-public class AlpineWebDependency implements WebDependency {
+public class AlpineWebDependency implements WebjarsBasedWebDependency {
     @Override
     public String id() {
         return "alpinejs";

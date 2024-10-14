@@ -2,6 +2,7 @@ package io.github.wimdeblauwe.ttcli.thymeleaf;
 
 import io.github.wimdeblauwe.ttcli.ProjectInitializationParameters;
 import io.github.wimdeblauwe.ttcli.deps.WebDependency;
+import io.github.wimdeblauwe.ttcli.deps.WebjarsBasedWebDependency;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceParameters;
 import org.springframework.stereotype.Component;
 
@@ -50,22 +51,26 @@ public class ThymeleafTemplatesInitService {
 
         StringBuilder cssLinksForLayoutTemplate = new StringBuilder();
         for (WebDependency webDependency : webDependencies) {
-            String cssForDependency = webDependency.getCssLinksForLayoutTemplate();
-            if (cssForDependency != null) {
-                cssLinksForLayoutTemplate
-                        .append('\n')
-                        .append(cssForDependency);
+            if (webDependency instanceof WebjarsBasedWebDependency webjarsBasedWebDependency) {
+                String cssForDependency = webjarsBasedWebDependency.getCssLinksForLayoutTemplate();
+                if (cssForDependency != null) {
+                    cssLinksForLayoutTemplate
+                            .append('\n')
+                            .append(cssForDependency);
+                }
             }
         }
         insertCssLinksToLayoutTemplate(layoutTemplate, cssLinksForLayoutTemplate.toString());
 
         StringBuilder jsLinksForLayoutTemplate = new StringBuilder();
         for (WebDependency webDependency : webDependencies) {
-            String jsForDependency = webDependency.getJsLinksForLayoutTemplate();
-            if (jsForDependency != null) {
-                jsLinksForLayoutTemplate
-                        .append('\n')
-                        .append(jsForDependency);
+            if (webDependency instanceof WebjarsBasedWebDependency webjarsBasedWebDependency) {
+                String jsForDependency = webjarsBasedWebDependency.getJsLinksForLayoutTemplate();
+                if (jsForDependency != null) {
+                    jsLinksForLayoutTemplate
+                            .append('\n')
+                            .append(jsForDependency);
+                }
             }
         }
         insertJsLinksToLayoutTemplate(layoutTemplate, jsLinksForLayoutTemplate.toString());

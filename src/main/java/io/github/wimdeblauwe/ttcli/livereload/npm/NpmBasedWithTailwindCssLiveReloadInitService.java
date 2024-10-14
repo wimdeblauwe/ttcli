@@ -1,7 +1,9 @@
 package io.github.wimdeblauwe.ttcli.livereload.npm;
 
 import io.github.wimdeblauwe.ttcli.ProjectInitializationParameters;
+import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitService;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceException;
+import io.github.wimdeblauwe.ttcli.livereload.TailwindCssSpecializedLiveReloadInitService;
 import io.github.wimdeblauwe.ttcli.livereload.helper.TailwindCssHelper;
 import io.github.wimdeblauwe.ttcli.npm.NodeService;
 import org.springframework.core.annotation.Order;
@@ -9,11 +11,13 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 @Component
 @Order(2)
-public class NpmBasedWithTailwindCssLiveReloadInitService extends NpmBasedLiveReloadInitService {
+public class NpmBasedWithTailwindCssLiveReloadInitService extends NpmBasedLiveReloadInitService implements TailwindCssSpecializedLiveReloadInitService {
     public NpmBasedWithTailwindCssLiveReloadInitService(NodeService nodeService) {
         super(nodeService);
     }
@@ -80,5 +84,10 @@ public class NpmBasedWithTailwindCssLiveReloadInitService extends NpmBasedLiveRe
         scripts.put("watch:svg", "onchange \"src/main/resources/static/svg/**/*.svg\" -- npm run build:svg");
         scripts.put("watch:serve", "browser-sync start --no-inject-changes --proxy localhost:8080 --files \"target/classes/templates\" \"target/classes/static\"");
         return scripts;
+    }
+
+    @Override
+    public boolean isTailwindVersionOf(Class<? extends LiveReloadInitService> liveReloadInitServiceClass) {
+        return liveReloadInitServiceClass.isAssignableFrom(NpmBasedLiveReloadInitService.class);
     }
 }

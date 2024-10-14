@@ -3,6 +3,7 @@ package io.github.wimdeblauwe.ttcli.livereload.devtools;
 import io.github.wimdeblauwe.ttcli.ProjectInitializationParameters;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitService;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceException;
+import io.github.wimdeblauwe.ttcli.livereload.TailwindCssSpecializedLiveReloadInitService;
 import io.github.wimdeblauwe.ttcli.livereload.helper.TailwindCssHelper;
 import io.github.wimdeblauwe.ttcli.maven.MavenPomReaderWriter;
 import io.github.wimdeblauwe.ttcli.npm.InstalledApplicationVersions;
@@ -21,7 +22,7 @@ import java.util.Set;
 
 @Component
 @Order(4)
-public class DevToolsBasedWithTailwindCssLiveReloadInitService implements LiveReloadInitService {
+public class DevToolsBasedWithTailwindCssLiveReloadInitService implements LiveReloadInitService, TailwindCssSpecializedLiveReloadInitService {
     private final NodeService nodeService;
 
     public DevToolsBasedWithTailwindCssLiveReloadInitService(NodeService nodeService) {
@@ -191,4 +192,8 @@ public class DevToolsBasedWithTailwindCssLiveReloadInitService implements LiveRe
         }
     }
 
+    @Override
+    public boolean isTailwindVersionOf(Class<? extends LiveReloadInitService> liveReloadInitServiceClass) {
+        return liveReloadInitServiceClass.isAssignableFrom(DevToolsBasedLiveReloadInitService.class);
+    }
 }

@@ -9,6 +9,8 @@ import io.github.wimdeblauwe.ttcli.maven.MavenInitService;
 import io.github.wimdeblauwe.ttcli.tailwind.TailwindDependencyInitService;
 import io.github.wimdeblauwe.ttcli.thymeleaf.ThymeleafTemplatesInitService;
 import io.github.wimdeblauwe.ttcli.util.FileUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -17,6 +19,7 @@ import java.nio.file.Path;
 
 @Component
 public class ProjectInitializationService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProjectInitializationService.class);
     private final SpringBootInitializrService initializrService;
     private final JavaCodeInitService javaCodeInitService;
     private final LiveReloadInitServiceFactory liveReloadInitServiceFactory;
@@ -50,8 +53,9 @@ public class ProjectInitializationService {
             Files.createDirectories(basePath);
         }
 
-        LiveReloadInitService liveReloadInitService = liveReloadInitServiceFactory.getInitService(parameters.liveReloadInitServiceParameters().initServiceId());
-
+        LiveReloadInitService liveReloadInitService = liveReloadInitServiceFactory.getInitService(parameters.liveReloadInitServiceParameters().initServiceId(),
+                                                                                                  parameters.hasTailwindCssWebDependency());
+        LOGGER.info("Using init service {}", liveReloadInitService);
         initializrService.generate(basePath,
                                    parameters.springBootProjectCreationParameters(),
                                    liveReloadInitService.additionalSpringInitializrDependencies());

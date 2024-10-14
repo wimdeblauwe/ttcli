@@ -10,7 +10,7 @@ import java.util.List;
  * See <a href="https://shoelace.style/">https://shoelace.style/</a>
  */
 @Component
-public class ShoelaceWebDependency implements WebDependency {
+public class ShoelaceWebDependency implements WebjarsBasedWebDependency {
     @Override
     public String id() {
         return "shoelace";
