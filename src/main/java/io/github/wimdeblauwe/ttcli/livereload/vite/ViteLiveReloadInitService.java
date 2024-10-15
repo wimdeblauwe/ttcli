@@ -129,7 +129,7 @@ public class ViteLiveReloadInitService implements LiveReloadInitService {
                     server: {
                         proxy: {
                             // Proxy all backend requests to Spring Boot except for static assets
-                            '^/(?!static|assets|.*\\\\.(js|css|png|svg|jpg|jpeg|gif|ico|woff|woff2)$)': {
+                            '^/(?!static|assets|@|.*\\\\.(js|css|png|svg|jpg|jpeg|gif|ico|woff|woff2)$)': {
                                 target: 'http://localhost:8080',  // Proxy to Spring Boot backend
                                 changeOrigin: true,
                                 secure: false
