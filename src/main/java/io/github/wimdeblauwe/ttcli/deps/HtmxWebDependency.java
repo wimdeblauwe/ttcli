@@ -44,7 +44,7 @@ public class HtmxWebDependency implements WebjarsBasedWebDependency {
         if (springBootVersion.startsWith("2.")) {
             htmxSpringBootThymeleafVersion = "1.0.0";
         } else if (springBootVersion.startsWith("3.")) {
-            htmxSpringBootThymeleafVersion = "3.5.1";
+            htmxSpringBootThymeleafVersion = "3.6.1";
         } else {
             throw new IllegalArgumentException("Unknown Spring Boot version: " + springBootVersion);
         }
