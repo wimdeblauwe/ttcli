@@ -14,8 +14,8 @@ public class MavenInitService {
     public void generate(ProjectInitializationParameters parameters) throws InterruptedException {
         try {
             addMavenDependencies(MavenPomReaderWriter.readFrom(parameters.basePath()),
-                                 parameters.webDependencies(),
-                                 parameters.springBootProjectCreationParameters().springBootVersion());
+                    parameters.webDependencies(),
+                    parameters.springBootProjectCreationParameters().springBootVersion());
         } catch (IOException e) {
             throw new MavenInitServiceException(e);
         }
@@ -28,7 +28,18 @@ public class MavenInitService {
         mavenPomReaderWriter.updateDependencies(dependencies -> {
             dependencies.appendChild(new Comment(" Web dependencies "));
         });
-        mavenPomReaderWriter.addDependency("org.webjars", "webjars-locator", "0.46");
+        if (springBootVersion.startsWith("1.")
+                || springBootVersion.startsWith("2.")
+                || springBootVersion.startsWith("3.0")
+                || springBootVersion.startsWith("3.1")
+                || springBootVersion.startsWith("3.2")
+                || springBootVersion.startsWith("3.3")
+        ) {
+            mavenPomReaderWriter.addDependency("org.webjars", "webjars-locator", "0.52");
+        } else {
+            // Starting with Spring Boot 3.4.0, we can use webjars-locator-lite
+            mavenPomReaderWriter.addDependency("org.webjars", "webjars-locator-lite", "1.0.1");
+        }
         for (WebDependency webDependency : webDependencies) {
             if (webDependency instanceof WebjarsBasedWebDependency webjarsBasedWebDependency) {
                 List<MavenDependency> mavenDependencies = webjarsBasedWebDependency.getMavenDependencies(springBootVersion);
