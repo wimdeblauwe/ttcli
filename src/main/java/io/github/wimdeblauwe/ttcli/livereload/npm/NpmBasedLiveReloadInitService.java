@@ -7,8 +7,8 @@ import io.github.wimdeblauwe.ttcli.livereload.helper.NpmHelper;
 import io.github.wimdeblauwe.ttcli.maven.MavenPomReaderWriter;
 import io.github.wimdeblauwe.ttcli.npm.InstalledApplicationVersions;
 import io.github.wimdeblauwe.ttcli.npm.NodeService;
-import io.github.wimdeblauwe.ttcli.util.ProcessBuilderFactory;
-import org.jsoup.nodes.Comment;
+import io.github.wimdeblauwe.ttcli.util.ExternalProcessException;
+import io.github.wimdeblauwe.ttcli.util.ExternalProcessRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -42,17 +42,17 @@ public class NpmBasedLiveReloadInitService implements LiveReloadInitService {
     public String getHelpText() {
         return """
                 # Live reload setup
-                                
+                
                 This project uses NPM to have live reloading.
-                                
+                
                 Use the following steps to get it working:
-                                
+                
                 1. Run the Spring Boot application with the `local` profile
                 2. From a terminal, run `npm run build && npm run watch` (You can also run `npm run --silent build && npm run --silent watch` if you want less output in the terminal)
                 3. Your default browser will open at http://localhost:3000
-                                
+                
                 You should now be able to change any HTML or CSS and have the browser reload upon saving the file.
-                                
+                
                 NOTE: If you use a separate authentication server (e.g. social logins, or Keycloak) then after login,
                 you might get redirected to http://localhost:8080 as opposed to http://localhost:3000.
                 Be sure to set the port back to `3000` in your browser to have live reload.""";
@@ -69,11 +69,11 @@ public class NpmBasedLiveReloadInitService implements LiveReloadInitService {
             InstalledApplicationVersions installedApplicationVersions = nodeService.checkIfNodeAndNpmAreInstalled();
             Path basePath = projectInitializationParameters.basePath();
             nodeService.createPackageJson(basePath,
-                                          projectInitializationParameters.projectName());
+                    projectInitializationParameters.projectName());
             nodeService.installNpmDevDependencies(basePath,
-                                                  npmDevDependencies());
+                    npmDevDependencies());
             copyPostcssConfigJs(basePath,
-                                postcssConfigFilePath());
+                    postcssConfigFilePath());
             nodeService.insertPackageJsonScripts(basePath, npmScripts());
 
             MavenPomReaderWriter mavenPomReaderWriter = MavenPomReaderWriter.readFrom(basePath);
@@ -91,20 +91,15 @@ public class NpmBasedLiveReloadInitService implements LiveReloadInitService {
 
     @Override
     public void runBuild(ProjectInitializationParameters projectInitializationParameters) throws LiveReloadInitServiceException {
-        ProcessBuilder builder = ProcessBuilderFactory.create(List.of("npm", "run", "build"));
-        builder.directory(projectInitializationParameters.basePath().toFile());
-        builder.redirectError(ProcessBuilder.Redirect.INHERIT);
-        int exitValue;
         try {
-            exitValue = builder.start().waitFor();
-        } catch (IOException e) {
+            ExternalProcessRunner.run(projectInitializationParameters.basePath().toFile(),
+                    List.of("npm", "run", "build"),
+                    () -> "Unable to run `npm run build`");
+        } catch (ExternalProcessException e) {
             throw new LiveReloadInitServiceException(e);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new LiveReloadInitServiceException(e);
-        }
-        if (exitValue != 0) {
-            throw new RuntimeException("unable to init tailwind css");
         }
     }
 
@@ -119,7 +114,7 @@ public class NpmBasedLiveReloadInitService implements LiveReloadInitService {
 
     protected List<String> npmDevDependencies() {
         return List.of("@babel/cli", "autoprefixer", "browser-sync", "cssnano",
-                       "mkdirp", "npm-run-all", "onchange", "postcss", "postcss-cli", "recursive-copy-cli", "path-exists-cli");
+                "mkdirp", "npm-run-all", "onchange", "postcss", "postcss-cli", "recursive-copy-cli", "path-exists-cli");
     }
 
     protected LinkedHashMap<String, String> npmScripts() {
@@ -147,7 +142,7 @@ public class NpmBasedLiveReloadInitService implements LiveReloadInitService {
                                      String sourceFile) throws IOException {
         try (InputStream stream = getClass().getResourceAsStream(sourceFile)) {
             Files.copy(Objects.requireNonNull(stream, () -> "Could not find " + sourceFile),
-                       base.resolve("postcss.config.js"));
+                    base.resolve("postcss.config.js"));
         }
     }
 
