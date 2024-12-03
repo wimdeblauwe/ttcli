@@ -1,7 +1,8 @@
 package io.github.wimdeblauwe.ttcli.npm;
 
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceException;
-import io.github.wimdeblauwe.ttcli.util.ProcessBuilderFactory;
+import io.github.wimdeblauwe.ttcli.util.ExternalProcessException;
+import io.github.wimdeblauwe.ttcli.util.ExternalProcessRunner;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -19,7 +20,7 @@ public class NodeService {
         String npmVersion = checkIfApplicationIsInstalled("npm");
         System.out.println("\uD83D\uDEE0️  Using node " + nodeVersion + " with npm " + npmVersion);
         InstalledApplicationVersions versions = new InstalledApplicationVersions(nodeVersion,
-                                                                                 npmVersion);
+                npmVersion);
         if (versions.nodeVersionBelowCurrentLtsVersion()) {
             throw new LiveReloadInitServiceException("Your node version is below the recommended version. Please upgrade to the latest LTS version.");
         }
@@ -58,13 +59,7 @@ public class NodeService {
         List<String> parameters = new ArrayList<>();
         parameters.addAll(List.of("npm", "install", "-D"));
         parameters.addAll(dependencies);
-        ProcessBuilder builder = ProcessBuilderFactory.create(parameters);
-        builder.directory(base.toFile());
-        builder.redirectError(ProcessBuilder.Redirect.INHERIT);
-        int exitValue = builder.start().waitFor();
-        if (exitValue != 0) {
-            throw new RuntimeException("installation of npm dependencies failed");
-        }
+        ExternalProcessRunner.run(base.toFile(), parameters, () -> "Installation of npm dependencies failed");
     }
 
     public void runNpxCommand(Path base,
@@ -72,13 +67,7 @@ public class NodeService {
         List<String> parameters = new ArrayList<>();
         parameters.add("npx");
         parameters.addAll(params);
-        ProcessBuilder builder = ProcessBuilderFactory.create(parameters);
-        builder.directory(base.toFile());
-        builder.redirectError(ProcessBuilder.Redirect.INHERIT);
-        int exitValue = builder.start().waitFor();
-        if (exitValue != 0) {
-            throw new RuntimeException("installation of npm dependencies failed");
-        }
+        ExternalProcessRunner.run(base.toFile(), parameters, () -> "npx command failed");
     }
 
     public void insertPackageJsonScripts(Path base,
@@ -96,17 +85,9 @@ public class NodeService {
 
     private String checkIfApplicationIsInstalled(String application) throws InterruptedException {
         try {
-            ProcessBuilder builder = ProcessBuilderFactory.create(List.of(application, "-v"));
-            builder.redirectError(ProcessBuilder.Redirect.INHERIT);
-            Process process = builder.start();
-            int exitValue = process.waitFor();
-            String version = new String(process.getInputStream().readAllBytes()).trim();
-            if (exitValue != 0) {
-                throw new LiveReloadInitServiceException(String.format("Seems the application '%s' is not installed, which is a prerequisite for the ttcli tool.", application));
-            }
-
-            return version;
-        } catch (IOException e) {
+            String output = ExternalProcessRunner.run(null, List.of(application, "-v"), () -> String.format("Seems the application '%s' is not installed, which is a prerequisite for the ttcli tool.", application));
+            return output.trim();
+        } catch (ExternalProcessException e) {
             throw new LiveReloadInitServiceException(String.format("Seems the application '%s' is not installed, which is a prerequisite for the ttcli tool.", application));
         }
     }

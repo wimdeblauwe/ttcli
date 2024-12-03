@@ -8,6 +8,8 @@ import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceFactory;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceParameters;
 import io.github.wimdeblauwe.ttcli.tailwind.TailwindDependency;
 import io.github.wimdeblauwe.ttcli.util.InetUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.component.context.ComponentContext;
 import org.springframework.shell.component.flow.ComponentFlow;
@@ -24,6 +26,8 @@ import java.util.stream.Collectors;
 
 @ShellComponent
 public class Init {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Init.class);
+
     @Autowired
     private ComponentFlow.Builder flowBuilder;
     @Autowired
@@ -79,7 +83,8 @@ public class Init {
             System.out.println("✅ Done generating project at " + basePath.toAbsolutePath());
             System.out.println();
             System.out.println("See HELP.md in the generated project for additional information.");
-        } catch (IOException | ProjectInitializationServiceException e) {
+        } catch (Exception e) {
+            LOGGER.error("Error during project generation: " + e.getMessage(), e);
             System.err.println("❌ Error during project generation: " + e.getMessage());
         }
     }

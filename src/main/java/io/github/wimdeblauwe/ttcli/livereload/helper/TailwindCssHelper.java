@@ -1,6 +1,6 @@
 package io.github.wimdeblauwe.ttcli.livereload.helper;
 
-import io.github.wimdeblauwe.ttcli.util.ProcessBuilderFactory;
+import io.github.wimdeblauwe.ttcli.util.ExternalProcessRunner;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -29,13 +29,7 @@ public final class TailwindCssHelper {
     }
 
     private static void initializeTailwindConfig(Path base) throws InterruptedException, IOException {
-        ProcessBuilder builder = ProcessBuilderFactory.create(List.of("npx", "tailwindcss", "init"));
-        builder.directory(base.toFile());
-        builder.redirectError(ProcessBuilder.Redirect.INHERIT);
-        int exitValue = builder.start().waitFor();
-        if (exitValue != 0) {
-            throw new RuntimeException("unable to init tailwind css");
-        }
+        ExternalProcessRunner.run(base.toFile(), List.of("npx", "tailwindcss", "init"), () -> "unable to init tailwind css");
     }
 
     private static String applicationCssContent() {
