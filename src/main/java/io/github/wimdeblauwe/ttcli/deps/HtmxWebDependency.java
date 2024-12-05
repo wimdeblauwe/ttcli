@@ -1,9 +1,8 @@
 package io.github.wimdeblauwe.ttcli.deps;
 
 import io.github.wimdeblauwe.ttcli.maven.MavenDependency;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
+import org.springframework.stereotype.Component;
 
 @Component
 public class HtmxWebDependency implements WebjarsBasedWebDependency {
@@ -47,10 +46,10 @@ public class HtmxWebDependency implements WebjarsBasedWebDependency {
                 || springBootVersion.startsWith("3.1")
                 || springBootVersion.startsWith("3.2")
                 || springBootVersion.startsWith("3.3")) {
-            htmxSpringBootThymeleafVersion = "3.6.2";
+            htmxSpringBootThymeleafVersion = "3.6.3";
         } else if (springBootVersion.startsWith("3.")) {
             // From Spring Boot 3.4 onwards, we can use version 4.x of htmx-spring-boot
-            htmxSpringBootThymeleafVersion = "4.0.0";
+            htmxSpringBootThymeleafVersion = "4.0.1";
         } else {
             throw new IllegalArgumentException("Unknown Spring Boot version: " + springBootVersion);
         }
