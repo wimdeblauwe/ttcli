@@ -7,9 +7,6 @@ import io.github.wimdeblauwe.ttcli.livereload.helper.NpmHelper;
 import io.github.wimdeblauwe.ttcli.maven.MavenPomReaderWriter;
 import io.github.wimdeblauwe.ttcli.npm.InstalledApplicationVersions;
 import io.github.wimdeblauwe.ttcli.npm.NodeService;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,6 +14,8 @@ import java.nio.file.StandardOpenOption;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
 @Component
 @Order(5)
@@ -78,7 +77,7 @@ public class ViteLiveReloadInitService implements LiveReloadInitService {
             createViteConfig(basePath);
 
             MavenPomReaderWriter mavenPomReaderWriter = MavenPomReaderWriter.readFrom(basePath);
-            mavenPomReaderWriter.addDependency("io.github.wimdeblauwe", "vite-spring-boot-thymeleaf", "0.4.0");
+            mavenPomReaderWriter.addDependency("io.github.wimdeblauwe", "vite-spring-boot-thymeleaf", "0.6.0");
             mavenPomReaderWriter.write();
 
             NpmHelper.updateMavenPom(mavenPomReaderWriter, installedApplicationVersions, false);
