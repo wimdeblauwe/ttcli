@@ -6,13 +6,14 @@ import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceException;
 import io.github.wimdeblauwe.ttcli.livereload.TailwindCssSpecializedLiveReloadInitService;
 import io.github.wimdeblauwe.ttcli.livereload.helper.TailwindCssHelper;
 import io.github.wimdeblauwe.ttcli.npm.NodeService;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 
 @Component
 @Order(2)
@@ -37,7 +38,8 @@ public class NpmBasedWithTailwindCssLiveReloadInitService extends NpmBasedLiveRe
             super.generate(projectInitializationParameters);
 
             TailwindCssHelper.createApplicationCss(projectInitializationParameters.basePath(),
-                                                   "src/main/resources/static/css/application.css");
+                    "src/main/resources/static/css/application.css",
+                    "../../templates");
         } catch (IOException e) {
             throw new LiveReloadInitServiceException(e);
         }
