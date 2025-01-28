@@ -102,7 +102,7 @@ public class ViteLiveReloadInitService implements LiveReloadInitService {
         return null;
     }
 
-    private void createViteConfig(Path basePath) throws IOException {
+    protected void createViteConfig(Path basePath) throws IOException {
         Path path = basePath.resolve("vite.config.js");
         String content = """
                 import {defineConfig} from 'vite';

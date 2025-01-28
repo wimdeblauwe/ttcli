@@ -1,7 +1,6 @@
 package io.github.wimdeblauwe.ttcli.livereload.helper;
 
 import io.github.wimdeblauwe.ttcli.util.ExternalProcessRunner;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -34,9 +33,8 @@ public final class TailwindCssHelper {
 
     private static String applicationCssContent() {
         return """
-                @tailwind base;
-                @tailwind components;
-                @tailwind utilities;""";
+            @import "tailwindcss";
+            """;
     }
 
     private TailwindCssHelper() {

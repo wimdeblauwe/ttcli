@@ -6,13 +6,14 @@ import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceException;
 import io.github.wimdeblauwe.ttcli.livereload.TailwindCssSpecializedLiveReloadInitService;
 import io.github.wimdeblauwe.ttcli.livereload.helper.TailwindCssHelper;
 import io.github.wimdeblauwe.ttcli.npm.NodeService;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
-
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.stream.Stream;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
 @Component
 @Order(6)
@@ -40,14 +41,7 @@ public class ViteWithTailwindCssLiveReloadInitService extends ViteLiveReloadInit
 
             TailwindCssHelper.createApplicationCss(basePath,
                                                    "src/main/resources/static/css/application.css");
-            TailwindCssHelper.setupTailwindConfig(basePath, "./src/main/resources/templates/**/*.html");
-            // Generate the postcss.config.js file for Tailwind CSS
-            nodeService.runNpxCommand(basePath, List.of("tailwindcss", "init", "-p"));
-
         } catch (IOException e) {
-            throw new LiveReloadInitServiceException(e);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
             throw new LiveReloadInitServiceException(e);
         }
     }
@@ -60,8 +54,52 @@ public class ViteWithTailwindCssLiveReloadInitService extends ViteLiveReloadInit
     @Override
     protected List<String> npmDevDependencies() {
         return Stream.concat(super.npmDevDependencies().stream(),
-                             Stream.of("tailwindcss", "postcss", "autoprefixer"))
+                Stream.of("tailwindcss", "@tailwindcss/vite"))
                      .toList();
+    }
+
+    @Override
+    protected void createViteConfig(Path basePath) throws IOException {
+        Path path = basePath.resolve("vite.config.js");
+        String content = """
+            import {defineConfig} from 'vite';
+            import tailwindcss from '@tailwindcss/vite';
+            import path from 'path';
+            import springBoot from '@wim.deblauwe/vite-plugin-spring-boot';
+            
+            export default defineConfig({
+                plugins: [
+                    tailwindcss(),
+                    springBoot()
+                ],
+                root: path.join(__dirname, './src/main/resources'),
+                build: {
+                    manifest: true,
+                    rollupOptions: {
+                        input: [
+                            '/static/css/application.css'
+                        ]
+                    },
+                    outDir: path.join(__dirname, `./target/classes/static`),
+                    copyPublicDir: false,
+                    emptyOutDir: true
+                },
+                server: {
+                    proxy: {
+                        // Proxy all backend requests to Spring Boot except for static assets
+                        '^/(?!static|assets|@|.*\\\\.(js|css|png|svg|jpg|jpeg|gif|ico|woff|woff2)$)': {
+                            target: 'http://localhost:8080',  // Proxy to Spring Boot backend
+                            changeOrigin: true,
+                            secure: false
+                        }
+                    },
+                    watch: {
+                        ignored: ['target/**']
+                    }
+                }
+            });
+            """;
+        Files.writeString(path, content, StandardOpenOption.CREATE);
     }
 
     @Override
