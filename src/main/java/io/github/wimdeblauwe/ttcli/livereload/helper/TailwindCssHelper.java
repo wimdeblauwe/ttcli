@@ -34,6 +34,7 @@ public final class TailwindCssHelper {
     private static String applicationCssContent() {
         return """
             @import "tailwindcss";
+            @source "../../templates";
             """;
     }
 
