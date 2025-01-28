@@ -6,14 +6,13 @@ import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceException;
 import io.github.wimdeblauwe.ttcli.livereload.TailwindCssSpecializedLiveReloadInitService;
 import io.github.wimdeblauwe.ttcli.livereload.helper.TailwindCssHelper;
 import io.github.wimdeblauwe.ttcli.npm.NodeService;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
-
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
 @Component
 @Order(2)
@@ -39,11 +38,7 @@ public class NpmBasedWithTailwindCssLiveReloadInitService extends NpmBasedLiveRe
 
             TailwindCssHelper.createApplicationCss(projectInitializationParameters.basePath(),
                                                    "src/main/resources/static/css/application.css");
-            TailwindCssHelper.setupTailwindConfig(projectInitializationParameters.basePath(), "./src/main/resources/templates/**/*.html");
         } catch (IOException e) {
-            throw new LiveReloadInitServiceException(e);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
             throw new LiveReloadInitServiceException(e);
         }
     }
@@ -61,6 +56,7 @@ public class NpmBasedWithTailwindCssLiveReloadInitService extends NpmBasedLiveRe
     protected List<String> npmDevDependencies() {
         List<String> dependencies = new ArrayList<>(super.npmDevDependencies());
         dependencies.add("tailwindcss");
+        dependencies.add("@tailwindcss/postcss");
         return dependencies;
     }
 

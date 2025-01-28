@@ -1,6 +1,6 @@
 const postcssConfig = {
-    plugins: [require('autoprefixer'),
-        require('tailwindcss')],
+    plugins: [
+        require('@tailwindcss/postcss')],
 };
 
 // If we are in production mode, then add cssnano
