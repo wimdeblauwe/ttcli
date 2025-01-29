@@ -16,7 +16,7 @@ public class DaisyUiTailwindDependency implements TailwindDependency{
 
     @Override
     public String npmPackageName() {
-        return "daisyui@latest";
+        return "daisyui@beta";
     }
 
     @Override

@@ -38,12 +38,9 @@ public class NpmBasedWithTailwindCssLiveReloadInitService extends NpmBasedLiveRe
             super.generate(projectInitializationParameters);
 
             TailwindCssHelper.createApplicationCss(projectInitializationParameters.basePath(),
-                                                   "src/main/resources/static/css/application.css");
-            TailwindCssHelper.setupTailwindConfig(projectInitializationParameters.basePath(), "./src/main/resources/templates/**/*.html");
+                    "src/main/resources/static/css/application.css",
+                    "../../templates");
         } catch (IOException e) {
-            throw new LiveReloadInitServiceException(e);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
             throw new LiveReloadInitServiceException(e);
         }
     }
@@ -61,6 +58,7 @@ public class NpmBasedWithTailwindCssLiveReloadInitService extends NpmBasedLiveRe
     protected List<String> npmDevDependencies() {
         List<String> dependencies = new ArrayList<>(super.npmDevDependencies());
         dependencies.add("tailwindcss");
+        dependencies.add("@tailwindcss/postcss");
         return dependencies;
     }
 

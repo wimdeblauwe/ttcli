@@ -43,18 +43,18 @@ public class DevToolsBasedWithTailwindCssLiveReloadInitService implements LiveRe
     public String getHelpText() {
         return """
                 # Live reload setup
-                                
+                
                 This project uses Spring Boot DevTools to have live reloading.
-                                
+                
                 Use the following steps to get it working:
-                                
+                
                 1. Install the LiveReload browser extension in your browser.
                 2. Configure your editor to automatically compile when saving. For IntelliJ, you need to enable 'Build project automatically' in the project settings.
                    Also enable 'Allow auto-make to start even if developed application is currently running'.
                 3. Run `npm run watch` in the `src/main/frontend` directory to ensure the Tailwind CSS output file is generated.
                 3. Run the Spring Boot application.
                 4. Open the browser at http://localhost:8080. Ensure the Live Reload extension is active in the browser.
-                                
+                
                 You should now be able to change any HTML or CSS and have the browser reload upon saving the file.
                 """;
     }
@@ -76,9 +76,9 @@ public class DevToolsBasedWithTailwindCssLiveReloadInitService implements LiveRe
             }
 
             nodeService.createPackageJson(frontendBasePath,
-                                          projectInitializationParameters.projectName());
+                    projectInitializationParameters.projectName());
             nodeService.installNpmDevDependencies(frontendBasePath,
-                                                  List.of("tailwindcss"));
+                    List.of("tailwindcss", "@tailwindcss/cli"));
             nodeService.insertPackageJsonScripts(frontendBasePath, npmScripts());
 
             MavenPomReaderWriter mavenPomReaderWriter = MavenPomReaderWriter.readFrom(basePath);
@@ -87,9 +87,8 @@ public class DevToolsBasedWithTailwindCssLiveReloadInitService implements LiveRe
 
 
             TailwindCssHelper.createApplicationCss(basePath,
-                                                   "src/main/frontend/application.css");
-            TailwindCssHelper.setupTailwindConfig(frontendBasePath,
-                                                  "../resources/templates/**/*.{html,js}");
+                    "src/main/frontend/application.css",
+                    "../resources/templates");
         } catch (IOException e) {
             throw new LiveReloadInitServiceException(e);
         } catch (InterruptedException e) {
@@ -126,51 +125,51 @@ public class DevToolsBasedWithTailwindCssLiveReloadInitService implements LiveRe
 
         mavenPomReaderWriter.updatePluginManagementPlugins(plugins -> {
             plugins.append("""
-                                   <plugin>
-                                       <groupId>com.github.eirslett</groupId>
-                                       <artifactId>frontend-maven-plugin</artifactId>
-                                       <version>${frontend-maven-plugin.version}</version>
-                                       <configuration>
-                                            <nodeVersion>${frontend-maven-plugin.nodeVersion}</nodeVersion>
-                                            <workingDirectory>src/main/frontend</workingDirectory>
-                                       		<installDirectory>target</installDirectory>
-                                       </configuration>
-                                       <executions>
-                                           <execution>
-                                               <id>install-frontend-tooling</id>
-                                               <goals>
-                                                   <goal>install-node-and-npm</goal>
-                                               </goals>
-                                               <configuration>
-                                                   <nodeVersion>${frontend-maven-plugin.nodeVersion}</nodeVersion>
-                                                   <npmVersion>${frontend-maven-plugin.npmVersion}</npmVersion>
-                                               </configuration>
-                                           </execution>
-                                           <execution>
-                                               <id>run-npm-install</id>
-                                               <goals>
-                                                   <goal>npm</goal>
-                                               </goals>
-                                           </execution>
-                                           <execution>
-                                               <id>run-npm-build</id>
-                                               <goals>
-                                                   <goal>npm</goal>
-                                               </goals>
-                                               <configuration>
-                                                   <arguments>run build</arguments>
-                                               </configuration>
-                                           </execution>
-                                       </executions>
-                                   </plugin>""");
+                    <plugin>
+                        <groupId>com.github.eirslett</groupId>
+                        <artifactId>frontend-maven-plugin</artifactId>
+                        <version>${frontend-maven-plugin.version}</version>
+                        <configuration>
+                             <nodeVersion>${frontend-maven-plugin.nodeVersion}</nodeVersion>
+                             <workingDirectory>src/main/frontend</workingDirectory>
+                        		<installDirectory>target</installDirectory>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>install-frontend-tooling</id>
+                                <goals>
+                                    <goal>install-node-and-npm</goal>
+                                </goals>
+                                <configuration>
+                                    <nodeVersion>${frontend-maven-plugin.nodeVersion}</nodeVersion>
+                                    <npmVersion>${frontend-maven-plugin.npmVersion}</npmVersion>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>run-npm-install</id>
+                                <goals>
+                                    <goal>npm</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>run-npm-build</id>
+                                <goals>
+                                    <goal>npm</goal>
+                                </goals>
+                                <configuration>
+                                    <arguments>run build</arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>""");
         });
 
         mavenPomReaderWriter.updateBuildPlugins(plugins -> {
             plugins.append("""
-                                   <plugin>
-                                       <groupId>com.github.eirslett</groupId>
-                                       <artifactId>frontend-maven-plugin</artifactId>
-                                   </plugin>""");
+                    <plugin>
+                        <groupId>com.github.eirslett</groupId>
+                        <artifactId>frontend-maven-plugin</artifactId>
+                    </plugin>""");
         });
 
         mavenPomReaderWriter.write();
@@ -180,7 +179,7 @@ public class DevToolsBasedWithTailwindCssLiveReloadInitService implements LiveRe
         Path path = base.resolve(".gitignore");
         Files.createDirectories(path.getParent());
         String s = """
-                                
+                
                 # Excludes for npm
                 src/main/frontend/node_modules
                 src/main/resources/css/application.css
