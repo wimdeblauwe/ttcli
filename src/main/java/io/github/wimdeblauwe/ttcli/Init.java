@@ -15,6 +15,7 @@ import org.springframework.shell.component.context.ComponentContext;
 import org.springframework.shell.component.flow.ComponentFlow;
 import org.springframework.shell.component.flow.DefaultSelectItem;
 import org.springframework.shell.component.flow.SelectItem;
+import org.springframework.shell.component.support.Nameable;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
@@ -62,6 +63,7 @@ public class Init {
             String artifactId = context.get("artifact-id");
             String projectName = context.get("project-name");
             String springBootVersion = context.get("spring-boot-version");
+            String javaVersion = context.get("java-version");
 
             List<String> selectedWebDependencyOptions = context.get("web-dependencies");
             List<WebDependency> selectedWebDependencies = webDependencies.stream().filter(webDependency -> selectedWebDependencyOptions.contains(webDependency.id())).toList();
@@ -72,13 +74,14 @@ public class Init {
             Path basePath = Path.of(baseDir).resolve(artifactId);
 
             projectInitializationService.initialize(new ProjectInitializationParameters(basePath,
-                                                                                        new SpringBootProjectCreationParameters(groupId,
-                                                                                                                                artifactId,
-                                                                                                                                projectName,
-                                                                                                                                springBootVersion),
-                                                                                        new LiveReloadInitServiceParameters(context.get("live-reload")),
-                                                                                        selectedWebDependencies,
-                                                                                        selectedTailwindDependencies));
+                    new SpringBootProjectCreationParameters(groupId,
+                            artifactId,
+                            projectName,
+                            springBootVersion,
+                            javaVersion),
+                    new LiveReloadInitServiceParameters(context.get("live-reload")),
+                    selectedWebDependencies,
+                    selectedTailwindDependencies));
 
             System.out.println("✅ Done generating project at " + basePath.toAbsolutePath());
             System.out.println();
@@ -98,8 +101,8 @@ public class Init {
             ComponentContext<?> context = flowResult.getContext();
             List<String> selectedTailwindDependencyOptions = context.get("tailwind-dependencies");
             return tailwindDependencies.stream()
-                                       .filter(webDependency -> selectedTailwindDependencyOptions.contains(webDependency.id()))
-                                       .toList();
+                    .filter(webDependency -> selectedTailwindDependencyOptions.contains(webDependency.id()))
+                    .toList();
         } else {
             return Collections.emptyList();
         }
@@ -111,39 +114,44 @@ public class Init {
 
     private void addGroupIdInput(ComponentFlow.Builder builder) {
         builder.withStringInput("group-id")
-               .name("Group: ")
-               .defaultValue("com.example")
-               .and();
+                .name("Group: ")
+                .defaultValue("com.example")
+                .and();
     }
 
     private void addArtifactIdInput(ComponentFlow.Builder builder) {
         builder.withStringInput("artifact-id")
-               .name("Artifact: ")
-               .defaultValue("demo")
-               .and();
+                .name("Artifact: ")
+                .defaultValue("demo")
+                .and();
     }
 
     private void addProjectNameInput(ComponentFlow.Builder builder) {
         builder.withStringInput("project-name")
-               .name("Project Name: ")
-               .defaultValue("Demo")
-               .and();
+                .name("Project Name: ")
+                .defaultValue("Demo")
+                .and();
     }
 
     private void addSpringBootVersionInput(ComponentFlow.Builder builder) {
         try {
             InetUtil.checkIfInternetAccessIsAvailable("start.spring.io");
             InitializrMetadata metadata = initializrClient.getMetadata();
-            BootVersion bootVersion = metadata.getBootVersion();
+            SpringInitializrSingleSelect bootVersion = metadata.getBootVersion();
             List<IdAndName> springBootVersions = bootVersion.getValues();
 
-            Map<String, String> selectItems = convertToMap(springBootVersions);
-            String defaultName = bootVersion.getDefaultName();
             builder.withSingleItemSelector("spring-boot-version")
-                   .name("Select Spring Boot version")
-                   .selectItems(selectItems)
-                   .defaultSelect(defaultName)
-                   .and();
+                    .name("Select Spring Boot version")
+                    .selectItems(convertToMap(springBootVersions))
+                    .sort(Comparator.comparing(Nameable::getName, Comparator.naturalOrder()))
+                    .defaultSelect(bootVersion.getDefaultName())
+                    .and()
+                    .withSingleItemSelector("java-version")
+                    .name("Java version")
+                    .selectItems(convertToMap(metadata.getJavaVersion().getValues()))
+                    .sort(Comparator.comparing(Nameable::getName, Comparator.naturalOrder()))
+                    .defaultSelect(metadata.getJavaVersion().getDefaultName())
+                    .and();
         } catch (IllegalStateException e) {
             throw new ProjectInitializationServiceException(e.getMessage());
         }
@@ -157,37 +165,37 @@ public class Init {
             reloadOptionIdsInOrder.add(initService.getId());
         }
         builder.withSingleItemSelector("live-reload")
-               .sort(Comparator.comparingInt(o -> reloadOptionIdsInOrder.indexOf(o.getItem())))
-               .name("Select live reload implementation:")
-               .selectItems(reloadOptions)
-               .max(reloadOptions.size())
-               .and();
+                .sort(Comparator.comparingInt(o -> reloadOptionIdsInOrder.indexOf(o.getItem())))
+                .name("Select live reload implementation:")
+                .selectItems(reloadOptions)
+                .max(reloadOptions.size())
+                .and();
     }
 
     private void addWebDependenciesInput(ComponentFlow.Builder builder) {
         builder.withMultiItemSelector("web-dependencies")
-               .name("Web dependencies")
-               .selectItems(buildWebDependencyOptions())
-               .and();
+                .name("Web dependencies")
+                .selectItems(buildWebDependencyOptions())
+                .and();
     }
 
     private List<SelectItem> buildWebDependencyOptions() {
         return webDependencies.stream()
-                              .map(webDependency -> new DefaultSelectItem(webDependency.displayName(), webDependency.id(), true, false))
-                              .sorted(Comparator.comparing(DefaultSelectItem::name))
-                              .collect(Collectors.toList());
+                .map(webDependency -> new DefaultSelectItem(webDependency.displayName(), webDependency.id(), true, false))
+                .sorted(Comparator.comparing(DefaultSelectItem::name))
+                .collect(Collectors.toList());
     }
 
     private void addTailwindDependenciesInput(ComponentFlow.Builder builder) {
         builder.withMultiItemSelector("tailwind-dependencies")
-               .name("Tailwind dependencies")
-               .selectItems(buildTailwindDependencyOptions())
-               .and();
+                .name("Tailwind dependencies")
+                .selectItems(buildTailwindDependencyOptions())
+                .and();
     }
 
     private List<SelectItem> buildTailwindDependencyOptions() {
         return tailwindDependencies.stream()
-                                   .map(tailwindDependency -> new DefaultSelectItem(tailwindDependency.displayName(), tailwindDependency.id(), true, false))
-                                   .collect(Collectors.toList());
+                .map(tailwindDependency -> new DefaultSelectItem(tailwindDependency.displayName(), tailwindDependency.id(), true, false))
+                .collect(Collectors.toList());
     }
 }

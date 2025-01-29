@@ -1,13 +1,22 @@
 package io.github.wimdeblauwe.ttcli.boot;
 
 public class InitializrMetadata {
-    private BootVersion bootVersion;
+    private SpringInitializrSingleSelect bootVersion;
+    private SpringInitializrSingleSelect javaVersion;
 
-    public BootVersion getBootVersion() {
+    public SpringInitializrSingleSelect getBootVersion() {
         return bootVersion;
     }
 
-    public void setBootVersion(BootVersion bootVersion) {
+    public void setBootVersion(SpringInitializrSingleSelect bootVersion) {
         this.bootVersion = bootVersion;
+    }
+
+    public SpringInitializrSingleSelect getJavaVersion() {
+        return javaVersion;
+    }
+
+    public void setJavaVersion(SpringInitializrSingleSelect javaVersion) {
+        this.javaVersion = javaVersion;
     }
 }

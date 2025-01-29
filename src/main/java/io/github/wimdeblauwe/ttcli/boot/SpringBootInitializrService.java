@@ -28,6 +28,7 @@ public class SpringBootInitializrService {
         dependencies.addAll(additionalDependencies);
         byte[] generatedProjectZip = initializrClient.generateProject("maven-project",
                                                                       parameters.springBootVersion(),
+                parameters.javaVersion(),
                                                                       parameters.groupId(),
                                                                       parameters.artifactId(),
                                                                       parameters.projectName(),
