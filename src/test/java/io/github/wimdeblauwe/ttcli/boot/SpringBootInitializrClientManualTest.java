@@ -27,6 +27,7 @@ class SpringBootInitializrClientManualTest {
         SpringBootInitializrClient client = springBootInitializrClient();
         byte[] o = client.generateProject("maven-project",
                                           "2.7.5",
+                "17",
                                           "com.example",
                                           "demo",
                                           "Demo",

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
-public class BootVersion {
+public class SpringInitializrSingleSelect {
     @JsonProperty("default")
     private String defaultId;
     private List<IdAndName> values;

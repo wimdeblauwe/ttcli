@@ -12,6 +12,7 @@ public interface SpringBootInitializrClient {
     @GetExchange("/starter.zip")
     byte[] generateProject(@RequestParam("type") String type,
                            @RequestParam("bootVersion") String bootVersion,
+                           @RequestParam("javaVersion") String javaVersion,
                            @RequestParam("groupId") String groupId,
                            @RequestParam("artifactId") String artifactId,
                            @RequestParam("name") String name,
