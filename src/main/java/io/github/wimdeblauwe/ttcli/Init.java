@@ -47,7 +47,7 @@ public class Init {
 
         try {
             ComponentFlow.Builder builder = flowBuilder.clone().reset();
-
+            addTypeInput(builder);
             addGroupIdInput(builder);
             addArtifactIdInput(builder);
             addProjectNameInput(builder);
@@ -59,6 +59,7 @@ public class Init {
             ComponentFlow.ComponentFlowResult flowResult = flow.run();
 
             ComponentContext<?> context = flowResult.getContext();
+            String type = context.get("type");
             String groupId = context.get("group-id");
             String artifactId = context.get("artifact-id");
             String projectName = context.get("project-name");
@@ -74,7 +75,9 @@ public class Init {
             Path basePath = Path.of(baseDir).resolve(artifactId);
 
             projectInitializationService.initialize(new ProjectInitializationParameters(basePath,
-                    new SpringBootProjectCreationParameters(groupId,
+                    new SpringBootProjectCreationParameters(
+                            SpringBootProjectType.valueOf(type),
+                            groupId,
                             artifactId,
                             projectName,
                             springBootVersion,
@@ -112,6 +115,17 @@ public class Init {
         return springBootVersions.stream().collect(Collectors.toMap(IdAndName::name, IdAndName::id));
     }
 
+    private void addTypeInput(ComponentFlow.Builder builder){
+        Map<String, String> typeOptions = new HashMap<>();
+        for (SpringBootProjectType type : SpringBootProjectType.values()) {
+            typeOptions.put(type.description(), type.name());
+        }
+        builder.withSingleItemSelector("type")
+                .name("Select Spring Boot project type:")
+                .selectItems(typeOptions)
+                .max(typeOptions.size())
+                .and();
+    }
     private void addGroupIdInput(ComponentFlow.Builder builder) {
         builder.withStringInput("group-id")
                 .name("Group: ")
