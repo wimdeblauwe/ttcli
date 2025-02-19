@@ -5,7 +5,7 @@ public interface TailwindDependency {
 
     String displayName();
 
-    String npmPackageName();
+    String npmPackageName(TailwindVersion tailwindVersion);
 
     String pluginName();
 }

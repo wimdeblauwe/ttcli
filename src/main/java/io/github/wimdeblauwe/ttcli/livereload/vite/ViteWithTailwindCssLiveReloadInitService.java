@@ -6,7 +6,7 @@ import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceException;
 import io.github.wimdeblauwe.ttcli.livereload.TailwindCssSpecializedLiveReloadInitService;
 import io.github.wimdeblauwe.ttcli.livereload.helper.TailwindCssHelper;
 import io.github.wimdeblauwe.ttcli.npm.NodeService;
-import org.springframework.core.annotation.Order;
+import io.github.wimdeblauwe.ttcli.tailwind.TailwindVersion;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 @Component
-@Order(6)
 public class ViteWithTailwindCssLiveReloadInitService extends ViteLiveReloadInitService implements TailwindCssSpecializedLiveReloadInitService {
     public ViteWithTailwindCssLiveReloadInitService(NodeService nodeService) {
         super(nodeService);
@@ -105,7 +104,8 @@ public class ViteWithTailwindCssLiveReloadInitService extends ViteLiveReloadInit
     }
 
     @Override
-    public boolean isTailwindVersionOf(Class<? extends LiveReloadInitService> liveReloadInitServiceClass) {
-        return liveReloadInitServiceClass.isAssignableFrom(ViteLiveReloadInitService.class);
+    public boolean isTailwindVersionOf(TailwindVersion tailwindVersion, Class<? extends LiveReloadInitService> liveReloadInitServiceClass) {
+        return tailwindVersion.equals(TailwindVersion.VERSION_4)
+                && liveReloadInitServiceClass.isAssignableFrom(ViteLiveReloadInitService.class);
     }
 }
