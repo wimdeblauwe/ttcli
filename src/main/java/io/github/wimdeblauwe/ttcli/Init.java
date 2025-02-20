@@ -47,7 +47,7 @@ public class Init {
 
         try {
             ComponentFlow.Builder builder = flowBuilder.clone().reset();
-            addTypeInput(builder);
+            addProjectTypeInput(builder);
             addGroupIdInput(builder);
             addArtifactIdInput(builder);
             addProjectNameInput(builder);
@@ -59,7 +59,7 @@ public class Init {
             ComponentFlow.ComponentFlowResult flowResult = flow.run();
 
             ComponentContext<?> context = flowResult.getContext();
-            String type = context.get("type");
+            String projectType = context.get("project-type");
             String groupId = context.get("group-id");
             String artifactId = context.get("artifact-id");
             String projectName = context.get("project-name");
@@ -76,7 +76,7 @@ public class Init {
 
             projectInitializationService.initialize(new ProjectInitializationParameters(basePath,
                     new SpringBootProjectCreationParameters(
-                            SpringBootProjectType.valueOf(type),
+                            SpringBootProjectType.valueOf(projectType),
                             groupId,
                             artifactId,
                             projectName,
@@ -115,12 +115,12 @@ public class Init {
         return springBootVersions.stream().collect(Collectors.toMap(IdAndName::name, IdAndName::id));
     }
 
-    private void addTypeInput(ComponentFlow.Builder builder){
+    private void addProjectTypeInput(ComponentFlow.Builder builder){
         Map<String, String> typeOptions = new HashMap<>();
         for (SpringBootProjectType type : SpringBootProjectType.values()) {
             typeOptions.put(type.description(), type.name());
         }
-        builder.withSingleItemSelector("type")
+        builder.withSingleItemSelector("project-type")
                 .name("Select Spring Boot project type:")
                 .selectItems(typeOptions)
                 .max(typeOptions.size())
