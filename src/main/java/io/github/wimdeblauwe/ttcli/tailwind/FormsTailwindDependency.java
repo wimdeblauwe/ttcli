@@ -15,7 +15,7 @@ public class FormsTailwindDependency implements TailwindDependency {
     }
 
     @Override
-    public String npmPackageName() {
+    public String npmPackageName(TailwindVersion tailwindVersion) {
         return "@tailwindcss/forms";
     }
 

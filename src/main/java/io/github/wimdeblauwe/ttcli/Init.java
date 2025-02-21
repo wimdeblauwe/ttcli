@@ -7,6 +7,7 @@ import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitService;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceFactory;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceParameters;
 import io.github.wimdeblauwe.ttcli.tailwind.TailwindDependency;
+import io.github.wimdeblauwe.ttcli.tailwind.TailwindVersion;
 import io.github.wimdeblauwe.ttcli.util.InetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,6 +70,7 @@ public class Init {
             List<WebDependency> selectedWebDependencies = webDependencies.stream().filter(webDependency -> selectedWebDependencyOptions.contains(webDependency.id())).toList();
 
             boolean hasTailwindCssWebDependency = selectedWebDependencies.stream().anyMatch(webDependency -> webDependency instanceof TailwindCssWebDependency);
+            TailwindVersion tailwindVersion = allowTailwindVersionSelection(hasTailwindCssWebDependency).orElse(null);
             List<TailwindDependency> selectedTailwindDependencies = allowTailwindDependenciesSelection(hasTailwindCssWebDependency);
 
             Path basePath = Path.of(baseDir).resolve(artifactId);
@@ -81,6 +83,7 @@ public class Init {
                             javaVersion),
                     new LiveReloadInitServiceParameters(context.get("live-reload")),
                     selectedWebDependencies,
+                    tailwindVersion,
                     selectedTailwindDependencies));
 
             System.out.println("✅ Done generating project at " + basePath.toAbsolutePath());
@@ -89,6 +92,20 @@ public class Init {
         } catch (Exception e) {
             LOGGER.error("Error during project generation: " + e.getMessage(), e);
             System.err.println("❌ Error during project generation: " + e.getMessage());
+        }
+    }
+
+    private Optional<TailwindVersion> allowTailwindVersionSelection(boolean hasTailwindCssWebDependency) {
+        if (hasTailwindCssWebDependency) {
+            ComponentFlow.Builder builder = flowBuilder.clone().reset();
+            addTailwindVersionInput(builder);
+            ComponentFlow build = builder.build();
+            ComponentFlow.ComponentFlowResult flowResult = build.run();
+            ComponentContext<?> context = flowResult.getContext();
+            String selectedTailwindVersion = context.get("tailwind-version");
+            return Optional.of(TailwindVersion.valueOf(selectedTailwindVersion));
+        } else {
+            return Optional.empty();
         }
     }
 
@@ -184,6 +201,17 @@ public class Init {
                 .map(webDependency -> new DefaultSelectItem(webDependency.displayName(), webDependency.id(), true, false))
                 .sorted(Comparator.comparing(DefaultSelectItem::name))
                 .collect(Collectors.toList());
+    }
+
+    private void addTailwindVersionInput(ComponentFlow.Builder builder) {
+        builder.withSingleItemSelector("tailwind-version")
+                .name("Tailwind version")
+                .selectItems(Map.of(
+                        "Tailwind 3", TailwindVersion.VERSION_3.name(),
+                        "Tailwind 4", TailwindVersion.VERSION_4.name())
+                )
+                .defaultSelect("Tailwind 4")
+                .and();
     }
 
     private void addTailwindDependenciesInput(ComponentFlow.Builder builder) {
