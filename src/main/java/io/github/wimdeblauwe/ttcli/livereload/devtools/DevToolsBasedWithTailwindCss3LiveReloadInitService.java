@@ -4,7 +4,7 @@ import io.github.wimdeblauwe.ttcli.ProjectInitializationParameters;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitService;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceException;
 import io.github.wimdeblauwe.ttcli.livereload.TailwindCssSpecializedLiveReloadInitService;
-import io.github.wimdeblauwe.ttcli.livereload.helper.TailwindCssHelper;
+import io.github.wimdeblauwe.ttcli.livereload.helper.TailwindCss3Helper;
 import io.github.wimdeblauwe.ttcli.maven.MavenPomReaderWriter;
 import io.github.wimdeblauwe.ttcli.npm.InstalledApplicationVersions;
 import io.github.wimdeblauwe.ttcli.npm.NodeService;
@@ -21,10 +21,10 @@ import java.util.List;
 import java.util.Set;
 
 @Component
-public class DevToolsBasedWithTailwindCssLiveReloadInitService implements LiveReloadInitService, TailwindCssSpecializedLiveReloadInitService {
+public class DevToolsBasedWithTailwindCss3LiveReloadInitService implements LiveReloadInitService, TailwindCssSpecializedLiveReloadInitService {
     private final NodeService nodeService;
 
-    public DevToolsBasedWithTailwindCssLiveReloadInitService(NodeService nodeService) {
+    public DevToolsBasedWithTailwindCss3LiveReloadInitService(NodeService nodeService) {
         this.nodeService = nodeService;
     }
 
@@ -77,7 +77,7 @@ public class DevToolsBasedWithTailwindCssLiveReloadInitService implements LiveRe
             nodeService.createPackageJson(frontendBasePath,
                     projectInitializationParameters.projectName());
             nodeService.installNpmDevDependencies(frontendBasePath,
-                    List.of("tailwindcss", "@tailwindcss/cli"));
+                    List.of("tailwindcss@3"));
             nodeService.insertPackageJsonScripts(frontendBasePath, npmScripts());
 
             MavenPomReaderWriter mavenPomReaderWriter = MavenPomReaderWriter.readFrom(basePath);
@@ -85,9 +85,10 @@ public class DevToolsBasedWithTailwindCssLiveReloadInitService implements LiveRe
             updateGitIgnore(basePath);
 
 
-            TailwindCssHelper.createApplicationCss(basePath,
-                    "src/main/frontend/application.css",
-                    "../resources/templates");
+            TailwindCss3Helper.createApplicationCss(basePath,
+                    "src/main/frontend/application.css");
+            TailwindCss3Helper.setupTailwindConfig(frontendBasePath,
+                    "../resources/templates/**/*.{html,js}");
         } catch (IOException e) {
             throw new LiveReloadInitServiceException(e);
         } catch (InterruptedException e) {
@@ -107,8 +108,8 @@ public class DevToolsBasedWithTailwindCssLiveReloadInitService implements LiveRe
 
     private LinkedHashMap<String, String> npmScripts() {
         LinkedHashMap<String, String> scripts = new LinkedHashMap<>();
-        scripts.put("build", "@tailwindcss/cli -i ./application.css -o ../resources/static/css/application.css");
-        scripts.put("watch", "@tailwindcss/cli --watch -i ./application.css -o ../resources/static/css/application.css");
+        scripts.put("build", "tailwindcss -i ./application.css -o ../resources/static/css/application.css");
+        scripts.put("watch", "tailwindcss --watch -i ./application.css -o ../resources/static/css/application.css");
         return scripts;
     }
 
@@ -192,7 +193,7 @@ public class DevToolsBasedWithTailwindCssLiveReloadInitService implements LiveRe
 
     @Override
     public boolean isTailwindVersionOf(TailwindVersion tailwindVersion, Class<? extends LiveReloadInitService> liveReloadInitServiceClass) {
-        return tailwindVersion.equals(TailwindVersion.VERSION_4)
+        return tailwindVersion.equals(TailwindVersion.VERSION_3)
                 && liveReloadInitServiceClass.isAssignableFrom(DevToolsBasedLiveReloadInitService.class);
     }
 }

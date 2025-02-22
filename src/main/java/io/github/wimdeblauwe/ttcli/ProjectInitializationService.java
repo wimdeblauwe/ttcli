@@ -54,6 +54,7 @@ public class ProjectInitializationService {
         }
 
         LiveReloadInitService liveReloadInitService = liveReloadInitServiceFactory.getInitService(parameters.liveReloadInitServiceParameters().initServiceId(),
+                parameters.tailwindVersion(),
                                                                                                   parameters.hasTailwindCssWebDependency());
         LOGGER.info("Using init service {}", liveReloadInitService);
         initializrService.generate(basePath,

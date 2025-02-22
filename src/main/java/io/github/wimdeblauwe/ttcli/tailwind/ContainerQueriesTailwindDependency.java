@@ -18,7 +18,7 @@ public class ContainerQueriesTailwindDependency implements TailwindDependency {
     }
 
     @Override
-    public String npmPackageName() {
+    public String npmPackageName(TailwindVersion tailwindVersion) {
         return "@tailwindcss/container-queries";
     }
 

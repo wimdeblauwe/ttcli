@@ -4,7 +4,7 @@ import io.github.wimdeblauwe.ttcli.ProjectInitializationParameters;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitService;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceException;
 import io.github.wimdeblauwe.ttcli.livereload.TailwindCssSpecializedLiveReloadInitService;
-import io.github.wimdeblauwe.ttcli.livereload.helper.TailwindCssHelper;
+import io.github.wimdeblauwe.ttcli.livereload.helper.TailwindCss3Helper;
 import io.github.wimdeblauwe.ttcli.npm.NodeService;
 import io.github.wimdeblauwe.ttcli.tailwind.TailwindVersion;
 import org.springframework.stereotype.Component;
@@ -16,8 +16,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 @Component
-public class NpmBasedWithTailwindCssLiveReloadInitService extends NpmBasedLiveReloadInitService implements TailwindCssSpecializedLiveReloadInitService {
-    public NpmBasedWithTailwindCssLiveReloadInitService(NodeService nodeService) {
+public class NpmBasedWithTailwindCss3LiveReloadInitService extends NpmBasedLiveReloadInitService implements TailwindCssSpecializedLiveReloadInitService {
+    public NpmBasedWithTailwindCss3LiveReloadInitService(NodeService nodeService) {
         super(nodeService);
     }
 
@@ -36,10 +36,13 @@ public class NpmBasedWithTailwindCssLiveReloadInitService extends NpmBasedLiveRe
         try {
             super.generate(projectInitializationParameters);
 
-            TailwindCssHelper.createApplicationCss(projectInitializationParameters.basePath(),
-                    "src/main/resources/static/css/application.css",
-                    "../../templates");
+            TailwindCss3Helper.createApplicationCss(projectInitializationParameters.basePath(),
+                    "src/main/resources/static/css/application.css");
+            TailwindCss3Helper.setupTailwindConfig(projectInitializationParameters.basePath(), "./src/main/resources/templates/**/*.html");
         } catch (IOException e) {
+            throw new LiveReloadInitServiceException(e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             throw new LiveReloadInitServiceException(e);
         }
     }
@@ -50,14 +53,13 @@ public class NpmBasedWithTailwindCssLiveReloadInitService extends NpmBasedLiveRe
     }
 
     protected String postcssConfigFilePath() {
-        return "/files/livereload/npm/npm-based-with-tailwind-css/postcss.config.js";
+        return "/files/livereload/npm/npm-based-with-tailwind-css-3/postcss.config.js";
     }
 
     @Override
     protected List<String> npmDevDependencies() {
         List<String> dependencies = new ArrayList<>(super.npmDevDependencies());
-        dependencies.add("tailwindcss");
-        dependencies.add("@tailwindcss/postcss");
+        dependencies.add("tailwindcss@3");
         return dependencies;
     }
 
@@ -85,7 +87,7 @@ public class NpmBasedWithTailwindCssLiveReloadInitService extends NpmBasedLiveRe
 
     @Override
     public boolean isTailwindVersionOf(TailwindVersion tailwindVersion, Class<? extends LiveReloadInitService> liveReloadInitServiceClass) {
-        return tailwindVersion.equals(TailwindVersion.VERSION_4)
+        return tailwindVersion.equals(TailwindVersion.VERSION_3)
                 && liveReloadInitServiceClass.isAssignableFrom(NpmBasedLiveReloadInitService.class);
     }
 }

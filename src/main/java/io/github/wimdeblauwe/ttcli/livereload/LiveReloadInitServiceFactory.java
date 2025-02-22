@@ -1,5 +1,6 @@
 package io.github.wimdeblauwe.ttcli.livereload;
 
+import io.github.wimdeblauwe.ttcli.tailwind.TailwindVersion;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -33,16 +34,17 @@ public class LiveReloadInitServiceFactory {
     }
 
     public LiveReloadInitService getInitService(String initServiceId,
+                                                TailwindVersion tailwindVersion,
                                                 boolean hasTailwindCssWebDependency) {
         return allServices.stream().filter(service -> service.getId().equals(initServiceId))
                           .findAny()
-                          .map(s -> hasTailwindCssWebDependency ? getCorrespondingTailwindCssSpecializedLiveReloadInitService(s) : s)
+                .map(s -> hasTailwindCssWebDependency ? getCorrespondingTailwindCssSpecializedLiveReloadInitService(tailwindVersion, s) : s)
                           .orElseThrow(() -> new IllegalArgumentException("Not a known service: " + initServiceId));
     }
 
-    private TailwindCssSpecializedLiveReloadInitService getCorrespondingTailwindCssSpecializedLiveReloadInitService(LiveReloadInitService initService) {
+    private TailwindCssSpecializedLiveReloadInitService getCorrespondingTailwindCssSpecializedLiveReloadInitService(TailwindVersion tailwindVersion, LiveReloadInitService initService) {
         return getTailwindCssSpecializedServices().stream()
-                                                  .filter(t -> t.isTailwindVersionOf(initService.getClass()))
+                .filter(t -> t.isTailwindVersionOf(tailwindVersion, initService.getClass()))
                                                   .findFirst()
                                                   .orElseThrow(() -> new IllegalArgumentException("Could not find the corresponding tailwind version of " + initService.getClass()));
     }

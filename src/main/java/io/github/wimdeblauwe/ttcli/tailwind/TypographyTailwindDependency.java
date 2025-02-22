@@ -18,7 +18,7 @@ public class TypographyTailwindDependency implements TailwindDependency {
     }
 
     @Override
-    public String npmPackageName() {
+    public String npmPackageName(TailwindVersion tailwindVersion) {
         return "@tailwindcss/typography";
     }
 

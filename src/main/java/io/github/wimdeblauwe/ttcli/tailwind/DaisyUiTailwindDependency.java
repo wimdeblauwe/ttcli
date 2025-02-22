@@ -15,8 +15,11 @@ public class DaisyUiTailwindDependency implements TailwindDependency{
     }
 
     @Override
-    public String npmPackageName() {
-        return "daisyui@beta";
+    public String npmPackageName(TailwindVersion tailwindVersion) {
+        return switch (tailwindVersion) {
+            case VERSION_3 -> "daisyui@4";
+            case VERSION_4 -> "daisyui@beta";
+        };
     }
 
     @Override

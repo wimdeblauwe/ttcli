@@ -1,8 +1,9 @@
 package io.github.wimdeblauwe.ttcli.deps;
 
 import io.github.wimdeblauwe.ttcli.maven.MavenDependency;
-import java.util.List;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class HtmxWebDependency implements WebjarsBasedWebDependency {
@@ -22,7 +23,7 @@ public class HtmxWebDependency implements WebjarsBasedWebDependency {
         String htmxSpringBootThymeleafVersion = getHtmxSpringBootThymeleafVersion(springBootVersion);
 
         return List.of(
-                new MavenDependency("org.webjars.npm", "htmx.org", "2.0.3"),
+                new MavenDependency("org.webjars.npm", "htmx.org", "2.0.4"),
                 new MavenDependency("io.github.wimdeblauwe", "htmx-spring-boot-thymeleaf", htmxSpringBootThymeleafVersion)
         );
     }
