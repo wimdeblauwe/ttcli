@@ -1,6 +1,6 @@
 package io.github.wimdeblauwe.ttcli.deps;
 
-import io.github.wimdeblauwe.ttcli.maven.MavenDependency;
+import io.github.wimdeblauwe.ttcli.buildtools.MavenDependency;
 
 import java.util.List;
 

@@ -2,7 +2,7 @@ package io.github.wimdeblauwe.ttcli.boot;
 
 public enum SpringBootProjectType {
     //TODO enable this values to allow gradle build
-    //GRADLE_GROOVY("gradle-project", "Gradle - Groovy"),
+    GRADLE_GROOVY("gradle-project", "Gradle - Groovy"),
     //GRADLE_KOTLIN("gradle-project-kotlin", "Gradle - Kotlin"),
     MAVEN("maven-project", "Maven");
 
@@ -27,8 +27,8 @@ public enum SpringBootProjectType {
             case "Maven":
                 return MAVEN;
             //TODO enable this case to allow gradle build
-            //case "Gradle - Groovy":
-            //    return GRADLE_GROOVY;
+            case "Gradle - Groovy":
+                return GRADLE_GROOVY;
             //case "Gradle - Kotlin":
             //    return GRADLE_KOTLIN;
             default:
