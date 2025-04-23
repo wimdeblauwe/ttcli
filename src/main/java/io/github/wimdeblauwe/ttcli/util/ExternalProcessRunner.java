@@ -34,7 +34,7 @@ public final class ExternalProcessRunner {
             }
             return output.toString();
         } catch (IOException e) {
-            throw new ExternalProcessException(errorMessageSupplier.get(), e);
+            throw new ExternalProcessException(errorMessageSupplier.get() + ": " + e.getMessage(), e);
         }
     }
 
