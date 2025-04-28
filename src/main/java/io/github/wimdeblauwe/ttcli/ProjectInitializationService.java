@@ -1,11 +1,11 @@
 package io.github.wimdeblauwe.ttcli;
 
 import io.github.wimdeblauwe.ttcli.boot.SpringBootInitializrService;
+import io.github.wimdeblauwe.ttcli.buildtools.BuildToolInitService;
 import io.github.wimdeblauwe.ttcli.help.HelpTextInitService;
 import io.github.wimdeblauwe.ttcli.java.JavaCodeInitService;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitService;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceFactory;
-import io.github.wimdeblauwe.ttcli.maven.MavenInitService;
 import io.github.wimdeblauwe.ttcli.tailwind.TailwindDependencyInitService;
 import io.github.wimdeblauwe.ttcli.thymeleaf.ThymeleafTemplatesInitService;
 import io.github.wimdeblauwe.ttcli.util.FileUtil;
@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 @Component
 public class ProjectInitializationService {
@@ -24,7 +25,7 @@ public class ProjectInitializationService {
     private final JavaCodeInitService javaCodeInitService;
     private final LiveReloadInitServiceFactory liveReloadInitServiceFactory;
     private final ThymeleafTemplatesInitService thymeleafTemplatesInitService;
-    private final MavenInitService mavenInitService;
+    private final List<BuildToolInitService> buildToolInitServices;
     private final TailwindDependencyInitService tailwindDependencyInitService;
     private final HelpTextInitService helpTextInitService;
 
@@ -32,14 +33,14 @@ public class ProjectInitializationService {
                                         JavaCodeInitService javaCodeInitService,
                                         LiveReloadInitServiceFactory liveReloadInitServiceFactory,
                                         ThymeleafTemplatesInitService thymeleafTemplatesInitService,
-                                        MavenInitService mavenInitService,
+                                        List<BuildToolInitService> buildToolInitServices,
                                         TailwindDependencyInitService tailwindDependencyInitService,
                                         HelpTextInitService helpTextInitService) {
         this.initializrService = initializrService;
         this.javaCodeInitService = javaCodeInitService;
         this.liveReloadInitServiceFactory = liveReloadInitServiceFactory;
         this.thymeleafTemplatesInitService = thymeleafTemplatesInitService;
-        this.mavenInitService = mavenInitService;
+        this.buildToolInitServices = buildToolInitServices;
         this.tailwindDependencyInitService = tailwindDependencyInitService;
         this.helpTextInitService = helpTextInitService;
     }
@@ -65,7 +66,8 @@ public class ProjectInitializationService {
         liveReloadInitService.generate(parameters);
         helpTextInitService.addHelpText(basePath, liveReloadInitService.getHelpText());
 
-        mavenInitService.generate(parameters);
+        BuildToolInitService buildToolInitService = buildToolInitServices.stream().filter(buildTool -> buildTool.canHandle(parameters)).findAny().orElseThrow();
+        buildToolInitService.generate(parameters);
         tailwindDependencyInitService.generate(liveReloadInitService, parameters);
         thymeleafTemplatesInitService.generate(parameters);
 

@@ -1,5 +1,6 @@
-package io.github.wimdeblauwe.ttcli.maven;
+package io.github.wimdeblauwe.ttcli.buildtools.maven;
 
+import io.github.wimdeblauwe.ttcli.buildtools.MavenDependency;
 import io.github.wimdeblauwe.ttcli.util.ExternalProcessRunner;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

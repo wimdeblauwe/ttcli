@@ -1,6 +1,6 @@
 package io.github.wimdeblauwe.ttcli.livereload.helper;
 
-import io.github.wimdeblauwe.ttcli.maven.MavenPomReaderWriter;
+import io.github.wimdeblauwe.ttcli.buildtools.maven.MavenPomReaderWriter;
 import io.github.wimdeblauwe.ttcli.npm.InstalledApplicationVersions;
 import org.jsoup.nodes.Comment;
 

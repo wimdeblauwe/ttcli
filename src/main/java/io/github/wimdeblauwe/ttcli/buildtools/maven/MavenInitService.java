@@ -1,6 +1,9 @@
-package io.github.wimdeblauwe.ttcli.maven;
+package io.github.wimdeblauwe.ttcli.buildtools.maven;
 
 import io.github.wimdeblauwe.ttcli.ProjectInitializationParameters;
+import io.github.wimdeblauwe.ttcli.boot.SpringBootProjectType;
+import io.github.wimdeblauwe.ttcli.buildtools.BuildToolInitService;
+import io.github.wimdeblauwe.ttcli.buildtools.MavenDependency;
 import io.github.wimdeblauwe.ttcli.deps.WebDependency;
 import io.github.wimdeblauwe.ttcli.deps.WebjarsBasedWebDependency;
 import org.jsoup.nodes.Comment;
@@ -10,7 +13,7 @@ import java.io.IOException;
 import java.util.List;
 
 @Component
-public class MavenInitService {
+public class MavenInitService implements BuildToolInitService {
     public void generate(ProjectInitializationParameters parameters) throws InterruptedException {
         try {
             addMavenDependencies(MavenPomReaderWriter.readFrom(parameters.basePath()),
@@ -19,6 +22,11 @@ public class MavenInitService {
         } catch (IOException e) {
             throw new MavenInitServiceException(e);
         }
+    }
+
+    @Override
+    public boolean canHandle(ProjectInitializationParameters parameters) {
+        return parameters.springBootProjectCreationParameters().type().equals(SpringBootProjectType.MAVEN);
     }
 
     private void addMavenDependencies(MavenPomReaderWriter mavenPomReaderWriter,
@@ -52,3 +60,4 @@ public class MavenInitService {
         mavenPomReaderWriter.write();
     }
 }
+
