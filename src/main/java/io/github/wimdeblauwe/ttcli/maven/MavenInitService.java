@@ -48,7 +48,7 @@ public class MavenInitService {
         }
         for (WebDependency webDependency : webDependencies) {
             if (webDependency instanceof WebjarsBasedWebDependency webjarsBasedWebDependency) {
-                List<MavenDependency> mavenDependencies = webjarsBasedWebDependency.getMavenDependencies(springBootVersion);
+                List<MavenDependency> mavenDependencies = webjarsBasedWebDependency.getMavenDependencies(springBootVersion, templateEngineType);
                 for (MavenDependency mavenDependency : mavenDependencies) {
                     mavenPomReaderWriter.addDependency(mavenDependency);
                 }

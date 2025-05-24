@@ -1,8 +1,10 @@
 package io.github.wimdeblauwe.ttcli.deps;
 
 import io.github.wimdeblauwe.ttcli.maven.MavenDependency;
+import io.github.wimdeblauwe.ttcli.template.TemplateEngineType;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -19,14 +21,16 @@ public class HtmxWebDependency implements WebjarsBasedWebDependency {
     }
 
     @Override
-    public List<MavenDependency> getMavenDependencies(String springBootVersion) {
-        String htmxSpringBootThymeleafVersion = getHtmxSpringBootThymeleafVersion(springBootVersion);
+    public List<MavenDependency> getMavenDependencies(String springBootVersion, TemplateEngineType templateEngineType) {
 
-        return List.of(
-                new MavenDependency("org.webjars.npm", "htmx.org", "2.0.4"),
-                // TODO only add this dependency if Thymeleaf is used
-                new MavenDependency("io.github.wimdeblauwe", "htmx-spring-boot-thymeleaf", htmxSpringBootThymeleafVersion)
-        );
+        List<MavenDependency> result = new ArrayList<>();
+        result.add(new MavenDependency("org.webjars.npm", "htmx.org", "2.0.4"));
+        if (templateEngineType == TemplateEngineType.THYMELEAF) {
+            String htmxSpringBootThymeleafVersion = getHtmxSpringBootThymeleafVersion(springBootVersion);
+            result.add(new MavenDependency("io.github.wimdeblauwe", "htmx-spring-boot-thymeleaf", htmxSpringBootThymeleafVersion));
+        }
+
+        return result;
     }
 
     @Override
