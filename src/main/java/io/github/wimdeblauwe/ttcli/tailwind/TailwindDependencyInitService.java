@@ -4,6 +4,7 @@ import io.github.wimdeblauwe.ttcli.ProjectInitializationParameters;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitService;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceException;
 import io.github.wimdeblauwe.ttcli.npm.NodeService;
+import io.github.wimdeblauwe.ttcli.template.TemplateEngineType;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -52,13 +53,25 @@ public class TailwindDependencyInitService {
     Path path = basePath.resolve("src/main/resources/static/css/application.css");
     byte[] bytes = Files.readAllBytes(path);
     String s = new String(bytes);
-    s = s.replaceFirst("@source \"../../templates\";", "@source \"../../templates\";" + System.lineSeparator()
+      s = s.replaceFirst("@source \"../../templates\";", "@source " +
+              getTemplateSources(parameters.templateEngineType()) +
+              ";" + System.lineSeparator()
         + parameters.tailwindDependencies()
         .stream()
         .map(it -> String.format("@plugin \"%s\";", it.pluginName()))
         .collect(Collectors.joining(System.lineSeparator())));
     Files.writeString(path, s);
   }
+
+    private static String getTemplateSources(TemplateEngineType templateEngineType) {
+        if (templateEngineType == TemplateEngineType.THYMELEAF) {
+            return "\"../../templates\"";
+        } else if (templateEngineType == TemplateEngineType.JTE) {
+            return "\"../../../jte\"";
+        } else {
+            throw new IllegalArgumentException("Unsupported template engine type: " + templateEngineType);
+        }
+    }
 
   private void generateForTailwindCss3(LiveReloadInitService liveReloadInitService,
                                        ProjectInitializationParameters parameters) {

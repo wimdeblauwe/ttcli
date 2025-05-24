@@ -24,6 +24,7 @@ public class HtmxWebDependency implements WebjarsBasedWebDependency {
 
         return List.of(
                 new MavenDependency("org.webjars.npm", "htmx.org", "2.0.4"),
+                // TODO only add this dependency if Thymeleaf is used
                 new MavenDependency("io.github.wimdeblauwe", "htmx-spring-boot-thymeleaf", htmxSpringBootThymeleafVersion)
         );
     }

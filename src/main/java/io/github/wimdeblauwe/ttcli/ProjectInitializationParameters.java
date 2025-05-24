@@ -6,6 +6,7 @@ import io.github.wimdeblauwe.ttcli.deps.WebDependency;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceParameters;
 import io.github.wimdeblauwe.ttcli.tailwind.TailwindDependency;
 import io.github.wimdeblauwe.ttcli.tailwind.TailwindVersion;
+import io.github.wimdeblauwe.ttcli.template.TemplateEngineType;
 import jakarta.annotation.Nullable;
 
 import java.nio.file.Path;
@@ -16,7 +17,8 @@ public record ProjectInitializationParameters(Path basePath,
                                               LiveReloadInitServiceParameters liveReloadInitServiceParameters,
                                               List<WebDependency> webDependencies,
                                               @Nullable TailwindVersion tailwindVersion,
-                                              List<TailwindDependency> tailwindDependencies) {
+                                              List<TailwindDependency> tailwindDependencies,
+                                              TemplateEngineType templateEngineType) {
     public String projectName() {
         return springBootProjectCreationParameters().projectName();
     }

@@ -3,6 +3,7 @@ package io.github.wimdeblauwe.ttcli.maven;
 import io.github.wimdeblauwe.ttcli.ProjectInitializationParameters;
 import io.github.wimdeblauwe.ttcli.deps.WebDependency;
 import io.github.wimdeblauwe.ttcli.deps.WebjarsBasedWebDependency;
+import io.github.wimdeblauwe.ttcli.template.TemplateEngineType;
 import org.jsoup.nodes.Comment;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +16,8 @@ public class MavenInitService {
         try {
             addMavenDependencies(MavenPomReaderWriter.readFrom(parameters.basePath()),
                     parameters.webDependencies(),
-                    parameters.springBootProjectCreationParameters().springBootVersion());
+                    parameters.springBootProjectCreationParameters().springBootVersion(),
+                    parameters.templateEngineType());
         } catch (IOException e) {
             throw new MavenInitServiceException(e);
         }
@@ -23,8 +25,12 @@ public class MavenInitService {
 
     private void addMavenDependencies(MavenPomReaderWriter mavenPomReaderWriter,
                                       List<WebDependency> webDependencies,
-                                      String springBootVersion) throws IOException, InterruptedException {
-        mavenPomReaderWriter.addDependency("nz.net.ultraq.thymeleaf", "thymeleaf-layout-dialect");
+                                      String springBootVersion,
+                                      TemplateEngineType templateEngineType) throws IOException, InterruptedException {
+        // Add template engine specific dependencies
+        if (templateEngineType == TemplateEngineType.THYMELEAF) {
+            mavenPomReaderWriter.addDependency("nz.net.ultraq.thymeleaf", "thymeleaf-layout-dialect");
+        }
         mavenPomReaderWriter.updateDependencies(dependencies -> {
             dependencies.appendChild(new Comment(" Web dependencies "));
         });

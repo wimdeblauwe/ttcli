@@ -7,6 +7,7 @@ import io.github.wimdeblauwe.ttcli.livereload.helper.NpmHelper;
 import io.github.wimdeblauwe.ttcli.maven.MavenPomReaderWriter;
 import io.github.wimdeblauwe.ttcli.npm.InstalledApplicationVersions;
 import io.github.wimdeblauwe.ttcli.npm.NodeService;
+import io.github.wimdeblauwe.ttcli.template.TemplateEngineType;
 import io.github.wimdeblauwe.ttcli.util.ExternalProcessException;
 import io.github.wimdeblauwe.ttcli.util.ExternalProcessRunner;
 import org.springframework.core.annotation.Order;
@@ -106,6 +107,11 @@ public class NpmBasedLiveReloadInitService implements LiveReloadInitService {
     @Override
     public Path getTailwindConfigFileParentPath(ProjectInitializationParameters parameters) {
         return null;
+    }
+
+    @Override
+    public boolean isApplicableForTemplateEngine(TemplateEngineType templateEngineType) {
+        return templateEngineType.equals(TemplateEngineType.THYMELEAF);
     }
 
     protected String postcssConfigFilePath() {

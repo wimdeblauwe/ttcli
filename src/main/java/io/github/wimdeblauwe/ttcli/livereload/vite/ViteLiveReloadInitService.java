@@ -7,6 +7,10 @@ import io.github.wimdeblauwe.ttcli.livereload.helper.NpmHelper;
 import io.github.wimdeblauwe.ttcli.maven.MavenPomReaderWriter;
 import io.github.wimdeblauwe.ttcli.npm.InstalledApplicationVersions;
 import io.github.wimdeblauwe.ttcli.npm.NodeService;
+import io.github.wimdeblauwe.ttcli.template.TemplateEngineType;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,12 +18,12 @@ import java.nio.file.StandardOpenOption;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 
 @Component
 @Order(5)
 public class ViteLiveReloadInitService implements LiveReloadInitService {
+    private static final String VITE_SPRING_BOOT_VERSION = "0.9.0-SNAPSHOT";
+
     protected final NodeService nodeService;
 
     public ViteLiveReloadInitService(NodeService nodeService) {
@@ -69,15 +73,19 @@ public class ViteLiveReloadInitService implements LiveReloadInitService {
             InstalledApplicationVersions installedApplicationVersions = nodeService.checkIfNodeAndNpmAreInstalled();
             Path basePath = projectInitializationParameters.basePath();
             nodeService.createPackageJsonForModule(basePath,
-                                                   projectInitializationParameters.projectName());
+                    projectInitializationParameters.projectName());
             nodeService.installNpmDevDependencies(basePath,
-                                                  npmDevDependencies());
+                    npmDevDependencies());
             nodeService.insertPackageJsonScripts(basePath, npmScripts());
 
             createViteConfig(basePath);
 
             MavenPomReaderWriter mavenPomReaderWriter = MavenPomReaderWriter.readFrom(basePath);
-            mavenPomReaderWriter.addDependency("io.github.wimdeblauwe", "vite-spring-boot-thymeleaf", "0.6.0");
+            if (projectInitializationParameters.templateEngineType() == TemplateEngineType.THYMELEAF) {
+                mavenPomReaderWriter.addDependency("io.github.wimdeblauwe", "vite-spring-boot-thymeleaf", VITE_SPRING_BOOT_VERSION);
+            } else if (projectInitializationParameters.templateEngineType() == TemplateEngineType.JTE) {
+                mavenPomReaderWriter.addDependency("io.github.wimdeblauwe", "vite-spring-boot-jte", VITE_SPRING_BOOT_VERSION);
+            }
             mavenPomReaderWriter.write();
 
             NpmHelper.updateMavenPom(mavenPomReaderWriter, installedApplicationVersions, false);
@@ -100,6 +108,12 @@ public class ViteLiveReloadInitService implements LiveReloadInitService {
     @Override
     public Path getTailwindConfigFileParentPath(ProjectInitializationParameters parameters) {
         return null;
+    }
+
+    @Override
+    public boolean isApplicableForTemplateEngine(TemplateEngineType templateEngineType) {
+        return templateEngineType.equals(TemplateEngineType.THYMELEAF)
+                || templateEngineType.equals(TemplateEngineType.JTE);
     }
 
     protected void createViteConfig(Path basePath) throws IOException {
@@ -145,25 +159,25 @@ public class ViteLiveReloadInitService implements LiveReloadInitService {
 
     private void updateSpringApplicationProperties(Path base) throws IOException {
         writeOrUpdatePropertiesFile(base,
-                                    "application-local.properties",
-                                    """
-                                            spring.thymeleaf.cache=false
-                                            spring.web.resources.chain.cache=false
-                                            
-                                            vite.mode=dev
-                                            """);
+                "application-local.properties",
+                """
+                        spring.thymeleaf.cache=false
+                        spring.web.resources.chain.cache=false
+                        
+                        vite.mode=dev
+                        """);
         writeOrUpdatePropertiesFile(base,
-                                    "application.properties",
-                                    """
-                                            vite.mode=build
-                                            """);
+                "application.properties",
+                """
+                        vite.mode=build
+                        """);
     }
 
     private static void writeOrUpdatePropertiesFile(Path base,
                                                     String fileName,
                                                     String content) throws IOException {
         Path propertiesFile = base.resolve("src/main/resources/" +
-                                           fileName);
+                fileName);
         Files.createDirectories(propertiesFile.getParent());
         if (!Files.exists(propertiesFile)) {
             Files.writeString(propertiesFile, content, StandardOpenOption.CREATE);

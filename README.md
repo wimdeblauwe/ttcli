@@ -1,6 +1,7 @@
 # Taming Thymeleaf CLI
 
-The goal of this project is to provide a command line tool to help set up a Spring Boot with Thymeleaf project.
+The goal of this project is to provide a command line tool to help set up a Spring Boot project with either JTE or
+Thymeleaf as the template engine.
 
 ## Usage
 
@@ -22,18 +23,22 @@ The tool will ask the following questions:
 1. GroupId: the Maven `groupId` that should be used for the project.
 2. ArtifactId: the Maven `artifactId` that should be used for the project.
 3. Name: the project name
-4. Live reload setup: Select how you want to have your live reload setup
-5. Web dependencies: Select from various CSS and/or JavaScript libraries to be added to your project.
+4. Spring Boot version: Select the Spring Boot version to use
+5. Template engine: Select either Thymeleaf (default) or JTE as the template engine
+6. Live reload setup: Select how you want to have your live reload setup
+7. Web dependencies: Select from various CSS and/or JavaScript libraries to be added to your project.
 
 The tool will create a new project in a sub-directory of the current directory with the name of the `artifactId` and apply the following changes:
 
 * Generate a Spring Boot project
 * Add NPM dependencies and NPM scripts needed to have a live reload setup
-* Add an `index.html` and `layout.html` page as a starting point for your Thymeleaf application.
+* Add template files as a starting point for your application:
+  * For Thymeleaf: `index.html` and `layout/main.html` in the `src/main/resources/templates` directory
+  * For JTE: `index.jte` and `layout/main.jte` in the `src/main/jte` directory
 * Setup Tailwind CSS when selected.
 * Setup Bootstrap when selected.
 * Adds webjars to the Maven dependencies.
-* Adds an `application-local.properties` with Thymeleaf template caching disabled.
+* Adds an `application-local.properties` with template caching disabled.
 
 > [!NOTE]
 > You can choose a different base directory that the tool should use via `ttcli --baseDir <otherdir>`
@@ -65,7 +70,8 @@ It requires an additional dependency on the Spring Boot side to process the asse
 The biggest advantages:
 
 * It is very quick to reload the changes.
-* Vite supports SASS, TypeScript, ... so you can use all that now in your Spring Boot with Thymeleaf project.
+* Vite supports SASS, TypeScript, ... so you can use all that now in your Spring Boot project with either JTE or
+  Thymeleaf.
   If you add the Vite Vue plugin, you can even write Vue components and have live reloading of them working just fine.
 
 ## Tailwind CSS support
