@@ -91,7 +91,7 @@ public class ViteLiveReloadInitService implements LiveReloadInitService {
             NpmHelper.updateMavenPom(mavenPomReaderWriter, installedApplicationVersions, false);
             NpmHelper.updateGitIgnore(basePath);
 
-            updateSpringApplicationProperties(basePath);
+            updateSpringApplicationProperties(basePath, projectInitializationParameters.templateEngineType());
         } catch (IOException e) {
             throw new LiveReloadInitServiceException(e);
         } catch (InterruptedException e) {
@@ -157,15 +157,25 @@ public class ViteLiveReloadInitService implements LiveReloadInitService {
         Files.writeString(path, content, StandardOpenOption.CREATE);
     }
 
-    private void updateSpringApplicationProperties(Path base) throws IOException {
-        writeOrUpdatePropertiesFile(base,
-                "application-local.properties",
-                """
-                        spring.thymeleaf.cache=false
-                        spring.web.resources.chain.cache=false
-                        
-                        vite.mode=dev
-                        """);
+    private void updateSpringApplicationProperties(Path base, TemplateEngineType templateEngineType) throws IOException {
+        if (templateEngineType.equals(TemplateEngineType.THYMELEAF)) {
+            writeOrUpdatePropertiesFile(base,
+                    "application-local.properties",
+                    """
+                            spring.thymeleaf.cache=false
+                            spring.web.resources.chain.cache=false
+                            
+                            vite.mode=dev
+                            """);
+        } else if (templateEngineType.equals(TemplateEngineType.JTE)) {
+            writeOrUpdatePropertiesFile(base,
+                    "application-local.properties",
+                    """
+                            spring.web.resources.chain.cache=false
+                            
+                            vite.mode=dev
+                            """);
+        }
         writeOrUpdatePropertiesFile(base,
                 "application.properties",
                 """

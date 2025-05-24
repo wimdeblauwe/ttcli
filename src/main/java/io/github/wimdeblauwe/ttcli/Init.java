@@ -71,6 +71,9 @@ public class Init {
             builder = flowBuilder.clone().reset();
             addLiveReloadInput(builder, templateEngineType);
             addWebDependenciesInput(builder);
+            flow = builder.build();
+            flowResult = flow.run();
+            context = flowResult.getContext();
 
             List<String> selectedWebDependencyOptions = context.get("web-dependencies");
             List<WebDependency> selectedWebDependencies = webDependencies.stream().filter(webDependency -> selectedWebDependencyOptions.contains(webDependency.id())).toList();
