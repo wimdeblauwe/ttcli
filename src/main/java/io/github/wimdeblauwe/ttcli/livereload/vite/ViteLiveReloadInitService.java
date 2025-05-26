@@ -22,7 +22,7 @@ import java.util.Set;
 @Component
 @Order(5)
 public class ViteLiveReloadInitService implements LiveReloadInitService {
-    private static final String VITE_SPRING_BOOT_VERSION = "0.9.0-SNAPSHOT";
+    private static final String VITE_SPRING_BOOT_VERSION = "0.9.0";
 
     protected final NodeService nodeService;
 
