@@ -9,6 +9,7 @@ import io.github.wimdeblauwe.ttcli.maven.MavenPomReaderWriter;
 import io.github.wimdeblauwe.ttcli.npm.InstalledApplicationVersions;
 import io.github.wimdeblauwe.ttcli.npm.NodeService;
 import io.github.wimdeblauwe.ttcli.tailwind.TailwindVersion;
+import io.github.wimdeblauwe.ttcli.template.TemplateEngineType;
 import org.jsoup.nodes.Comment;
 import org.springframework.stereotype.Component;
 
@@ -103,6 +104,11 @@ public class DevToolsBasedWithTailwindCssLiveReloadInitService implements LiveRe
     @Override
     public Path getTailwindConfigFileParentPath(ProjectInitializationParameters parameters) {
         return parameters.basePath().resolve("src/main/frontend");
+    }
+
+    @Override
+    public boolean isApplicableForTemplateEngine(TemplateEngineType templateEngineType) {
+        return templateEngineType.equals(TemplateEngineType.THYMELEAF);
     }
 
     private LinkedHashMap<String, String> npmScripts() {

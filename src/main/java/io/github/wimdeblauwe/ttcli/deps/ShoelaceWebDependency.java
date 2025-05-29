@@ -1,6 +1,7 @@
 package io.github.wimdeblauwe.ttcli.deps;
 
 import io.github.wimdeblauwe.ttcli.maven.MavenDependency;
+import io.github.wimdeblauwe.ttcli.template.TemplateEngineType;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -22,7 +23,7 @@ public class ShoelaceWebDependency implements WebjarsBasedWebDependency {
     }
 
     @Override
-    public List<MavenDependency> getMavenDependencies(String springBootVersion) {
+    public List<MavenDependency> getMavenDependencies(String springBootVersion, TemplateEngineType templateEngineType) {
         return Collections.singletonList(new MavenDependency("org.webjars.npm", "shoelace-style__shoelace", "2.20.0"));
     }
 

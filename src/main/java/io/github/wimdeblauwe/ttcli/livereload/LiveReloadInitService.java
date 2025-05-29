@@ -1,6 +1,7 @@
 package io.github.wimdeblauwe.ttcli.livereload;
 
 import io.github.wimdeblauwe.ttcli.ProjectInitializationParameters;
+import io.github.wimdeblauwe.ttcli.template.TemplateEngineType;
 
 import java.nio.file.Path;
 import java.util.Set;
@@ -19,4 +20,6 @@ public interface LiveReloadInitService {
     void runBuild(ProjectInitializationParameters projectInitializationParameters) throws LiveReloadInitServiceException;
 
     Path getTailwindConfigFileParentPath(ProjectInitializationParameters parameters);
+
+    boolean isApplicableForTemplateEngine(TemplateEngineType templateEngineType);
 }

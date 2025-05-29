@@ -3,6 +3,7 @@ package io.github.wimdeblauwe.ttcli.livereload.devtools;
 import io.github.wimdeblauwe.ttcli.ProjectInitializationParameters;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitService;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceException;
+import io.github.wimdeblauwe.ttcli.template.TemplateEngineType;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -57,5 +58,10 @@ public class DevToolsBasedLiveReloadInitService implements LiveReloadInitService
     @Override
     public Path getTailwindConfigFileParentPath(ProjectInitializationParameters parameters) {
         return null;
+    }
+
+    @Override
+    public boolean isApplicableForTemplateEngine(TemplateEngineType templateEngineType) {
+        return templateEngineType.equals(TemplateEngineType.THYMELEAF);
     }
 }

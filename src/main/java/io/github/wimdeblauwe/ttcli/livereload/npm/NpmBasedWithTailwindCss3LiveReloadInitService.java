@@ -7,6 +7,7 @@ import io.github.wimdeblauwe.ttcli.livereload.TailwindCssSpecializedLiveReloadIn
 import io.github.wimdeblauwe.ttcli.livereload.helper.TailwindCss3Helper;
 import io.github.wimdeblauwe.ttcli.npm.NodeService;
 import io.github.wimdeblauwe.ttcli.tailwind.TailwindVersion;
+import io.github.wimdeblauwe.ttcli.template.TemplateEngineType;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -38,7 +39,11 @@ public class NpmBasedWithTailwindCss3LiveReloadInitService extends NpmBasedLiveR
 
             TailwindCss3Helper.createApplicationCss(projectInitializationParameters.basePath(),
                     "src/main/resources/static/css/application.css");
-            TailwindCss3Helper.setupTailwindConfig(projectInitializationParameters.basePath(), "./src/main/resources/templates/**/*.html");
+            if (projectInitializationParameters.templateEngineType().equals(TemplateEngineType.THYMELEAF)) {
+                TailwindCss3Helper.setupTailwindConfig(projectInitializationParameters.basePath(), "./src/main/resources/templates/**/*.html");
+            } else if (projectInitializationParameters.templateEngineType().equals(TemplateEngineType.JTE)) {
+                TailwindCss3Helper.setupTailwindConfig(projectInitializationParameters.basePath(), "./src/main/jte/**/*.jte");
+            }
         } catch (IOException e) {
             throw new LiveReloadInitServiceException(e);
         } catch (InterruptedException e) {

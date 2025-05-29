@@ -3,10 +3,12 @@ package io.github.wimdeblauwe.ttcli;
 import io.github.wimdeblauwe.ttcli.boot.SpringBootInitializrService;
 import io.github.wimdeblauwe.ttcli.help.HelpTextInitService;
 import io.github.wimdeblauwe.ttcli.java.JavaCodeInitService;
+import io.github.wimdeblauwe.ttcli.jte.JteTemplatesInitService;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitService;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceFactory;
 import io.github.wimdeblauwe.ttcli.maven.MavenInitService;
 import io.github.wimdeblauwe.ttcli.tailwind.TailwindDependencyInitService;
+import io.github.wimdeblauwe.ttcli.template.TemplateEngineType;
 import io.github.wimdeblauwe.ttcli.thymeleaf.ThymeleafTemplatesInitService;
 import io.github.wimdeblauwe.ttcli.util.FileUtil;
 import org.slf4j.Logger;
@@ -24,6 +26,7 @@ public class ProjectInitializationService {
     private final JavaCodeInitService javaCodeInitService;
     private final LiveReloadInitServiceFactory liveReloadInitServiceFactory;
     private final ThymeleafTemplatesInitService thymeleafTemplatesInitService;
+    private final JteTemplatesInitService jteTemplatesInitService;
     private final MavenInitService mavenInitService;
     private final TailwindDependencyInitService tailwindDependencyInitService;
     private final HelpTextInitService helpTextInitService;
@@ -32,6 +35,7 @@ public class ProjectInitializationService {
                                         JavaCodeInitService javaCodeInitService,
                                         LiveReloadInitServiceFactory liveReloadInitServiceFactory,
                                         ThymeleafTemplatesInitService thymeleafTemplatesInitService,
+                                        JteTemplatesInitService jteTemplatesInitService,
                                         MavenInitService mavenInitService,
                                         TailwindDependencyInitService tailwindDependencyInitService,
                                         HelpTextInitService helpTextInitService) {
@@ -39,6 +43,7 @@ public class ProjectInitializationService {
         this.javaCodeInitService = javaCodeInitService;
         this.liveReloadInitServiceFactory = liveReloadInitServiceFactory;
         this.thymeleafTemplatesInitService = thymeleafTemplatesInitService;
+        this.jteTemplatesInitService = jteTemplatesInitService;
         this.mavenInitService = mavenInitService;
         this.tailwindDependencyInitService = tailwindDependencyInitService;
         this.helpTextInitService = helpTextInitService;
@@ -59,7 +64,8 @@ public class ProjectInitializationService {
         LOGGER.info("Using init service {}", liveReloadInitService);
         initializrService.generate(basePath,
                                    parameters.springBootProjectCreationParameters(),
-                                   liveReloadInitService.additionalSpringInitializrDependencies());
+                liveReloadInitService.additionalSpringInitializrDependencies(),
+                parameters.templateEngineType());
         javaCodeInitService.generate(parameters);
 
         liveReloadInitService.generate(parameters);
@@ -67,7 +73,13 @@ public class ProjectInitializationService {
 
         mavenInitService.generate(parameters);
         tailwindDependencyInitService.generate(liveReloadInitService, parameters);
-        thymeleafTemplatesInitService.generate(parameters);
+
+        // Generate templates based on the selected template engine
+        if (parameters.templateEngineType() == TemplateEngineType.THYMELEAF) {
+            thymeleafTemplatesInitService.generate(parameters);
+        } else if (parameters.templateEngineType() == TemplateEngineType.JTE) {
+            jteTemplatesInitService.generate(parameters);
+        }
 
         liveReloadInitService.runBuild(parameters);
     }
