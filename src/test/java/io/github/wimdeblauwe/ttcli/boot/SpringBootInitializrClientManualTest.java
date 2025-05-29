@@ -25,7 +25,7 @@ class SpringBootInitializrClientManualTest {
     @Test
     void testGenerate() throws IOException {
         SpringBootInitializrClient client = springBootInitializrClient();
-        byte[] o = client.generateProject("maven-project",
+        byte[] o = client.generateProject(SpringBootProjectType.MAVEN.value(),
                                           "2.7.5",
                 "17",
                                           "com.example",

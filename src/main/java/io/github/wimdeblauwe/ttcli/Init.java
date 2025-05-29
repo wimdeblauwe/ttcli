@@ -48,7 +48,7 @@ public class Init {
 
         try {
             ComponentFlow.Builder builder = flowBuilder.clone().reset();
-
+            addProjectTypeInput(builder);
             addGroupIdInput(builder);
             addArtifactIdInput(builder);
             addProjectNameInput(builder);
@@ -60,6 +60,7 @@ public class Init {
             ComponentFlow.ComponentFlowResult flowResult = flow.run();
 
             ComponentContext<?> context = flowResult.getContext();
+            String projectType = context.get("project-type");
             String groupId = context.get("group-id");
             String artifactId = context.get("artifact-id");
             String projectName = context.get("project-name");
@@ -76,7 +77,9 @@ public class Init {
             Path basePath = Path.of(baseDir).resolve(artifactId);
 
             projectInitializationService.initialize(new ProjectInitializationParameters(basePath,
-                    new SpringBootProjectCreationParameters(groupId,
+                    new SpringBootProjectCreationParameters(
+                            SpringBootProjectType.valueOf(projectType),
+                            groupId,
                             artifactId,
                             projectName,
                             springBootVersion,
@@ -129,6 +132,17 @@ public class Init {
         return springBootVersions.stream().collect(Collectors.toMap(IdAndName::name, IdAndName::id));
     }
 
+    private void addProjectTypeInput(ComponentFlow.Builder builder){
+        Map<String, String> typeOptions = new HashMap<>();
+        for (SpringBootProjectType type : SpringBootProjectType.values()) {
+            typeOptions.put(type.description(), type.name());
+        }
+        builder.withSingleItemSelector("project-type")
+                .name("Select Spring Boot project type:")
+                .selectItems(typeOptions)
+                .max(typeOptions.size())
+                .and();
+    }
     private void addGroupIdInput(ComponentFlow.Builder builder) {
         builder.withStringInput("group-id")
                 .name("Group: ")

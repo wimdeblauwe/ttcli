@@ -1,12 +1,15 @@
 package io.github.wimdeblauwe.ttcli.livereload.vite;
 
 import io.github.wimdeblauwe.ttcli.ProjectInitializationParameters;
+import io.github.wimdeblauwe.ttcli.buildtools.maven.MavenPomReaderWriter;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitService;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceException;
 import io.github.wimdeblauwe.ttcli.livereload.helper.NpmHelper;
-import io.github.wimdeblauwe.ttcli.maven.MavenPomReaderWriter;
 import io.github.wimdeblauwe.ttcli.npm.InstalledApplicationVersions;
 import io.github.wimdeblauwe.ttcli.npm.NodeService;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,8 +17,6 @@ import java.nio.file.StandardOpenOption;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 
 @Component
 @Order(5)

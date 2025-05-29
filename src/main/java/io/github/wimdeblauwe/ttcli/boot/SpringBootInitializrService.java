@@ -26,7 +26,7 @@ public class SpringBootInitializrService {
 
         Set<String> dependencies = new HashSet<>(Set.of("web", "thymeleaf"));
         dependencies.addAll(additionalDependencies);
-        byte[] generatedProjectZip = initializrClient.generateProject("maven-project",
+        byte[] generatedProjectZip = initializrClient.generateProject(parameters.type().value(),
                                                                       parameters.springBootVersion(),
                 parameters.javaVersion(),
                                                                       parameters.groupId(),
