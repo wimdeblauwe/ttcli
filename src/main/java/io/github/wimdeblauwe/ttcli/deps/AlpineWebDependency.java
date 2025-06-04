@@ -1,6 +1,7 @@
 package io.github.wimdeblauwe.ttcli.deps;
 
 import io.github.wimdeblauwe.ttcli.maven.MavenDependency;
+import io.github.wimdeblauwe.ttcli.template.TemplateEngineType;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -19,18 +20,22 @@ public class AlpineWebDependency implements WebjarsBasedWebDependency {
     }
 
     @Override
-    public List<MavenDependency> getMavenDependencies(String springBootVersion) {
+    public List<MavenDependency> getMavenDependencies(String springBootVersion, TemplateEngineType templateEngineType) {
         return Collections.singletonList(new MavenDependency("org.webjars.npm", "alpinejs", "3.14.8"));
     }
 
     @Override
-    public String getCssLinksForLayoutTemplate() {
+    public String getCssLinksForLayoutTemplate(TemplateEngineType templateEngineType) {
         return null;
     }
 
     @Override
-    public String getJsLinksForLayoutTemplate() {
-        return """
+    public String getJsLinksForLayoutTemplate(TemplateEngineType templateEngineType) {
+        return switch (templateEngineType) {
+            case THYMELEAF -> """
                 <script type="text/javascript" th:src="@{/webjars/alpinejs/dist/cdn.min.js}"></script>""";
+            case JTE -> """
+                    <script type="text/javascript" src="/webjars/alpinejs/dist/cdn.min.js"></script>""";
+        };
     }
 }

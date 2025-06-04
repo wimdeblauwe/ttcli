@@ -7,6 +7,7 @@ import io.github.wimdeblauwe.ttcli.livereload.TailwindCssSpecializedLiveReloadIn
 import io.github.wimdeblauwe.ttcli.livereload.helper.TailwindCssHelper;
 import io.github.wimdeblauwe.ttcli.npm.NodeService;
 import io.github.wimdeblauwe.ttcli.tailwind.TailwindVersion;
+import io.github.wimdeblauwe.ttcli.template.TemplateEngineType;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -59,10 +60,17 @@ public class ViteWithTailwindCssLiveReloadInitService extends ViteLiveReloadInit
                 .toList();
     }
 
-    @Override
-    protected void createViteConfig(Path basePath) throws IOException {
+    protected void createViteConfig(Path basePath, TemplateEngineType templateEngineType) throws IOException {
         Path path = basePath.resolve("vite.config.js");
-        String content = """
+        String content = switch (templateEngineType) {
+            case THYMELEAF -> viteConfigForThymeleaf();
+            case JTE -> viteConfigForJte();
+        };
+        Files.writeString(path, content, StandardOpenOption.CREATE);
+    }
+
+    private static String viteConfigForThymeleaf() {
+        return """
                 import {defineConfig} from 'vite';
                 import tailwindcss from '@tailwindcss/vite';
                 import path from 'path';
@@ -100,7 +108,51 @@ public class ViteWithTailwindCssLiveReloadInitService extends ViteLiveReloadInit
                     }
                 });
                 """;
-        Files.writeString(path, content, StandardOpenOption.CREATE);
+    }
+
+    private static String viteConfigForJte() {
+        return """
+                import {defineConfig} from 'vite';
+                import tailwindcss from '@tailwindcss/vite';
+                import path from 'path';
+                import springBoot from '@wim.deblauwe/vite-plugin-spring-boot';
+                
+                export default defineConfig({
+                    plugins: [
+                        tailwindcss(),
+                        springBoot({
+                                        fullCopyFilePaths: {
+                                            include: ['jte/**/*.jte'],
+                                        }
+                        })
+                    ],
+                    root: path.join(__dirname, './src/main/'),
+                    build: {
+                        manifest: true,
+                        rollupOptions: {
+                            input: [
+                                '/resources/static/css/application.css'
+                            ]
+                        },
+                        outDir: path.join(__dirname, `./target/classes/static`),
+                        copyPublicDir: false,
+                        emptyOutDir: true
+                    },
+                    server: {
+                        proxy: {
+                            // Proxy all backend requests to Spring Boot except for static assets
+                            '^/(?!resources/static|assets|@|.*\\\\.(js|css|png|svg|jpg|jpeg|gif|ico|woff|woff2)$)': {
+                                target: 'http://localhost:8080',  // Proxy to Spring Boot backend
+                                changeOrigin: true,
+                                secure: false
+                            }
+                        },
+                        watch: {
+                            ignored: ['target/**']
+                        }
+                    }
+                });
+                """;
     }
 
     @Override

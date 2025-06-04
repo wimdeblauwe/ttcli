@@ -8,6 +8,7 @@ import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceFactory;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceParameters;
 import io.github.wimdeblauwe.ttcli.tailwind.TailwindDependency;
 import io.github.wimdeblauwe.ttcli.tailwind.TailwindVersion;
+import io.github.wimdeblauwe.ttcli.template.TemplateEngineType;
 import io.github.wimdeblauwe.ttcli.util.InetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,8 +54,7 @@ public class Init {
             addArtifactIdInput(builder);
             addProjectNameInput(builder);
             addSpringBootVersionInput(builder);
-            addLiveReloadInput(builder);
-            addWebDependenciesInput(builder);
+            addTemplateEngineInput(builder);
 
             ComponentFlow flow = builder.build();
             ComponentFlow.ComponentFlowResult flowResult = flow.run();
@@ -65,6 +65,15 @@ public class Init {
             String projectName = context.get("project-name");
             String springBootVersion = context.get("spring-boot-version");
             String javaVersion = context.get("java-version");
+            String templateEngineId = context.get("template-engine");
+            TemplateEngineType templateEngineType = TemplateEngineType.valueOf(templateEngineId);
+
+            builder = flowBuilder.clone().reset();
+            addLiveReloadInput(builder, templateEngineType);
+            addWebDependenciesInput(builder);
+            flow = builder.build();
+            flowResult = flow.run();
+            context = flowResult.getContext();
 
             List<String> selectedWebDependencyOptions = context.get("web-dependencies");
             List<WebDependency> selectedWebDependencies = webDependencies.stream().filter(webDependency -> selectedWebDependencyOptions.contains(webDependency.id())).toList();
@@ -84,7 +93,8 @@ public class Init {
                     new LiveReloadInitServiceParameters(context.get("live-reload")),
                     selectedWebDependencies,
                     tailwindVersion,
-                    selectedTailwindDependencies));
+                    selectedTailwindDependencies,
+                    templateEngineType));
 
             System.out.println("✅ Done generating project at " + basePath.toAbsolutePath());
             System.out.println();
@@ -174,18 +184,32 @@ public class Init {
         }
     }
 
-    private void addLiveReloadInput(ComponentFlow.Builder builder) {
+    private void addLiveReloadInput(ComponentFlow.Builder builder, TemplateEngineType templateEngineType) {
         Map<String, String> reloadOptions = new HashMap<>();
         List<String> reloadOptionIdsInOrder = new ArrayList<>();
         for (LiveReloadInitService initService : liveReloadInitServiceFactory.getNormalServices()) {
-            reloadOptions.put(initService.getName(), initService.getId());
-            reloadOptionIdsInOrder.add(initService.getId());
+            if (initService.isApplicableForTemplateEngine(templateEngineType)) {
+                reloadOptions.put(initService.getName(), initService.getId());
+                reloadOptionIdsInOrder.add(initService.getId());
+            }
         }
         builder.withSingleItemSelector("live-reload")
                 .sort(Comparator.comparingInt(o -> reloadOptionIdsInOrder.indexOf(o.getItem())))
                 .name("Select live reload implementation:")
                 .selectItems(reloadOptions)
                 .max(reloadOptions.size())
+                .and();
+    }
+
+    private void addTemplateEngineInput(ComponentFlow.Builder builder) {
+        Map<String, String> templateEngineOptions = new HashMap<>();
+        templateEngineOptions.put("Thymeleaf", TemplateEngineType.THYMELEAF.name());
+        templateEngineOptions.put("JTE", TemplateEngineType.JTE.name());
+
+        builder.withSingleItemSelector("template-engine")
+                .name("Select template engine")
+                .selectItems(templateEngineOptions)
+                .defaultSelect("Thymeleaf")
                 .and();
     }
 

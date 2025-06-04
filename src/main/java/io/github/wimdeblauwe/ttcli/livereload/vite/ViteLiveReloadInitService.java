@@ -7,6 +7,11 @@ import io.github.wimdeblauwe.ttcli.livereload.helper.NpmHelper;
 import io.github.wimdeblauwe.ttcli.maven.MavenPomReaderWriter;
 import io.github.wimdeblauwe.ttcli.npm.InstalledApplicationVersions;
 import io.github.wimdeblauwe.ttcli.npm.NodeService;
+import io.github.wimdeblauwe.ttcli.template.TemplateEngineType;
+import io.github.wimdeblauwe.ttcli.util.PropertiesFilesUtil;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,12 +19,12 @@ import java.nio.file.StandardOpenOption;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 
 @Component
 @Order(5)
 public class ViteLiveReloadInitService implements LiveReloadInitService {
+    private static final String VITE_SPRING_BOOT_VERSION = "0.10.0";
+
     protected final NodeService nodeService;
 
     public ViteLiveReloadInitService(NodeService nodeService) {
@@ -69,21 +74,25 @@ public class ViteLiveReloadInitService implements LiveReloadInitService {
             InstalledApplicationVersions installedApplicationVersions = nodeService.checkIfNodeAndNpmAreInstalled();
             Path basePath = projectInitializationParameters.basePath();
             nodeService.createPackageJsonForModule(basePath,
-                                                   projectInitializationParameters.projectName());
+                    projectInitializationParameters.projectName());
             nodeService.installNpmDevDependencies(basePath,
-                                                  npmDevDependencies());
+                    npmDevDependencies());
             nodeService.insertPackageJsonScripts(basePath, npmScripts());
 
-            createViteConfig(basePath);
+            createViteConfig(basePath, projectInitializationParameters.templateEngineType());
 
             MavenPomReaderWriter mavenPomReaderWriter = MavenPomReaderWriter.readFrom(basePath);
-            mavenPomReaderWriter.addDependency("io.github.wimdeblauwe", "vite-spring-boot-thymeleaf", "0.6.0");
+            if (projectInitializationParameters.templateEngineType() == TemplateEngineType.THYMELEAF) {
+                mavenPomReaderWriter.addDependency("io.github.wimdeblauwe", "vite-spring-boot-thymeleaf", VITE_SPRING_BOOT_VERSION);
+            } else if (projectInitializationParameters.templateEngineType() == TemplateEngineType.JTE) {
+                mavenPomReaderWriter.addDependency("io.github.wimdeblauwe", "vite-spring-boot-jte", VITE_SPRING_BOOT_VERSION);
+            }
             mavenPomReaderWriter.write();
 
             NpmHelper.updateMavenPom(mavenPomReaderWriter, installedApplicationVersions, false);
             NpmHelper.updateGitIgnore(basePath);
 
-            updateSpringApplicationProperties(basePath);
+            updateSpringApplicationProperties(basePath, projectInitializationParameters.templateEngineType());
         } catch (IOException e) {
             throw new LiveReloadInitServiceException(e);
         } catch (InterruptedException e) {
@@ -102,9 +111,23 @@ public class ViteLiveReloadInitService implements LiveReloadInitService {
         return null;
     }
 
-    protected void createViteConfig(Path basePath) throws IOException {
+    @Override
+    public boolean isApplicableForTemplateEngine(TemplateEngineType templateEngineType) {
+        return templateEngineType.equals(TemplateEngineType.THYMELEAF)
+                || templateEngineType.equals(TemplateEngineType.JTE);
+    }
+
+    protected void createViteConfig(Path basePath, TemplateEngineType templateEngineType) throws IOException {
         Path path = basePath.resolve("vite.config.js");
-        String content = """
+        String content = switch (templateEngineType) {
+            case THYMELEAF -> viteConfigForThymeleaf();
+            case JTE -> viteConfigForJte();
+        };
+        Files.writeString(path, content, StandardOpenOption.CREATE);
+    }
+
+    private static String viteConfigForThymeleaf() {
+        return """
                 import {defineConfig} from 'vite';
                 import path from 'path';
                 import springBoot from '@wim.deblauwe/vite-plugin-spring-boot';
@@ -140,37 +163,88 @@ public class ViteLiveReloadInitService implements LiveReloadInitService {
                     }
                 });
                 """;
-        Files.writeString(path, content, StandardOpenOption.CREATE);
     }
 
-    private void updateSpringApplicationProperties(Path base) throws IOException {
-        writeOrUpdatePropertiesFile(base,
-                                    "application-local.properties",
-                                    """
-                                            spring.thymeleaf.cache=false
-                                            spring.web.resources.chain.cache=false
-                                            
-                                            vite.mode=dev
-                                            """);
-        writeOrUpdatePropertiesFile(base,
-                                    "application.properties",
-                                    """
-                                            vite.mode=build
-                                            """);
+    private static String viteConfigForJte() {
+        return """
+                import {defineConfig} from 'vite';
+                import path from 'path';
+                import springBoot from '@wim.deblauwe/vite-plugin-spring-boot';
+                
+                export default defineConfig({
+                    plugins: [
+                        springBoot({
+                                        fullCopyFilePaths: {
+                                            include: ['jte/**/*.jte'],
+                                        }
+                        })
+                    ],
+                    root: path.join(__dirname, './src/main/'),
+                    build: {
+                        manifest: true,
+                        rollupOptions: {
+                            input: [
+                                '/resources/static/css/application.css'
+                            ]
+                        },
+                        outDir: path.join(__dirname, `./target/classes/static`),
+                        copyPublicDir: false,
+                        emptyOutDir: true
+                    },
+                    server: {
+                        proxy: {
+                            // Proxy all backend requests to Spring Boot except for static assets
+                            '^/(?!resources/static|assets|@|.*\\\\.(js|css|png|svg|jpg|jpeg|gif|ico|woff|woff2)$)': {
+                                target: 'http://localhost:8080',  // Proxy to Spring Boot backend
+                                changeOrigin: true,
+                                secure: false
+                            }
+                        },
+                        watch: {
+                            ignored: ['target/**']
+                        }
+                    }
+                });
+                """;
     }
 
-    private static void writeOrUpdatePropertiesFile(Path base,
-                                                    String fileName,
-                                                    String content) throws IOException {
-        Path propertiesFile = base.resolve("src/main/resources/" +
-                                           fileName);
-        Files.createDirectories(propertiesFile.getParent());
-        if (!Files.exists(propertiesFile)) {
-            Files.writeString(propertiesFile, content, StandardOpenOption.CREATE);
-        } else {
-            Files.writeString(propertiesFile, content, StandardOpenOption.APPEND);
+    private void updateSpringApplicationProperties(Path base, TemplateEngineType templateEngineType) throws IOException {
+        if (templateEngineType.equals(TemplateEngineType.THYMELEAF)) {
+            PropertiesFilesUtil.writeOrUpdatePropertiesFile(base,
+                    "application-local.properties",
+                    """
+                            spring.thymeleaf.cache=false
+                            spring.web.resources.chain.cache=false
+                            
+                            vite.mode=dev
+                            """);
+            PropertiesFilesUtil.writeOrUpdatePropertiesFile(base,
+                    "application.properties",
+                    """                            
+                            vite.mode=build
+                            """);
+        } else if (templateEngineType.equals(TemplateEngineType.JTE)) {
+            PropertiesFilesUtil.writeOrUpdatePropertiesFile(base,
+                    "application-local.properties",
+                    """
+                            gg.jte.usePrecompiledTemplates=false
+                            gg.jte.development-mode=true
+                            spring.web.resources.chain.cache=false
+                            
+                            vite.mode=dev
+                            """);
+            PropertiesFilesUtil.removePropertyFromPropertiesFile(base, "application.properties", "gg.jte.development-mode");
+            PropertiesFilesUtil.writeOrUpdatePropertiesFile(base,
+                    "application.properties",
+                    """
+                            gg.jte.usePrecompiledTemplates=true
+                            
+                            vite.mode=build
+                            vite.vite-entries-prefix=resources/static
+                            """);
         }
     }
+
 
     protected List<String> npmDevDependencies() {
         return List.of("vite", "@wim.deblauwe/vite-plugin-spring-boot");
