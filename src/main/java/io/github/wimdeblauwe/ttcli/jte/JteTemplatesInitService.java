@@ -4,6 +4,7 @@ import io.github.wimdeblauwe.ttcli.ProjectInitializationParameters;
 import io.github.wimdeblauwe.ttcli.deps.WebDependency;
 import io.github.wimdeblauwe.ttcli.deps.WebjarsBasedWebDependency;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceParameters;
+import io.github.wimdeblauwe.ttcli.template.TemplateEngineType;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -53,11 +54,11 @@ public class JteTemplatesInitService {
         StringBuilder cssLinksForLayoutTemplate = new StringBuilder();
         for (WebDependency webDependency : webDependencies) {
             if (webDependency instanceof WebjarsBasedWebDependency webjarsBasedWebDependency) {
-                String cssForDependency = webjarsBasedWebDependency.getCssLinksForLayoutTemplate();
+                String cssForDependency = webjarsBasedWebDependency.getCssLinksForLayoutTemplate(TemplateEngineType.JTE);
                 if (cssForDependency != null) {
                     cssLinksForLayoutTemplate
                             .append('\n')
-                            .append(cssForDependency.replace("th:href", "href"));
+                            .append(cssForDependency);
                 }
             }
         }
@@ -66,11 +67,11 @@ public class JteTemplatesInitService {
         StringBuilder jsLinksForLayoutTemplate = new StringBuilder();
         for (WebDependency webDependency : webDependencies) {
             if (webDependency instanceof WebjarsBasedWebDependency webjarsBasedWebDependency) {
-                String jsForDependency = webjarsBasedWebDependency.getJsLinksForLayoutTemplate();
+                String jsForDependency = webjarsBasedWebDependency.getJsLinksForLayoutTemplate(TemplateEngineType.JTE);
                 if (jsForDependency != null) {
                     jsLinksForLayoutTemplate
                             .append('\n')
-                            .append(jsForDependency.replace("th:src", "src"));
+                            .append(jsForDependency);
                 }
             }
         }

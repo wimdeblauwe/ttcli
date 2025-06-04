@@ -28,14 +28,22 @@ public class ShoelaceWebDependency implements WebjarsBasedWebDependency {
     }
 
     @Override
-    public String getCssLinksForLayoutTemplate() {
-        return """
+    public String getCssLinksForLayoutTemplate(TemplateEngineType templateEngineType) {
+        return switch (templateEngineType) {
+            case THYMELEAF -> """
                 <link rel="stylesheet" th:href="@{/webjars/shoelace-style__shoelace/dist/themes/light.css}">""";
+            case JTE -> """
+                    <link rel="stylesheet" href="/webjars/shoelace-style__shoelace/dist/themes/light.css">""";
+        };
     }
 
     @Override
-    public String getJsLinksForLayoutTemplate() {
-        return """
+    public String getJsLinksForLayoutTemplate(TemplateEngineType templateEngineType) {
+        return switch (templateEngineType) {
+            case THYMELEAF -> """
                 <script type="module" th:src="@{/webjars/shoelace-style__shoelace/cdn/shoelace-autoloader.js}"></script>""";
+            case JTE -> """
+                    <script type="module" th:src="/webjars/shoelace-style__shoelace/cdn/shoelace-autoloader.js"></script>""";
+        };
     }
 }

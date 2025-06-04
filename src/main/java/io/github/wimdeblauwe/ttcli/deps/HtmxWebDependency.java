@@ -34,14 +34,18 @@ public class HtmxWebDependency implements WebjarsBasedWebDependency {
     }
 
     @Override
-    public String getCssLinksForLayoutTemplate() {
+    public String getCssLinksForLayoutTemplate(TemplateEngineType templateEngineType) {
         return null;
     }
 
     @Override
-    public String getJsLinksForLayoutTemplate() {
-        return """
+    public String getJsLinksForLayoutTemplate(TemplateEngineType templateEngineType) {
+        return switch (templateEngineType) {
+            case THYMELEAF -> """
                 <script type="text/javascript" th:src="@{/webjars/htmx.org/dist/htmx.min.js}"></script>""";
+            case JTE -> """
+                    <script type="text/javascript" src="/webjars/htmx.org/dist/htmx.min.js"></script>""";
+        };
     }
 
     private static String getHtmxSpringBootThymeleafVersion(String springBootVersion) {

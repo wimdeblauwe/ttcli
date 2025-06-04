@@ -4,6 +4,7 @@ import io.github.wimdeblauwe.ttcli.ProjectInitializationParameters;
 import io.github.wimdeblauwe.ttcli.deps.WebDependency;
 import io.github.wimdeblauwe.ttcli.deps.WebjarsBasedWebDependency;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceParameters;
+import io.github.wimdeblauwe.ttcli.template.TemplateEngineType;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -52,7 +53,7 @@ public class ThymeleafTemplatesInitService {
         StringBuilder cssLinksForLayoutTemplate = new StringBuilder();
         for (WebDependency webDependency : webDependencies) {
             if (webDependency instanceof WebjarsBasedWebDependency webjarsBasedWebDependency) {
-                String cssForDependency = webjarsBasedWebDependency.getCssLinksForLayoutTemplate();
+                String cssForDependency = webjarsBasedWebDependency.getCssLinksForLayoutTemplate(TemplateEngineType.THYMELEAF);
                 if (cssForDependency != null) {
                     cssLinksForLayoutTemplate
                             .append('\n')
@@ -65,7 +66,7 @@ public class ThymeleafTemplatesInitService {
         StringBuilder jsLinksForLayoutTemplate = new StringBuilder();
         for (WebDependency webDependency : webDependencies) {
             if (webDependency instanceof WebjarsBasedWebDependency webjarsBasedWebDependency) {
-                String jsForDependency = webjarsBasedWebDependency.getJsLinksForLayoutTemplate();
+                String jsForDependency = webjarsBasedWebDependency.getJsLinksForLayoutTemplate(TemplateEngineType.THYMELEAF);
                 if (jsForDependency != null) {
                     jsLinksForLayoutTemplate
                             .append('\n')
