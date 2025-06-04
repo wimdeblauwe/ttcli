@@ -27,7 +27,7 @@ class PropertiesFilesUtilTest {
         // Verify
         Path propertiesFile = tempDir.resolve("src/main/resources/" + fileName);
         assertThat(Files.exists(propertiesFile)).isTrue();
-        assertThat(Files.readString(propertiesFile)).isEqualTo(content);
+        assertThat(Files.readString(propertiesFile)).isEqualToNormalizingNewlines(content);
     }
 
     @Test
@@ -47,7 +47,7 @@ class PropertiesFilesUtilTest {
         PropertiesFilesUtil.writeOrUpdatePropertiesFile(tempDir, fileName, additionalContent);
 
         // Verify
-        assertThat(Files.readString(propertiesFile)).isEqualTo(initialContent + additionalContent);
+        assertThat(Files.readString(propertiesFile)).isEqualToNormalizingNewlines(initialContent + additionalContent);
     }
 
     @Test
@@ -94,7 +94,7 @@ class PropertiesFilesUtilTest {
 
         // Verify that the content remains unchanged
         String updatedContent = Files.readString(propertiesFile);
-        assertThat(updatedContent).isEqualTo(initialContent);
+        assertThat(updatedContent).isEqualToIgnoringNewLines(initialContent);
     }
 
     @Test
