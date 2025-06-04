@@ -23,7 +23,7 @@ import java.util.Set;
 @Component
 @Order(5)
 public class ViteLiveReloadInitService implements LiveReloadInitService {
-    private static final String VITE_SPRING_BOOT_VERSION = "0.9.0";
+    private static final String VITE_SPRING_BOOT_VERSION = "0.10.0";
 
     protected final NodeService nodeService;
 
@@ -45,18 +45,18 @@ public class ViteLiveReloadInitService implements LiveReloadInitService {
     public String getHelpText() {
         return """
                 # Live reload setup
-
+                
                 This project uses Vite to have live reloading.
-
+                
                 Use the following steps to get it working:
-
+                
                 1. Start the Vite development server with `npm run dev`.
                 2. Run the Spring Boot application with the `local` profile. You can do this from your IDE,
                 or via the command line using `mvn spring-boot:run -Dspring-boot.run.profiles=local`.
                 3. Open your browser at http://localhost:8080
-
+                
                 You should now be able to change any HTML or CSS and have the browser reload upon saving the file.
-
+                
                 PS: It is also possible to use the URL that Vite uses (Usually http://localhost:5173) given the
                 Spring Boot application runs on port 8080. If another port is used, you will need to edit `vite.config.js`.
                 """;
@@ -79,7 +79,7 @@ public class ViteLiveReloadInitService implements LiveReloadInitService {
                     npmDevDependencies());
             nodeService.insertPackageJsonScripts(basePath, npmScripts());
 
-            createViteConfig(basePath);
+            createViteConfig(basePath, projectInitializationParameters.templateEngineType());
 
             MavenPomReaderWriter mavenPomReaderWriter = MavenPomReaderWriter.readFrom(basePath);
             if (projectInitializationParameters.templateEngineType() == TemplateEngineType.THYMELEAF) {
@@ -117,9 +117,17 @@ public class ViteLiveReloadInitService implements LiveReloadInitService {
                 || templateEngineType.equals(TemplateEngineType.JTE);
     }
 
-    protected void createViteConfig(Path basePath) throws IOException {
+    protected void createViteConfig(Path basePath, TemplateEngineType templateEngineType) throws IOException {
         Path path = basePath.resolve("vite.config.js");
-        String content = """
+        String content = switch (templateEngineType) {
+            case THYMELEAF -> viteConfigForThymeleaf();
+            case JTE -> viteConfigForJte();
+        };
+        Files.writeString(path, content, StandardOpenOption.CREATE);
+    }
+
+    private static String viteConfigForThymeleaf() {
+        return """
                 import {defineConfig} from 'vite';
                 import path from 'path';
                 import springBoot from '@wim.deblauwe/vite-plugin-spring-boot';
@@ -155,7 +163,49 @@ public class ViteLiveReloadInitService implements LiveReloadInitService {
                     }
                 });
                 """;
-        Files.writeString(path, content, StandardOpenOption.CREATE);
+    }
+
+    private static String viteConfigForJte() {
+        return """
+                import {defineConfig} from 'vite';
+                import path from 'path';
+                import springBoot from '@wim.deblauwe/vite-plugin-spring-boot';
+                
+                export default defineConfig({
+                    plugins: [
+                        springBoot({
+                                        fullCopyFilePaths: {
+                                            include: ['jte/**/*.jte'],
+                                        }
+                        })
+                    ],
+                    root: path.join(__dirname, './src/main/'),
+                    build: {
+                        manifest: true,
+                        rollupOptions: {
+                            input: [
+                                '/resources/static/css/application.css'
+                            ]
+                        },
+                        outDir: path.join(__dirname, `./target/classes/static`),
+                        copyPublicDir: false,
+                        emptyOutDir: true
+                    },
+                    server: {
+                        proxy: {
+                            // Proxy all backend requests to Spring Boot except for static assets
+                            '^/(?!resources/static|assets|@|.*\\\\.(js|css|png|svg|jpg|jpeg|gif|ico|woff|woff2)$)': {
+                                target: 'http://localhost:8080',  // Proxy to Spring Boot backend
+                                changeOrigin: true,
+                                secure: false
+                            }
+                        },
+                        watch: {
+                            ignored: ['target/**']
+                        }
+                    }
+                });
+                """;
     }
 
     private void updateSpringApplicationProperties(Path base, TemplateEngineType templateEngineType) throws IOException {
@@ -190,6 +240,7 @@ public class ViteLiveReloadInitService implements LiveReloadInitService {
                             gg.jte.usePrecompiledTemplates=true
                             
                             vite.mode=build
+                            vite.vite-entries-prefix=resources/static
                             """);
         }
     }
