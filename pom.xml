@@ -18,7 +18,7 @@
         <java.version>23</java.version>
         <spring-shell.version>3.4.0</spring-shell.version>
         <xmlprojector.version>1.4.23</xmlprojector.version>
-        <jsoup.version>1.20.1</jsoup.version>
+        <jsoup.version>1.21.1</jsoup.version>
         <xsoup.version>0.3.7</xsoup.version>
         <jline.version>3.30.4</jline.version>
 
