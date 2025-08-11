@@ -20,7 +20,7 @@
         <xmlprojector.version>1.4.23</xmlprojector.version>
         <jsoup.version>1.20.1</jsoup.version>
         <xsoup.version>0.3.7</xsoup.version>
-        <jline.version>3.30.4</jline.version>
+        <jline.version>3.30.5</jline.version>
 
         <!-- Maven plugins -->
         <assembly-plugin.version>3.7.1</assembly-plugin.version>
