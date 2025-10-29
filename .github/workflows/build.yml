@@ -9,7 +9,7 @@ on:
       - main
 
 env:
-  JAVA_VERSION: '23'
+  JAVA_VERSION: '25'
   JAVA_DISTRO: 'temurin'
 
 jobs:
