@@ -21,7 +21,7 @@ jobs:
       HEAD: ${{ steps.version.outputs.HEAD }}
       NEXT_VERSION: ${{ steps.version.outputs.NEXT_VERSION }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: 'Set up Java'
         uses: actions/setup-java@v4
@@ -67,7 +67,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: 'Check out repository'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ needs.precheck.outputs.HEAD }}
 
@@ -112,7 +112,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 'Check out repository'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ needs.precheck.outputs.HEAD }}
           fetch-depth: 0
