@@ -15,7 +15,7 @@
     <description>CLI interface to make working with Thymeleaf projects easier</description>
     <inceptionYear>2022</inceptionYear>
     <properties>
-        <java.version>23</java.version>
+        <java.version>25</java.version>
         <spring-shell.version>3.4.1</spring-shell.version>
         <xmlprojector.version>1.4.23</xmlprojector.version>
         <jsoup.version>1.21.2</jsoup.version>
