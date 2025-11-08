@@ -23,7 +23,6 @@ import java.util.Set;
 @Component
 @Order(5)
 public class ViteLiveReloadInitService implements LiveReloadInitService {
-    private static final String VITE_SPRING_BOOT_VERSION = "0.10.0";
 
     protected final NodeService nodeService;
 
@@ -82,10 +81,11 @@ public class ViteLiveReloadInitService implements LiveReloadInitService {
             createViteConfig(basePath, projectInitializationParameters.templateEngineType());
 
             MavenPomReaderWriter mavenPomReaderWriter = MavenPomReaderWriter.readFrom(basePath);
+            String springBootVersion = projectInitializationParameters.springBootProjectCreationParameters().springBootVersion();
             if (projectInitializationParameters.templateEngineType() == TemplateEngineType.THYMELEAF) {
-                mavenPomReaderWriter.addDependency("io.github.wimdeblauwe", "vite-spring-boot-thymeleaf", VITE_SPRING_BOOT_VERSION);
+                mavenPomReaderWriter.addDependency("io.github.wimdeblauwe", "vite-spring-boot-thymeleaf", getViteSpringBootVersion(springBootVersion));
             } else if (projectInitializationParameters.templateEngineType() == TemplateEngineType.JTE) {
-                mavenPomReaderWriter.addDependency("io.github.wimdeblauwe", "vite-spring-boot-jte", VITE_SPRING_BOOT_VERSION);
+                mavenPomReaderWriter.addDependency("io.github.wimdeblauwe", "vite-spring-boot-jte", getViteSpringBootVersion(springBootVersion));
             }
             mavenPomReaderWriter.write();
 
@@ -124,6 +124,16 @@ public class ViteLiveReloadInitService implements LiveReloadInitService {
             case JTE -> viteConfigForJte();
         };
         Files.writeString(path, content, StandardOpenOption.CREATE);
+    }
+
+    private String getViteSpringBootVersion(String springBootVersion) {
+        if (springBootVersion.startsWith("3.")) {
+            return "1.0.0";
+        } else if (springBootVersion.startsWith("4.")) {
+            return "2.0.0-rc.1";
+        } else {
+            throw new IllegalArgumentException("Unknown Spring Boot version: " + springBootVersion);
+        }
     }
 
     private static String viteConfigForThymeleaf() {
