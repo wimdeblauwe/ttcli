@@ -24,7 +24,7 @@ public class ShoelaceWebDependency implements WebjarsBasedWebDependency {
 
     @Override
     public List<MavenDependency> getMavenDependencies(String springBootVersion, TemplateEngineType templateEngineType) {
-        return Collections.singletonList(new MavenDependency("org.webjars.npm", "shoelace-style__shoelace", "2.20.0"));
+        return Collections.singletonList(new MavenDependency("org.webjars.npm", "shoelace-style__shoelace", "2.20.1"));
     }
 
     @Override
