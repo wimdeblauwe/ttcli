@@ -21,16 +21,16 @@ public class BootstrapWebDependency implements WebjarsBasedWebDependency {
 
     @Override
     public List<MavenDependency> getMavenDependencies(String springBootVersion, TemplateEngineType templateEngineType) {
-        return Collections.singletonList(new MavenDependency("org.webjars", "bootstrap", "5.3.3"));
+        return Collections.singletonList(new MavenDependency("org.webjars.npm", "bootstrap", "5.3.8"));
     }
 
     @Override
     public String getCssLinksForLayoutTemplate(TemplateEngineType templateEngineType) {
         return switch (templateEngineType) {
             case THYMELEAF -> """
-                    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">""";
+                    <link rel="stylesheet" th:href="@{/webjars/bootstrap/dist/css/bootstrap.min.css}">""";
             case JTE -> """
-                    <link rel="stylesheet" href="/webjars/bootstrap/css/bootstrap.min.css">""";
+                    <link rel="stylesheet" href="/webjars/bootstrap/dist/css/bootstrap.min.css">""";
         };
     }
 
@@ -38,9 +38,9 @@ public class BootstrapWebDependency implements WebjarsBasedWebDependency {
     public String getJsLinksForLayoutTemplate(TemplateEngineType templateEngineType) {
         return switch (templateEngineType) {
             case THYMELEAF -> """
-                <script defer th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>""";
+                    <script defer th:src="@{/webjars/bootstrap/dist/js/bootstrap.min.js}"></script>""";
             case JTE -> """
-                    <script defer src="/webjars/bootstrap/js/bootstrap.min.js"></script>""";
+                    <script defer src="/webjars/bootstrap/dist/js/bootstrap.min.js"></script>""";
         };
     }
 }
