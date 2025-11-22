@@ -312,7 +312,9 @@
                             <metadataRepository>
                                 <enabled>true</enabled>
                             </metadataRepository>
-                            <buildArgs>--initialize-at-run-time=sun.net.dns.ResolverConfigurationImpl -march=compatibility</buildArgs>
+                            <buildArgs>--enable-native-access=ALL-UNNAMED
+                                --initialize-at-run-time=sun.net.dns.ResolverConfigurationImpl -march=compatibility
+                            </buildArgs>
                         </configuration>
                         <executions>
                             <execution>
