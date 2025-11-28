@@ -130,7 +130,7 @@ public class ViteLiveReloadInitService implements LiveReloadInitService {
         if (springBootVersion.startsWith("3.")) {
             return "1.0.0";
         } else if (springBootVersion.startsWith("4.")) {
-            return "2.0.0-rc.1";
+            return "2.0.0";
         } else {
             throw new IllegalArgumentException("Unknown Spring Boot version: " + springBootVersion);
         }
