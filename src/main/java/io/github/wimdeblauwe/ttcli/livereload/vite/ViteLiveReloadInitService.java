@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Set;
 
 @Component
-@Order(5)
+@Order(1)
 public class ViteLiveReloadInitService implements LiveReloadInitService {
 
     protected final NodeService nodeService;

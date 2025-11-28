@@ -21,7 +21,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.*;
 
 @Component
-@Order(1)
+@Order(2)
 public class NpmBasedLiveReloadInitService implements LiveReloadInitService {
     private final NodeService nodeService;
 
