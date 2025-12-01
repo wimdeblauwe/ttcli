@@ -23,7 +23,7 @@
         <jline.version>3.30.6</jline.version>
 
         <!-- Maven plugins -->
-        <assembly-plugin.version>3.7.1</assembly-plugin.version>
+        <assembly-plugin.version>3.8.0</assembly-plugin.version>
         <os-plugin.version>1.7.1</os-plugin.version>
         <jreleaser-plugin.version>1.21.0</jreleaser-plugin.version>
 
