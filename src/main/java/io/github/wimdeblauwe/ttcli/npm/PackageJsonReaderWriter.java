@@ -1,20 +1,20 @@
 package io.github.wimdeblauwe.ttcli.npm;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Map;
 
 public class PackageJsonReaderWriter {
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+    private static final JsonMapper JSON_MAPPER = JsonMapper.builder().enable(SerializationFeature.INDENT_OUTPUT).build();
     private final Path path;
     private final PackageJsonModel packageJsonModel;
 
     public PackageJsonReaderWriter(Path path) throws IOException {
         this.path = path;
-        packageJsonModel = OBJECT_MAPPER.readValue(path.toFile(), PackageJsonModel.class);
+        packageJsonModel = JSON_MAPPER.readValue(path.toFile(), PackageJsonModel.class);
     }
 
     public static PackageJsonReaderWriter readFrom(Path path) throws IOException {
@@ -31,6 +31,6 @@ public class PackageJsonReaderWriter {
     }
 
     public void write() throws IOException {
-        OBJECT_MAPPER.writeValue(path.toFile(), packageJsonModel);
+        JSON_MAPPER.writeValue(path.toFile(), packageJsonModel);
     }
 }

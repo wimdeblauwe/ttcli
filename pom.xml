@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.7</version>
+        <version>4.0.6</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>io.github.wimdeblauwe</groupId>
@@ -16,11 +16,10 @@
     <inceptionYear>2022</inceptionYear>
     <properties>
         <java.version>25</java.version>
-        <spring-shell.version>3.4.1</spring-shell.version>
+        <spring-shell.version>4.0.2</spring-shell.version>
         <xmlprojector.version>1.4.23</xmlprojector.version>
         <jsoup.version>1.22.1</jsoup.version>
         <xsoup.version>0.3.7</xsoup.version>
-        <jline.version>3.30.6</jline.version>
 
         <!-- Maven plugins -->
         <assembly-plugin.version>3.8.0</assembly-plugin.version>
@@ -47,11 +46,6 @@
             <artifactId>spring-shell-starter-jna</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.jline</groupId>
-            <artifactId>jline</artifactId>
-            <version>${jline.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
             <version>${jsoup.version}</version>
@@ -60,10 +54,6 @@
             <groupId>us.codecraft</groupId>
             <artifactId>xsoup</artifactId>
             <version>${xsoup.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
         </dependency>
 
         <dependency>

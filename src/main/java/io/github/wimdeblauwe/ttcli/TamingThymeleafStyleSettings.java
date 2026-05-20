@@ -1,6 +1,7 @@
 package io.github.wimdeblauwe.ttcli;
 
-import org.springframework.shell.style.StyleSettings;
+
+import org.springframework.shell.jline.tui.style.StyleSettings;
 
 public class TamingThymeleafStyleSettings extends StyleSettings {
     @Override
