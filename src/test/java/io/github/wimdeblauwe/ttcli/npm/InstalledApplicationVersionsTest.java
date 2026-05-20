@@ -10,13 +10,13 @@ class InstalledApplicationVersionsTest {
 
     @Test
     void testNodeVersionBelowCurrentLtsVersion_versionOk() {
-        InstalledApplicationVersions versions = new InstalledApplicationVersions("v18.16.1", "9.5.1");
+        InstalledApplicationVersions versions = new InstalledApplicationVersions("v18.16.1", PackageManager.NPM, "9.5.1");
         assertThat(versions.nodeVersionBelowCurrentLtsVersion()).isFalse();
     }
 
     @Test
     void testNodeVersionBelowCurrentLtsVersion_versionNotOk() {
-        InstalledApplicationVersions versions = new InstalledApplicationVersions("v12.13.0", "6.12.0");
+        InstalledApplicationVersions versions = new InstalledApplicationVersions("v12.13.0", PackageManager.NPM, "6.12.0");
         assertThat(versions.nodeVersionBelowCurrentLtsVersion()).isTrue();
     }
 }

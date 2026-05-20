@@ -6,7 +6,9 @@ import io.github.wimdeblauwe.ttcli.java.JavaCodeInitService;
 import io.github.wimdeblauwe.ttcli.jte.JteTemplatesInitService;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitService;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceFactory;
+import io.github.wimdeblauwe.ttcli.livereload.helper.NpmHelper;
 import io.github.wimdeblauwe.ttcli.maven.MavenInitService;
+import io.github.wimdeblauwe.ttcli.npm.PackageManager;
 import io.github.wimdeblauwe.ttcli.tailwind.TailwindDependencyInitService;
 import io.github.wimdeblauwe.ttcli.template.TemplateEngineType;
 import io.github.wimdeblauwe.ttcli.thymeleaf.ThymeleafTemplatesInitService;
@@ -69,7 +71,12 @@ public class ProjectInitializationService {
         javaCodeInitService.generate(parameters);
 
         liveReloadInitService.generate(parameters);
-        helpTextInitService.addHelpText(basePath, liveReloadInitService.getHelpText());
+        PackageManager packageManager = parameters.packageManager();
+        String helpText = liveReloadInitService.getHelpText(packageManager);
+        if (packageManager == PackageManager.PNPM) {
+            helpText += NpmHelper.pnpmOnlyBuiltDependenciesHelpText();
+        }
+        helpTextInitService.addHelpText(basePath, helpText);
 
         mavenInitService.generate(parameters);
         tailwindDependencyInitService.generate(liveReloadInitService, parameters);

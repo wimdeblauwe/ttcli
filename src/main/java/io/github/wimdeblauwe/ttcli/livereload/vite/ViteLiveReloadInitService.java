@@ -7,6 +7,7 @@ import io.github.wimdeblauwe.ttcli.livereload.helper.NpmHelper;
 import io.github.wimdeblauwe.ttcli.maven.MavenPomReaderWriter;
 import io.github.wimdeblauwe.ttcli.npm.InstalledApplicationVersions;
 import io.github.wimdeblauwe.ttcli.npm.NodeService;
+import io.github.wimdeblauwe.ttcli.npm.PackageManager;
 import io.github.wimdeblauwe.ttcli.template.TemplateEngineType;
 import io.github.wimdeblauwe.ttcli.util.PropertiesFilesUtil;
 import org.springframework.core.annotation.Order;
@@ -42,23 +43,29 @@ public class ViteLiveReloadInitService implements LiveReloadInitService {
 
     @Override
     public String getHelpText() {
+        return getHelpText(PackageManager.NPM);
+    }
+
+    @Override
+    public String getHelpText(PackageManager packageManager) {
+        String pm = packageManager.executable();
         return """
                 # Live reload setup
-                
+
                 This project uses Vite to have live reloading.
-                
+
                 Use the following steps to get it working:
                 
-                1. Start the Vite development server with `npm run dev`.
+                1. Start the Vite development server with `%s run dev`.
                 2. Run the Spring Boot application with the `local` profile. You can do this from your IDE,
                 or via the command line using `mvn spring-boot:run -Dspring-boot.run.profiles=local`.
                 3. Open your browser at http://localhost:8080
-                
+
                 You should now be able to change any HTML or CSS and have the browser reload upon saving the file.
-                
+
                 PS: It is also possible to use the URL that Vite uses (Usually http://localhost:5173) given the
                 Spring Boot application runs on port 8080. If another port is used, you will need to edit `vite.config.js`.
-                """;
+                """.formatted(pm);
 
     }
 
@@ -70,13 +77,14 @@ public class ViteLiveReloadInitService implements LiveReloadInitService {
     @Override
     public void generate(ProjectInitializationParameters projectInitializationParameters) throws LiveReloadInitServiceException {
         try {
-            InstalledApplicationVersions installedApplicationVersions = nodeService.checkIfNodeAndNpmAreInstalled();
+            PackageManager packageManager = projectInitializationParameters.packageManager();
+            InstalledApplicationVersions installedApplicationVersions = nodeService.checkIfNodeAndPackageManagerAreInstalled(packageManager);
             Path basePath = projectInitializationParameters.basePath();
             nodeService.createPackageJsonForModule(basePath,
                     projectInitializationParameters.projectName());
-            nodeService.installNpmDevDependencies(basePath,
+            nodeService.installDevDependencies(packageManager, basePath,
                     npmDevDependencies());
-            nodeService.insertPackageJsonScripts(basePath, npmScripts());
+            nodeService.insertPackageJsonScripts(basePath, NpmHelper.rewriteScriptsForPackageManager(packageManager, npmScripts()));
 
             createViteConfig(basePath, projectInitializationParameters.templateEngineType());
 
@@ -93,6 +101,10 @@ public class ViteLiveReloadInitService implements LiveReloadInitService {
             NpmHelper.updateGitIgnore(basePath);
 
             updateSpringApplicationProperties(basePath, projectInitializationParameters.templateEngineType());
+
+            if (packageManager == PackageManager.PNPM) {
+                NpmHelper.applyPnpmOnlyBuiltDependencies(basePath);
+            }
         } catch (IOException e) {
             throw new LiveReloadInitServiceException(e);
         } catch (InterruptedException e) {

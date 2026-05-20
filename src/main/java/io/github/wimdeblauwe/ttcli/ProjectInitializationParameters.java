@@ -4,6 +4,7 @@ import io.github.wimdeblauwe.ttcli.boot.SpringBootProjectCreationParameters;
 import io.github.wimdeblauwe.ttcli.deps.TailwindCssWebDependency;
 import io.github.wimdeblauwe.ttcli.deps.WebDependency;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceParameters;
+import io.github.wimdeblauwe.ttcli.npm.PackageManager;
 import io.github.wimdeblauwe.ttcli.tailwind.TailwindDependency;
 import io.github.wimdeblauwe.ttcli.tailwind.TailwindVersion;
 import io.github.wimdeblauwe.ttcli.template.TemplateEngineType;
@@ -25,5 +26,9 @@ public record ProjectInitializationParameters(Path basePath,
 
     public boolean hasTailwindCssWebDependency() {
         return webDependencies.stream().anyMatch(webDependency -> webDependency instanceof TailwindCssWebDependency);
+    }
+
+    public PackageManager packageManager() {
+        return liveReloadInitServiceParameters.packageManager();
     }
 }

@@ -5,6 +5,7 @@ import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 
 public class PackageJsonReaderWriter {
@@ -28,6 +29,15 @@ public class PackageJsonReaderWriter {
 
     public void addScripts(Map<String, String> scripts) {
         packageJsonModel.addScripts(scripts);
+    }
+
+    public void setPnpmOnlyBuiltDependencies(List<String> onlyBuiltDependencies) {
+        PackageJsonModel.PnpmConfig pnpm = packageJsonModel.getPnpm();
+        if (pnpm == null) {
+            pnpm = new PackageJsonModel.PnpmConfig();
+            packageJsonModel.setPnpm(pnpm);
+        }
+        pnpm.setOnlyBuiltDependencies(onlyBuiltDependencies);
     }
 
     public void write() throws IOException {

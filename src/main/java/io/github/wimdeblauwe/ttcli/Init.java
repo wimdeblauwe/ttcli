@@ -6,6 +6,7 @@ import io.github.wimdeblauwe.ttcli.deps.WebDependency;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitService;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceFactory;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceParameters;
+import io.github.wimdeblauwe.ttcli.npm.PackageManager;
 import io.github.wimdeblauwe.ttcli.tailwind.TailwindDependency;
 import io.github.wimdeblauwe.ttcli.tailwind.TailwindVersion;
 import io.github.wimdeblauwe.ttcli.template.TemplateEngineType;
@@ -88,6 +89,8 @@ public class Init {
             List<WebDependency> selectedWebDependencies = webDependencies.stream().filter(webDependency -> selectedWebDependencyOptions.contains(webDependency.id())).toList();
 
             boolean hasTailwindCssWebDependency = selectedWebDependencies.stream().anyMatch(webDependency -> webDependency instanceof TailwindCssWebDependency);
+            String liveReloadId = context.get("live-reload");
+            PackageManager packageManager = allowPackageManagerSelection(liveReloadId, hasTailwindCssWebDependency);
             TailwindVersion tailwindVersion = allowTailwindVersionSelection(hasTailwindCssWebDependency).orElse(null);
             List<TailwindDependency> selectedTailwindDependencies = allowTailwindDependenciesSelection(hasTailwindCssWebDependency);
 
@@ -99,7 +102,7 @@ public class Init {
                             projectName,
                             springBootVersion,
                             javaVersion),
-                    new LiveReloadInitServiceParameters(context.get("live-reload")),
+                    new LiveReloadInitServiceParameters(liveReloadId, packageManager),
                     selectedWebDependencies,
                     tailwindVersion,
                     selectedTailwindDependencies,
@@ -112,6 +115,29 @@ public class Init {
             LOGGER.error("Error during project generation: " + e.getMessage(), e);
             System.err.println("❌ Error during project generation: " + e.getMessage());
         }
+    }
+
+    private PackageManager allowPackageManagerSelection(String liveReloadId, boolean hasTailwindCssWebDependency) {
+        if (!liveReloadUsesNode(liveReloadId, hasTailwindCssWebDependency)) {
+            return PackageManager.NPM;
+        }
+        ComponentFlow.Builder builder = flowBuilder.clone().reset();
+        builder.withSingleItemSelector("package-manager")
+                .name("Select package manager")
+                .selectItems(Map.of("npm", PackageManager.NPM.name(),
+                        "pnpm", PackageManager.PNPM.name()))
+                .defaultSelect("npm")
+                .and();
+        ComponentFlow.ComponentFlowResult flowResult = builder.build().run();
+        return PackageManager.valueOf(flowResult.getContext().get("package-manager"));
+    }
+
+    private boolean liveReloadUsesNode(String liveReloadId, boolean hasTailwindCssWebDependency) {
+        return switch (liveReloadId) {
+            case "npm-based", "vite" -> true;
+            case "dev-tools-based" -> hasTailwindCssWebDependency;
+            default -> false;
+        };
     }
 
     private Optional<TailwindVersion> allowTailwindVersionSelection(boolean hasTailwindCssWebDependency) {

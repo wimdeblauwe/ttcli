@@ -4,7 +4,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public record InstalledApplicationVersions(String nodeVersion,
-                                           String npmVersion) {
+                                           PackageManager packageManager,
+                                           String packageManagerVersion) {
     private static final Pattern NODE_VERSION_PATTERN_MAJOR = Pattern.compile("v([0-9]+)\\.");
     private static final int NODE_CURRENT_LTS_MAJOR_VERSION = 18;
 
