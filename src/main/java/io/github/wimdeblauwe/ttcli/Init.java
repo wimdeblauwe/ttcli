@@ -13,21 +13,30 @@ import io.github.wimdeblauwe.ttcli.util.InetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.shell.component.context.ComponentContext;
-import org.springframework.shell.component.flow.ComponentFlow;
-import org.springframework.shell.component.flow.DefaultSelectItem;
-import org.springframework.shell.component.flow.SelectItem;
-import org.springframework.shell.component.support.Nameable;
-import org.springframework.shell.standard.ShellComponent;
-import org.springframework.shell.standard.ShellMethod;
-import org.springframework.shell.standard.ShellOption;
+import org.springframework.shell.core.command.annotation.Command;
+import org.springframework.shell.core.command.annotation.Option;
+import org.springframework.shell.jline.tui.component.context.ComponentContext;
+import org.springframework.shell.jline.tui.component.flow.ComponentFlow;
+import org.springframework.shell.jline.tui.component.flow.DefaultSelectItem;
+import org.springframework.shell.jline.tui.component.flow.SelectItem;
+import org.springframework.shell.jline.tui.component.support.Nameable;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@ShellComponent
+//import org.springframework.shell.component.context.ComponentContext;
+//import org.springframework.shell.component.flow.ComponentFlow;
+//import org.springframework.shell.component.flow.DefaultSelectItem;
+//import org.springframework.shell.component.flow.SelectItem;
+//import org.springframework.shell.component.support.Nameable;
+//import org.springframework.shell.standard.ShellComponent;
+//import org.springframework.shell.standard.ShellMethod;
+//import org.springframework.shell.standard.ShellOption;
+
+@Component
 public class Init {
     private static final Logger LOGGER = LoggerFactory.getLogger(Init.class);
 
@@ -44,8 +53,8 @@ public class Init {
     @Autowired
     private LiveReloadInitServiceFactory liveReloadInitServiceFactory;
 
-    @ShellMethod
-    public void init(@ShellOption(defaultValue = ".", value = "baseDir") String baseDir) throws IOException, InterruptedException {
+    @Command(description = "Generate a Spring Boot project with Thymeleaf or JTE templating")
+    public void init(@Option(defaultValue = ".", longName = "baseDir") String baseDir) throws IOException, InterruptedException {
 
         try {
             ComponentFlow.Builder builder = flowBuilder.clone().reset();
