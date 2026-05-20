@@ -80,6 +80,18 @@ public class Init {
 
             builder = flowBuilder.clone().reset();
             addLiveReloadInput(builder, templateEngineType);
+            flow = builder.build();
+            flowResult = flow.run();
+            context = flowResult.getContext();
+            String liveReloadId = context.get("live-reload");
+
+            // npm-based and vite always need a package manager — ask right after live-reload.
+            // dev-tools-based only needs one if Tailwind is selected, so defer until web deps are known.
+            PackageManager packageManagerEarly = liveReloadAlwaysUsesNode(liveReloadId)
+                    ? promptPackageManager()
+                    : null;
+
+            builder = flowBuilder.clone().reset();
             addWebDependenciesInput(builder);
             flow = builder.build();
             flowResult = flow.run();
@@ -89,8 +101,9 @@ public class Init {
             List<WebDependency> selectedWebDependencies = webDependencies.stream().filter(webDependency -> selectedWebDependencyOptions.contains(webDependency.id())).toList();
 
             boolean hasTailwindCssWebDependency = selectedWebDependencies.stream().anyMatch(webDependency -> webDependency instanceof TailwindCssWebDependency);
-            String liveReloadId = context.get("live-reload");
-            PackageManager packageManager = allowPackageManagerSelection(liveReloadId, hasTailwindCssWebDependency);
+            PackageManager packageManager = packageManagerEarly != null
+                    ? packageManagerEarly
+                    : allowPackageManagerSelection(liveReloadId, hasTailwindCssWebDependency);
             TailwindVersion tailwindVersion = allowTailwindVersionSelection(hasTailwindCssWebDependency).orElse(null);
             List<TailwindDependency> selectedTailwindDependencies = allowTailwindDependenciesSelection(hasTailwindCssWebDependency);
 
@@ -121,6 +134,10 @@ public class Init {
         if (!liveReloadUsesNode(liveReloadId, hasTailwindCssWebDependency)) {
             return PackageManager.NPM;
         }
+        return promptPackageManager();
+    }
+
+    private PackageManager promptPackageManager() {
         ComponentFlow.Builder builder = flowBuilder.clone().reset();
         builder.withSingleItemSelector("package-manager")
                 .name("Select package manager")
@@ -130,6 +147,10 @@ public class Init {
                 .and();
         ComponentFlow.ComponentFlowResult flowResult = builder.build().run();
         return PackageManager.valueOf(flowResult.getContext().get("package-manager"));
+    }
+
+    private boolean liveReloadAlwaysUsesNode(String liveReloadId) {
+        return "npm-based".equals(liveReloadId) || "vite".equals(liveReloadId);
     }
 
     private boolean liveReloadUsesNode(String liveReloadId, boolean hasTailwindCssWebDependency) {
