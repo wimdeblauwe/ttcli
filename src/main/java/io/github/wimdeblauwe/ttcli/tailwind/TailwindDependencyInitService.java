@@ -36,7 +36,7 @@ public class TailwindDependencyInitService {
         List<String> npmPackages = tailwindDependencies.stream().map(tailwindDependency -> tailwindDependency.npmPackageName(parameters.tailwindVersion()))
             .toList();
         Path basePath = liveReloadInitService.getTailwindConfigFileParentPath(parameters);
-        nodeService.installNpmDevDependencies(basePath, npmPackages);
+          nodeService.installDevDependencies(parameters.packageManager(), basePath, npmPackages);
 
         updateTailwindConfigFile(basePath, parameters);
       }
@@ -81,7 +81,7 @@ public class TailwindDependencyInitService {
         List<String> npmPackages = tailwindDependencies.stream().map(tailwindDependency -> tailwindDependency.npmPackageName(parameters.tailwindVersion()))
                 .toList();
         Path basePath = liveReloadInitService.getTailwindConfigFileParentPath(parameters);
-        nodeService.installNpmDevDependencies(basePath, npmPackages);
+          nodeService.installDevDependencies(parameters.packageManager(), basePath, npmPackages);
 
         updateTailwindConfigFileVersion3(basePath, parameters);
       }

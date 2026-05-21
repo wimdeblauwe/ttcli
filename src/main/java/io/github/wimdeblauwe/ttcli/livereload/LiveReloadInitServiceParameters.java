@@ -1,4 +1,7 @@
 package io.github.wimdeblauwe.ttcli.livereload;
 
-public record LiveReloadInitServiceParameters(String initServiceId) {
+import io.github.wimdeblauwe.ttcli.npm.PackageManager;
+
+public record LiveReloadInitServiceParameters(String initServiceId,
+                                              PackageManager packageManager) {
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -14,6 +15,7 @@ public class PackageJsonModel {
     private String type;
     private Map<String, String> devDependencies;
     private Map<String, String> scripts;
+    private PnpmConfig pnpm;
 
     public String getName() {
         return name;
@@ -65,5 +67,26 @@ public class PackageJsonModel {
 
     public void addScripts(Map<String, String> scripts) {
         getScripts().putAll(scripts);
+    }
+
+    public PnpmConfig getPnpm() {
+        return pnpm;
+    }
+
+    public void setPnpm(PnpmConfig pnpm) {
+        this.pnpm = pnpm;
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public static class PnpmConfig {
+        private List<String> onlyBuiltDependencies;
+
+        public List<String> getOnlyBuiltDependencies() {
+            return onlyBuiltDependencies;
+        }
+
+        public void setOnlyBuiltDependencies(List<String> onlyBuiltDependencies) {
+            this.onlyBuiltDependencies = onlyBuiltDependencies;
+        }
     }
 }

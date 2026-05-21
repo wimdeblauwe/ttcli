@@ -41,7 +41,7 @@ public class ViteWithTailwindCss3LiveReloadInitService extends ViteLiveReloadIni
                     "src/main/resources/static/css/application.css");
             TailwindCss3Helper.setupTailwindConfig(basePath, "./src/main/resources/templates/**/*.html");
             // Generate the postcss.config.js file for Tailwind CSS
-            nodeService.runNpxCommand(basePath, List.of("tailwindcss@3", "init", "-p"));
+            nodeService.runPackageRunnerCommand(projectInitializationParameters.packageManager(), basePath, List.of("tailwindcss@3", "init", "-p"));
 
         } catch (IOException e) {
             throw new LiveReloadInitServiceException(e);

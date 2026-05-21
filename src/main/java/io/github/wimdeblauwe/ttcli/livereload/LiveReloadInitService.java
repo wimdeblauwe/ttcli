@@ -1,6 +1,7 @@
 package io.github.wimdeblauwe.ttcli.livereload;
 
 import io.github.wimdeblauwe.ttcli.ProjectInitializationParameters;
+import io.github.wimdeblauwe.ttcli.npm.PackageManager;
 import io.github.wimdeblauwe.ttcli.template.TemplateEngineType;
 
 import java.nio.file.Path;
@@ -12,6 +13,10 @@ public interface LiveReloadInitService {
     String getName();
 
     String getHelpText();
+
+    default String getHelpText(PackageManager packageManager) {
+        return getHelpText();
+    }
 
     Set<String> additionalSpringInitializrDependencies();
 

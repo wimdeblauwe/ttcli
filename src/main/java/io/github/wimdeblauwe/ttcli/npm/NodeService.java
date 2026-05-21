@@ -15,12 +15,13 @@ import java.util.Map;
 
 @Component
 public class NodeService {
-    public InstalledApplicationVersions checkIfNodeAndNpmAreInstalled() throws IOException, InterruptedException {
+    public InstalledApplicationVersions checkIfNodeAndPackageManagerAreInstalled(PackageManager packageManager) throws IOException, InterruptedException {
         String nodeVersion = checkIfApplicationIsInstalled("node");
-        String npmVersion = checkIfApplicationIsInstalled("npm");
-        System.out.println("\uD83D\uDEE0️  Using node " + nodeVersion + " with npm " + npmVersion);
+        String packageManagerVersion = checkIfApplicationIsInstalled(packageManager.executable());
+        System.out.println("🛠️  Using node " + nodeVersion + " with " + packageManager.executable() + " " + packageManagerVersion);
         InstalledApplicationVersions versions = new InstalledApplicationVersions(nodeVersion,
-                npmVersion);
+                packageManager,
+                packageManagerVersion);
         if (versions.nodeVersionBelowCurrentLtsVersion()) {
             throw new LiveReloadInitServiceException("Your node version is below the recommended version. Please upgrade to the latest LTS version.");
         }
@@ -53,26 +54,31 @@ public class NodeService {
                 """.formatted(name));
     }
 
-    public void installNpmDevDependencies(Path base,
-                                          List<String> dependencies) throws IOException, InterruptedException {
-        System.out.println("\uD83D\uDD28 Installing npm dependencies");
+    public void installDevDependencies(PackageManager packageManager,
+                                       Path base,
+                                       List<String> dependencies) throws IOException, InterruptedException {
+        System.out.println("🔨 Installing " + packageManager.executable() + " dependencies");
         List<String> parameters = new ArrayList<>();
-        parameters.addAll(List.of("npm", "install", "-D"));
+        parameters.addAll(List.of(packageManager.executable(), "install", "-D"));
         parameters.addAll(dependencies);
-        ExternalProcessRunner.run(base.toFile(), parameters, () -> "Installation of npm dependencies failed");
+        ExternalProcessRunner.run(base.toFile(), parameters, () -> "Installation of " + packageManager.executable() + " dependencies failed");
     }
 
-    public void runNpxCommand(Path base,
-                              List<String> params) throws IOException, InterruptedException {
+    public void runPackageRunnerCommand(PackageManager packageManager,
+                                        Path base,
+                                        List<String> params) throws IOException, InterruptedException {
         List<String> parameters = new ArrayList<>();
-        parameters.add("npx");
+        // PackageRunnerCommand may be 'npx' or 'pnpm dlx' — split on space so both work.
+        for (String part : packageManager.packageRunnerCommand().split(" ")) {
+            parameters.add(part);
+        }
         parameters.addAll(params);
-        ExternalProcessRunner.run(base.toFile(), parameters, () -> "npx command failed");
+        ExternalProcessRunner.run(base.toFile(), parameters, () -> packageManager.packageRunnerCommand() + " command failed");
     }
 
     public void insertPackageJsonScripts(Path base,
                                          Map<String, String> scripts) throws IOException, InterruptedException {
-        System.out.println("\uD83D\uDC77\u200D♂️ Adding npm build scripts");
+        System.out.println("👷‍♂️ Adding build scripts to package.json");
         addBuildScriptsToPackageJson(base, scripts);
     }
 
@@ -80,6 +86,13 @@ public class NodeService {
                                               Map<String, String> scripts) throws IOException {
         PackageJsonReaderWriter packageJsonReaderWriter = PackageJsonReaderWriter.readFrom(base.resolve("package.json"));
         packageJsonReaderWriter.addScripts(scripts);
+        packageJsonReaderWriter.write();
+    }
+
+    public void setPnpmOnlyBuiltDependencies(Path base,
+                                             List<String> onlyBuiltDependencies) throws IOException {
+        PackageJsonReaderWriter packageJsonReaderWriter = PackageJsonReaderWriter.readFrom(base.resolve("package.json"));
+        packageJsonReaderWriter.setPnpmOnlyBuiltDependencies(onlyBuiltDependencies);
         packageJsonReaderWriter.write();
     }
 

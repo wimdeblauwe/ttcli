@@ -4,8 +4,10 @@ import io.github.wimdeblauwe.ttcli.ProjectInitializationParameters;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitService;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceException;
 import io.github.wimdeblauwe.ttcli.livereload.TailwindCssSpecializedLiveReloadInitService;
+import io.github.wimdeblauwe.ttcli.livereload.helper.NpmHelper;
 import io.github.wimdeblauwe.ttcli.livereload.helper.TailwindCssHelper;
 import io.github.wimdeblauwe.ttcli.npm.NodeService;
+import io.github.wimdeblauwe.ttcli.npm.PackageManager;
 import io.github.wimdeblauwe.ttcli.tailwind.TailwindVersion;
 import org.springframework.stereotype.Component;
 
@@ -39,6 +41,10 @@ public class NpmBasedWithTailwindCssLiveReloadInitService extends NpmBasedLiveRe
             TailwindCssHelper.createApplicationCss(projectInitializationParameters.basePath(),
                     "src/main/resources/static/css/application.css",
                     "../../templates");
+
+            if (projectInitializationParameters.packageManager() == PackageManager.PNPM) {
+                NpmHelper.applyPnpmOnlyBuiltDependencies(projectInitializationParameters.basePath());
+            }
         } catch (IOException e) {
             throw new LiveReloadInitServiceException(e);
         }

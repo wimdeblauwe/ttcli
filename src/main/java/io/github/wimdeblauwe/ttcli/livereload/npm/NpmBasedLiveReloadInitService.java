@@ -7,6 +7,7 @@ import io.github.wimdeblauwe.ttcli.livereload.helper.NpmHelper;
 import io.github.wimdeblauwe.ttcli.maven.MavenPomReaderWriter;
 import io.github.wimdeblauwe.ttcli.npm.InstalledApplicationVersions;
 import io.github.wimdeblauwe.ttcli.npm.NodeService;
+import io.github.wimdeblauwe.ttcli.npm.PackageManager;
 import io.github.wimdeblauwe.ttcli.template.TemplateEngineType;
 import io.github.wimdeblauwe.ttcli.util.ExternalProcessException;
 import io.github.wimdeblauwe.ttcli.util.ExternalProcessRunner;
@@ -41,22 +42,28 @@ public class NpmBasedLiveReloadInitService implements LiveReloadInitService {
 
     @Override
     public String getHelpText() {
+        return getHelpText(PackageManager.NPM);
+    }
+
+    @Override
+    public String getHelpText(PackageManager packageManager) {
+        String pm = packageManager.executable();
         return """
                 # Live reload setup
                 
-                This project uses NPM to have live reloading.
+                This project uses %s to have live reloading.
                 
                 Use the following steps to get it working:
-                
+
                 1. Run the Spring Boot application with the `local` profile
-                2. From a terminal, run `npm run build && npm run watch` (You can also run `npm run --silent build && npm run --silent watch` if you want less output in the terminal)
+                2. From a terminal, run `%s run build && %s run watch` (You can also run `%s run --silent build && %s run --silent watch` if you want less output in the terminal)
                 3. Your default browser will open at http://localhost:3000
-                
+
                 You should now be able to change any HTML or CSS and have the browser reload upon saving the file.
-                
+
                 NOTE: If you use a separate authentication server (e.g. social logins, or Keycloak) then after login,
                 you might get redirected to http://localhost:8080 as opposed to http://localhost:3000.
-                Be sure to set the port back to `3000` in your browser to have live reload.""";
+                Be sure to set the port back to `3000` in your browser to have live reload.""".formatted(pm, pm, pm, pm, pm);
     }
 
     @Override
@@ -67,15 +74,17 @@ public class NpmBasedLiveReloadInitService implements LiveReloadInitService {
     @Override
     public void generate(ProjectInitializationParameters projectInitializationParameters) throws LiveReloadInitServiceException {
         try {
-            InstalledApplicationVersions installedApplicationVersions = nodeService.checkIfNodeAndNpmAreInstalled();
+            PackageManager packageManager = projectInitializationParameters.packageManager();
+            InstalledApplicationVersions installedApplicationVersions = nodeService.checkIfNodeAndPackageManagerAreInstalled(packageManager);
             Path basePath = projectInitializationParameters.basePath();
             nodeService.createPackageJson(basePath,
                     projectInitializationParameters.projectName());
-            nodeService.installNpmDevDependencies(basePath,
+            nodeService.installDevDependencies(packageManager,
+                    basePath,
                     npmDevDependencies());
             copyPostcssConfigJs(basePath,
                     postcssConfigFilePath());
-            nodeService.insertPackageJsonScripts(basePath, npmScripts());
+            nodeService.insertPackageJsonScripts(basePath, NpmHelper.rewriteScriptsForPackageManager(packageManager, npmScripts()));
 
             MavenPomReaderWriter mavenPomReaderWriter = MavenPomReaderWriter.readFrom(basePath);
             NpmHelper.updateMavenPom(mavenPomReaderWriter, installedApplicationVersions, true);
@@ -93,9 +102,10 @@ public class NpmBasedLiveReloadInitService implements LiveReloadInitService {
     @Override
     public void runBuild(ProjectInitializationParameters projectInitializationParameters) throws LiveReloadInitServiceException {
         try {
+            PackageManager packageManager = projectInitializationParameters.packageManager();
             ExternalProcessRunner.run(projectInitializationParameters.basePath().toFile(),
-                    List.of("npm", "run", "build"),
-                    () -> "Unable to run `npm run build`");
+                    List.of(packageManager.executable(), "run", "build"),
+                    () -> "Unable to run `" + packageManager.executable() + " run build`");
         } catch (ExternalProcessException e) {
             throw new LiveReloadInitServiceException(e);
         } catch (InterruptedException e) {

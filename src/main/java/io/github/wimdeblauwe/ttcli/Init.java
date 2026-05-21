@@ -6,6 +6,7 @@ import io.github.wimdeblauwe.ttcli.deps.WebDependency;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitService;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceFactory;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceParameters;
+import io.github.wimdeblauwe.ttcli.npm.PackageManager;
 import io.github.wimdeblauwe.ttcli.tailwind.TailwindDependency;
 import io.github.wimdeblauwe.ttcli.tailwind.TailwindVersion;
 import io.github.wimdeblauwe.ttcli.template.TemplateEngineType;
@@ -79,6 +80,18 @@ public class Init {
 
             builder = flowBuilder.clone().reset();
             addLiveReloadInput(builder, templateEngineType);
+            flow = builder.build();
+            flowResult = flow.run();
+            context = flowResult.getContext();
+            String liveReloadId = context.get("live-reload");
+
+            // npm-based and vite always need a package manager — ask right after live-reload.
+            // dev-tools-based only needs one if Tailwind is selected, so defer until web deps are known.
+            PackageManager packageManagerEarly = liveReloadAlwaysUsesNode(liveReloadId)
+                    ? promptPackageManager()
+                    : null;
+
+            builder = flowBuilder.clone().reset();
             addWebDependenciesInput(builder);
             flow = builder.build();
             flowResult = flow.run();
@@ -88,6 +101,9 @@ public class Init {
             List<WebDependency> selectedWebDependencies = webDependencies.stream().filter(webDependency -> selectedWebDependencyOptions.contains(webDependency.id())).toList();
 
             boolean hasTailwindCssWebDependency = selectedWebDependencies.stream().anyMatch(webDependency -> webDependency instanceof TailwindCssWebDependency);
+            PackageManager packageManager = packageManagerEarly != null
+                    ? packageManagerEarly
+                    : allowPackageManagerSelection(liveReloadId, hasTailwindCssWebDependency);
             TailwindVersion tailwindVersion = allowTailwindVersionSelection(hasTailwindCssWebDependency).orElse(null);
             List<TailwindDependency> selectedTailwindDependencies = allowTailwindDependenciesSelection(hasTailwindCssWebDependency);
 
@@ -99,7 +115,7 @@ public class Init {
                             projectName,
                             springBootVersion,
                             javaVersion),
-                    new LiveReloadInitServiceParameters(context.get("live-reload")),
+                    new LiveReloadInitServiceParameters(liveReloadId, packageManager),
                     selectedWebDependencies,
                     tailwindVersion,
                     selectedTailwindDependencies,
@@ -112,6 +128,37 @@ public class Init {
             LOGGER.error("Error during project generation: " + e.getMessage(), e);
             System.err.println("❌ Error during project generation: " + e.getMessage());
         }
+    }
+
+    private PackageManager allowPackageManagerSelection(String liveReloadId, boolean hasTailwindCssWebDependency) {
+        if (!liveReloadUsesNode(liveReloadId, hasTailwindCssWebDependency)) {
+            return PackageManager.NPM;
+        }
+        return promptPackageManager();
+    }
+
+    private PackageManager promptPackageManager() {
+        ComponentFlow.Builder builder = flowBuilder.clone().reset();
+        builder.withSingleItemSelector("package-manager")
+                .name("Select package manager")
+                .selectItems(Map.of("npm", PackageManager.NPM.name(),
+                        "pnpm", PackageManager.PNPM.name()))
+                .defaultSelect("npm")
+                .and();
+        ComponentFlow.ComponentFlowResult flowResult = builder.build().run();
+        return PackageManager.valueOf(flowResult.getContext().get("package-manager"));
+    }
+
+    private boolean liveReloadAlwaysUsesNode(String liveReloadId) {
+        return "npm-based".equals(liveReloadId) || "vite".equals(liveReloadId);
+    }
+
+    private boolean liveReloadUsesNode(String liveReloadId, boolean hasTailwindCssWebDependency) {
+        return switch (liveReloadId) {
+            case "npm-based", "vite" -> true;
+            case "dev-tools-based" -> hasTailwindCssWebDependency;
+            default -> false;
+        };
     }
 
     private Optional<TailwindVersion> allowTailwindVersionSelection(boolean hasTailwindCssWebDependency) {
