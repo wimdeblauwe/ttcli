@@ -44,7 +44,7 @@ public class MavenInitService {
             mavenPomReaderWriter.addDependency("org.webjars", "webjars-locator", "0.52");
         } else {
             // Starting with Spring Boot 3.4.0, we can use webjars-locator-lite
-            mavenPomReaderWriter.addDependency("org.webjars", "webjars-locator-lite", "1.0.1");
+            mavenPomReaderWriter.addDependency("org.webjars", "webjars-locator-lite");
         }
         for (WebDependency webDependency : webDependencies) {
             if (webDependency instanceof WebjarsBasedWebDependency webjarsBasedWebDependency) {
