@@ -56,11 +56,11 @@ This is the simplest option, but it is also the slowest to reload upon change.
 The biggest advantage is that you do not need to have npm installed.
 
 > [!NOTE]
-> If you also select 'Tailwind CSS' with this option, then you will need `npm` to make it work.
+> If you also select 'Tailwind CSS' with this option, then you will need `npm` or `pnpm` to make it work.
 
 ### Npm based scripts
 
-This uses npm to watch the HTML, CSS and JavaScript files and processes them.
+This uses npm (or pnpm) to watch the HTML, CSS and JavaScript files and processes them.
 This gives a quicker live reload experience compared to using DevTools.
 
 ### Vite
@@ -73,6 +73,10 @@ The biggest advantages:
 * Vite supports SASS, TypeScript, ... so you can use all that now in your Spring Boot project with either JTE or
   Thymeleaf.
   If you add the Vite Vue plugin, you can even write Vue components and have live reloading of them working just fine.
+
+## Package manager support
+
+It is possible to use NPM or PNPM as the package manager for the live reload setup.
 
 ## Tailwind CSS support
 
