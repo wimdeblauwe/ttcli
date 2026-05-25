@@ -93,14 +93,14 @@ jobs:
         run: ./mvnw -B -ntp --file pom.xml -Pdist package -DskipTests
 
       - name: 'Upload build artifact'
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: artifacts-${{ matrix.os }}
           path: |
             target/distributions/*.zip
 
       - name: 'Upload jar build artifact'
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: matrix.os == 'ubuntu-latest'
         with:
           name: artifacts-jar
@@ -147,7 +147,7 @@ jobs:
 
       - name: Capture JReleaser output
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: jreleaser-release-output
           retention-days: 7
