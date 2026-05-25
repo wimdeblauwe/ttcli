@@ -18,7 +18,7 @@
         <java.version>25</java.version>
         <spring-shell.version>4.0.2</spring-shell.version>
         <xmlprojector.version>1.4.23</xmlprojector.version>
-        <jsoup.version>1.22.1</jsoup.version>
+        <jsoup.version>1.22.2</jsoup.version>
         <xsoup.version>0.3.7</xsoup.version>
 
         <!-- Maven plugins -->
