@@ -255,6 +255,10 @@
                                     </ttcli>
                                     <ttcli-single-jar>
                                         <type>SINGLE_JAR</type>
+                                        <java>
+                                            <mainClass>io.github.wimdeblauwe.ttcli.TamingThymeleafCliApplication
+                                            </mainClass>
+                                        </java>
                                         <artifacts>
                                             <artifact>
                                                 <path>{{artifactsDir}}/ttcli-{{projectVersion}}.jar</path>
