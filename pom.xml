@@ -260,6 +260,14 @@
                                                 <path>{{artifactsDir}}/ttcli-{{projectVersion}}.jar</path>
                                             </artifact>
                                         </artifacts>
+                                        <jbang>
+                                            <active>ALWAYS</active>
+                                            <alias>ttcli</alias>
+                                            <repository>
+                                                <name>jbang-catalog</name>
+                                                <commitMessage>Bump ttcli to {{tagName}}.</commitMessage>
+                                            </repository>
+                                        </jbang>
                                     </ttcli-single-jar>
                                 </distributions>
                             </jreleaser>
