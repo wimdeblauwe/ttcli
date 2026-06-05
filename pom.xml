@@ -267,6 +267,9 @@
                                         <jbang>
                                             <active>ALWAYS</active>
                                             <alias>ttcli</alias>
+                                            <downloadUrl>
+                                                https://github.com/wimdeblauwe/ttcli/releases/download/{{tagName}}/{{artifactFile}}
+                                            </downloadUrl>
                                             <repository>
                                                 <name>jbang-catalog</name>
                                                 <commitMessage>Bump ttcli to {{tagName}}.</commitMessage>
