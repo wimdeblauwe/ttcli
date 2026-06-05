@@ -270,6 +270,11 @@
                                             <downloadUrl>
                                                 https://github.com/wimdeblauwe/ttcli/releases/download/{{tagName}}/{{artifactFile}}
                                             </downloadUrl>
+                                            <templateDirectory>src/main/jreleaser/distributions/ttcli-single-jar/jbang
+                                            </templateDirectory>
+                                            <skipTemplates>
+                                                <skipTemplate>jbang.java.tpl</skipTemplate>
+                                            </skipTemplates>
                                             <repository>
                                                 <name>jbang-catalog</name>
                                                 <commitMessage>Bump ttcli to {{tagName}}.</commitMessage>
