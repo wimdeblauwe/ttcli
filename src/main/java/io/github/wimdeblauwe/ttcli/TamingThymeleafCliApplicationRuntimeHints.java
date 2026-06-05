@@ -10,6 +10,7 @@ public class TamingThymeleafCliApplicationRuntimeHints implements RuntimeHintsRe
     public void registerHints(RuntimeHints hints,
                               ClassLoader classLoader) {
         hints.resources().registerPattern("files/*");
+        hints.resources().registerPattern("org/springframework/shell/component/*.stg");
         hints.reflection()
              .registerType(PackageJsonModel.class, MemberCategory.values());
     }
