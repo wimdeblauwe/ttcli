@@ -14,6 +14,12 @@ The application is also available via the following package managers:
 * [Homebrew](https://brew.sh/) (Linux/macOS): `brew install wimdeblauwe/homebrew-ttcli/ttcli`
 * [Chocolatey](https://chocolatey.org/) (Windows): `choco install ttcli`
 
+You can also run it via [JBang](https://www.jbang.dev/):
+
+```
+jbang run ttcli@wimdeblauwe init
+```
+
 ### Initialize
 
 Run `ttcli init` to have the tool create a new Spring Boot project with an NPM based live-reload setup.
