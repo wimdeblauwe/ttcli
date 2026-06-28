@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.0.6</version>
+        <version>4.1.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>io.github.wimdeblauwe</groupId>
@@ -16,7 +16,7 @@
     <inceptionYear>2022</inceptionYear>
     <properties>
         <java.version>25</java.version>
-        <spring-shell.version>4.0.2</spring-shell.version>
+        <spring-shell.version>4.0.3</spring-shell.version>
         <xmlprojector.version>1.4.23</xmlprojector.version>
         <jsoup.version>1.22.2</jsoup.version>
         <xsoup.version>0.3.7</xsoup.version>
