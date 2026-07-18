@@ -82,10 +82,11 @@ public class ProjectInitializationService {
         tailwindDependencyInitService.generate(liveReloadInitService, parameters);
 
         // Generate templates based on the selected template engine
-        if (parameters.templateEngineType() == TemplateEngineType.THYMELEAF) {
-            thymeleafTemplatesInitService.generate(parameters);
-        } else if (parameters.templateEngineType() == TemplateEngineType.JTE) {
-            jteTemplatesInitService.generate(parameters);
+        switch (parameters.templateEngineType()) {
+            case TemplateEngineType.Thymeleaf _ -> {
+                thymeleafTemplatesInitService.generate(parameters);
+            }
+            case TemplateEngineType.Jte _ -> jteTemplatesInitService.generate(parameters);
         }
 
         liveReloadInitService.runBuild(parameters);

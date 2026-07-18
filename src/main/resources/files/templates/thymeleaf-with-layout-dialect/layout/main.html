@@ -1,24 +1,20 @@
 <!DOCTYPE html>
 <html th:lang="|${#locale.language}-${#locale.country}|"
       xmlns:th="http://www.thymeleaf.org"
-      th:fragment="layout(content)"
-      th:with="title=${title} ?: ~{::title},scriptContent=${scriptContent} ?: ~{}">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <th:block th:replace="${title}"></th:block>
+    <title></title>
     <!-- REPLACE WITH HEAD TAGS -->
     <!-- REPLACE WITH EXTERNAL CSS LINKS -->
 </head>
 <body>
-<main th:replace="${content}">
+<main layout:fragment="content">
 </main>
 <!-- REPLACE WITH EXTERNAL JS LINKS -->
-<th:block th:replace="${scriptContent}">
+<th:block layout:fragment="script-content">
 
 </th:block>
 </body>
-<template>
-    <title>My application</title>
-</template>
 </html>

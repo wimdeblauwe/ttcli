@@ -28,15 +28,6 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
-//import org.springframework.shell.component.context.ComponentContext;
-//import org.springframework.shell.component.flow.ComponentFlow;
-//import org.springframework.shell.component.flow.DefaultSelectItem;
-//import org.springframework.shell.component.flow.SelectItem;
-//import org.springframework.shell.component.support.Nameable;
-//import org.springframework.shell.standard.ShellComponent;
-//import org.springframework.shell.standard.ShellMethod;
-//import org.springframework.shell.standard.ShellOption;
-
 @Component
 public class Init {
     private static final Logger LOGGER = LoggerFactory.getLogger(Init.class);
@@ -76,8 +67,8 @@ public class Init {
             String springBootVersion = context.get("spring-boot-version");
             String javaVersion = context.get("java-version");
             String templateEngineId = context.get("template-engine");
-            TemplateEngineType templateEngineType = TemplateEngineType.valueOf(templateEngineId);
 
+            TemplateEngineType templateEngineType = getTemplateEngineType(templateEngineId);
             builder = flowBuilder.clone().reset();
             addLiveReloadInput(builder, templateEngineType);
             flow = builder.build();
@@ -128,6 +119,28 @@ public class Init {
             LOGGER.error("Error during project generation: " + e.getMessage(), e);
             System.err.println("❌ Error during project generation: " + e.getMessage());
         }
+    }
+
+    private TemplateEngineType getTemplateEngineType(String templateEngineId) {
+        TemplateEngineType templateEngineType;
+        if (templateEngineId.equals(TemplateEngineType.TYPE_THYMELEAF)) {
+            ComponentFlow.Builder builder = flowBuilder.clone().reset();
+            builder.withSingleItemSelector("thymeleaf-layout-dialect")
+                    .name("Use Thymeleaf Layout Dialect?")
+                    .selectItems(List.of(new DefaultSelectItem("Yes", "true", true, false), new DefaultSelectItem("No", "false", true, false)))
+                    .defaultSelect("Yes")
+                    .and();
+            ComponentFlow flow = builder.build();
+            ComponentFlow.ComponentFlowResult flowResult = flow.run();
+            ComponentContext<?> context = flowResult.getContext();
+            boolean useThymeleafLayoutDialect = Boolean.parseBoolean(context.get("thymeleaf-layout-dialect"));
+            templateEngineType = new TemplateEngineType.Thymeleaf(useThymeleafLayoutDialect);
+        } else if (templateEngineId.equals(TemplateEngineType.TYPE_JTE)) {
+            templateEngineType = new TemplateEngineType.Jte();
+        } else {
+            throw new ProjectInitializationServiceException("Invalid template engine: " + templateEngineId);
+        }
+        return templateEngineType;
     }
 
     private PackageManager allowPackageManagerSelection(String liveReloadId, boolean hasTailwindCssWebDependency) {
@@ -259,8 +272,8 @@ public class Init {
 
     private void addTemplateEngineInput(ComponentFlow.Builder builder) {
         Map<String, String> templateEngineOptions = new HashMap<>();
-        templateEngineOptions.put("Thymeleaf", TemplateEngineType.THYMELEAF.name());
-        templateEngineOptions.put("JTE", TemplateEngineType.JTE.name());
+        templateEngineOptions.put("Thymeleaf", TemplateEngineType.TYPE_THYMELEAF);
+        templateEngineOptions.put("JTE", TemplateEngineType.TYPE_JTE);
 
         builder.withSingleItemSelector("template-engine")
                 .name("Select template engine")

@@ -19,41 +19,44 @@ public class ThymeleafTemplatesInitService {
 
     public void generate(ProjectInitializationParameters parameters) throws IOException {
         Path basePath = parameters.basePath();
-        createDefaultLayoutTemplate(basePath, parameters.webDependencies(), parameters.liveReloadInitServiceParameters());
-        createDefaultIndexTemplate(basePath);
+        TemplateEngineType.Thymeleaf thymeleafParameters = (TemplateEngineType.Thymeleaf) parameters.templateEngineType();
+        createDefaultLayoutTemplate(basePath, parameters.webDependencies(), parameters.liveReloadInitServiceParameters(), thymeleafParameters);
+        createDefaultIndexTemplate(basePath, thymeleafParameters);
         createDefaultApplicationCss(basePath);
     }
 
     private void createDefaultLayoutTemplate(Path base,
                                              List<WebDependency> webDependencies,
-                                             LiveReloadInitServiceParameters liveReloadInitServiceParameters) throws IOException {
+                                             LiveReloadInitServiceParameters liveReloadInitServiceParameters, TemplateEngineType.Thymeleaf thymeleafParameters) throws IOException {
         Path layoutTemplate = base.resolve("src/main/resources/templates/layout/main.html");
         Files.createDirectories(layoutTemplate.getParent());
-        String source = "/files/templates/thymeleaf/layout/main.html";
+        String source = "/files/templates/" +
+                templateSourceDirectory(thymeleafParameters) +
+                "/layout/main.html";
         try (InputStream stream = getClass().getResourceAsStream(source)) {
             Files.copy(Objects.requireNonNull(stream, () -> "Could not find " + source),
-                       layoutTemplate);
+                    layoutTemplate);
         }
 
         StringBuilder headTags = new StringBuilder();
         if (!liveReloadInitServiceParameters.initServiceId().equals("vite")
-            && !liveReloadInitServiceParameters.initServiceId().equals("vite-with-tailwind-css")) {
+                && !liveReloadInitServiceParameters.initServiceId().equals("vite-with-tailwind-css")) {
             headTags.append("""
-                                    <link rel="stylesheet" th:href="@{/css/application.css}">""");
+                    <link rel="stylesheet" th:href="@{/css/application.css}">""");
         } else {
             headTags.append("""
-                                    <vite:client></vite:client>
-                                    <vite:vite>
-                                      <vite:entry value="/css/application.css"></vite:entry>
-                                    </vite:vite>
-                                    """);
+                    <vite:client></vite:client>
+                    <vite:vite>
+                      <vite:entry value="/css/application.css"></vite:entry>
+                    </vite:vite>
+                    """);
         }
         insertHeadTagsToLayoutTemplate(layoutTemplate, headTags.toString());
 
         StringBuilder cssLinksForLayoutTemplate = new StringBuilder();
         for (WebDependency webDependency : webDependencies) {
             if (webDependency instanceof WebjarsBasedWebDependency webjarsBasedWebDependency) {
-                String cssForDependency = webjarsBasedWebDependency.getCssLinksForLayoutTemplate(TemplateEngineType.THYMELEAF);
+                String cssForDependency = webjarsBasedWebDependency.getCssLinksForLayoutTemplate(thymeleafParameters);
                 if (cssForDependency != null) {
                     cssLinksForLayoutTemplate
                             .append('\n')
@@ -66,7 +69,7 @@ public class ThymeleafTemplatesInitService {
         StringBuilder jsLinksForLayoutTemplate = new StringBuilder();
         for (WebDependency webDependency : webDependencies) {
             if (webDependency instanceof WebjarsBasedWebDependency webjarsBasedWebDependency) {
-                String jsForDependency = webjarsBasedWebDependency.getJsLinksForLayoutTemplate(TemplateEngineType.THYMELEAF);
+                String jsForDependency = webjarsBasedWebDependency.getJsLinksForLayoutTemplate(thymeleafParameters);
                 if (jsForDependency != null) {
                     jsLinksForLayoutTemplate
                             .append('\n')
@@ -81,7 +84,7 @@ public class ThymeleafTemplatesInitService {
                                                 String headTags) throws IOException {
         String layoutTemplateContent = Files.readString(layoutTemplate);
         String result = layoutTemplateContent.replace("<!-- REPLACE WITH HEAD TAGS -->",
-                                                      headTags);
+                headTags);
         Files.writeString(layoutTemplate, result);
     }
 
@@ -89,7 +92,7 @@ public class ThymeleafTemplatesInitService {
                                                 String cssLinksForLayoutTemplate) throws IOException {
         String layoutTemplateContent = Files.readString(layoutTemplate);
         String result = layoutTemplateContent.replace("<!-- REPLACE WITH EXTERNAL CSS LINKS -->",
-                                                      cssLinksForLayoutTemplate);
+                cssLinksForLayoutTemplate);
         Files.writeString(layoutTemplate, result);
     }
 
@@ -97,17 +100,19 @@ public class ThymeleafTemplatesInitService {
                                                String jsLinksForLayoutTemplate) throws IOException {
         String layoutTemplateContent = Files.readString(layoutTemplate);
         String result = layoutTemplateContent.replace("<!-- REPLACE WITH EXTERNAL JS LINKS -->",
-                                                      jsLinksForLayoutTemplate);
+                jsLinksForLayoutTemplate);
         Files.writeString(layoutTemplate, result);
     }
 
-    private void createDefaultIndexTemplate(Path base) throws IOException {
+    private void createDefaultIndexTemplate(Path base, TemplateEngineType.Thymeleaf thymeleafParameters) throws IOException {
         Path indexTemplate = base.resolve("src/main/resources/templates/index.html");
         Files.createDirectories(indexTemplate.getParent());
-        String source = "/files/templates/thymeleaf/index.html";
+        String source = "/files/templates/" +
+                templateSourceDirectory(thymeleafParameters) +
+                "/index.html";
         try (InputStream stream = getClass().getResourceAsStream(source)) {
             Files.copy(Objects.requireNonNull(stream, () -> "Could not find " + source),
-                       indexTemplate);
+                    indexTemplate);
         }
     }
 
@@ -116,6 +121,14 @@ public class ThymeleafTemplatesInitService {
         Files.createDirectories(path.getParent());
         if (!Files.exists(path)) {
             Files.writeString(path, "");
+        }
+    }
+
+    private static String templateSourceDirectory(TemplateEngineType.Thymeleaf thymeleafParameters) {
+        if (thymeleafParameters.useLayoutDialect()) {
+            return "thymeleaf-with-layout-dialect";
+        } else {
+            return "thymeleaf";
         }
     }
 

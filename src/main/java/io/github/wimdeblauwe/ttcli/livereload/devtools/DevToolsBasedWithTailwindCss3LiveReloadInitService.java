@@ -121,7 +121,7 @@ public class DevToolsBasedWithTailwindCss3LiveReloadInitService implements LiveR
 
     @Override
     public boolean isApplicableForTemplateEngine(TemplateEngineType templateEngineType) {
-        return templateEngineType.equals(TemplateEngineType.THYMELEAF);
+        return templateEngineType instanceof TemplateEngineType.Thymeleaf;
     }
 
     private LinkedHashMap<String, String> npmScripts() {

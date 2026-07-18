@@ -30,9 +30,9 @@ public class ShoelaceWebDependency implements WebjarsBasedWebDependency {
     @Override
     public String getCssLinksForLayoutTemplate(TemplateEngineType templateEngineType) {
         return switch (templateEngineType) {
-            case THYMELEAF -> """
+            case TemplateEngineType.Thymeleaf _ -> """
                 <link rel="stylesheet" th:href="@{/webjars/shoelace-style__shoelace/dist/themes/light.css}">""";
-            case JTE -> """
+            case TemplateEngineType.Jte _ -> """
                     <link rel="stylesheet" href="/webjars/shoelace-style__shoelace/dist/themes/light.css">""";
         };
     }
@@ -40,9 +40,9 @@ public class ShoelaceWebDependency implements WebjarsBasedWebDependency {
     @Override
     public String getJsLinksForLayoutTemplate(TemplateEngineType templateEngineType) {
         return switch (templateEngineType) {
-            case THYMELEAF -> """
+            case TemplateEngineType.Thymeleaf _ -> """
                 <script type="module" th:src="@{/webjars/shoelace-style__shoelace/cdn/shoelace-autoloader.js}"></script>""";
-            case JTE -> """
+            case TemplateEngineType.Jte _ -> """
                     <script type="module" th:src="/webjars/shoelace-style__shoelace/cdn/shoelace-autoloader.js"></script>""";
         };
     }

@@ -63,8 +63,8 @@ public class ViteWithTailwindCssLiveReloadInitService extends ViteLiveReloadInit
     protected void createViteConfig(Path basePath, TemplateEngineType templateEngineType) throws IOException {
         Path path = basePath.resolve("vite.config.js");
         String content = switch (templateEngineType) {
-            case THYMELEAF -> viteConfigForThymeleaf();
-            case JTE -> viteConfigForJte();
+            case TemplateEngineType.Thymeleaf _ -> viteConfigForThymeleaf();
+            case TemplateEngineType.Jte _ -> viteConfigForJte();
         };
         Files.writeString(path, content, StandardOpenOption.CREATE);
     }
