@@ -41,10 +41,11 @@ public class NpmBasedWithTailwindCss3LiveReloadInitService extends NpmBasedLiveR
 
             TailwindCss3Helper.createApplicationCss(projectInitializationParameters.basePath(),
                     "src/main/resources/static/css/application.css");
-            if (projectInitializationParameters.templateEngineType().equals(TemplateEngineType.THYMELEAF)) {
-                TailwindCss3Helper.setupTailwindConfig(projectInitializationParameters.basePath(), "./src/main/resources/templates/**/*.html");
-            } else if (projectInitializationParameters.templateEngineType().equals(TemplateEngineType.JTE)) {
-                TailwindCss3Helper.setupTailwindConfig(projectInitializationParameters.basePath(), "./src/main/jte/**/*.jte");
+            switch (projectInitializationParameters.templateEngineType()) {
+                case TemplateEngineType.Thymeleaf _ ->
+                        TailwindCss3Helper.setupTailwindConfig(projectInitializationParameters.basePath(), "./src/main/resources/templates/**/*.html");
+                case TemplateEngineType.Jte _ ->
+                        TailwindCss3Helper.setupTailwindConfig(projectInitializationParameters.basePath(), "./src/main/jte/**/*.jte");
             }
 
             if (projectInitializationParameters.packageManager() == PackageManager.PNPM) {

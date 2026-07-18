@@ -27,9 +27,9 @@ public class BootstrapWebDependency implements WebjarsBasedWebDependency {
     @Override
     public String getCssLinksForLayoutTemplate(TemplateEngineType templateEngineType) {
         return switch (templateEngineType) {
-            case THYMELEAF -> """
+            case TemplateEngineType.Thymeleaf _ -> """
                     <link rel="stylesheet" th:href="@{/webjars/bootstrap/dist/css/bootstrap.min.css}">""";
-            case JTE -> """
+            case TemplateEngineType.Jte _ -> """
                     <link rel="stylesheet" href="/webjars/bootstrap/dist/css/bootstrap.min.css">""";
         };
     }
@@ -37,9 +37,9 @@ public class BootstrapWebDependency implements WebjarsBasedWebDependency {
     @Override
     public String getJsLinksForLayoutTemplate(TemplateEngineType templateEngineType) {
         return switch (templateEngineType) {
-            case THYMELEAF -> """
+            case TemplateEngineType.Thymeleaf _ -> """
                     <script defer th:src="@{/webjars/bootstrap/dist/js/bootstrap.min.js}"></script>""";
-            case JTE -> """
+            case TemplateEngineType.Jte _ -> """
                     <script defer src="/webjars/bootstrap/dist/js/bootstrap.min.js"></script>""";
         };
     }

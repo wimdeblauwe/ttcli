@@ -51,18 +51,18 @@ public class ViteLiveReloadInitService implements LiveReloadInitService {
         String pm = packageManager.executable();
         return """
                 # Live reload setup
-
+                
                 This project uses Vite to have live reloading.
-
+                
                 Use the following steps to get it working:
                 
                 1. Start the Vite development server with `%s run dev`.
                 2. Run the Spring Boot application with the `local` profile. You can do this from your IDE,
                 or via the command line using `mvn spring-boot:run -Dspring-boot.run.profiles=local`.
                 3. Open your browser at http://localhost:8080
-
+                
                 You should now be able to change any HTML or CSS and have the browser reload upon saving the file.
-
+                
                 PS: It is also possible to use the URL that Vite uses (Usually http://localhost:5173) given the
                 Spring Boot application runs on port 8080. If another port is used, you will need to edit `vite.config.js`.
                 """.formatted(pm);
@@ -90,10 +90,11 @@ public class ViteLiveReloadInitService implements LiveReloadInitService {
 
             MavenPomReaderWriter mavenPomReaderWriter = MavenPomReaderWriter.readFrom(basePath);
             String springBootVersion = projectInitializationParameters.springBootProjectCreationParameters().springBootVersion();
-            if (projectInitializationParameters.templateEngineType() == TemplateEngineType.THYMELEAF) {
-                mavenPomReaderWriter.addDependency("io.github.wimdeblauwe", "vite-spring-boot-thymeleaf", getViteSpringBootVersion(springBootVersion));
-            } else if (projectInitializationParameters.templateEngineType() == TemplateEngineType.JTE) {
-                mavenPomReaderWriter.addDependency("io.github.wimdeblauwe", "vite-spring-boot-jte", getViteSpringBootVersion(springBootVersion));
+            switch (projectInitializationParameters.templateEngineType()) {
+                case TemplateEngineType.Thymeleaf _ ->
+                        mavenPomReaderWriter.addDependency("io.github.wimdeblauwe", "vite-spring-boot-thymeleaf", getViteSpringBootVersion(springBootVersion));
+                case TemplateEngineType.Jte _ ->
+                        mavenPomReaderWriter.addDependency("io.github.wimdeblauwe", "vite-spring-boot-jte", getViteSpringBootVersion(springBootVersion));
             }
             mavenPomReaderWriter.write();
 
@@ -125,15 +126,14 @@ public class ViteLiveReloadInitService implements LiveReloadInitService {
 
     @Override
     public boolean isApplicableForTemplateEngine(TemplateEngineType templateEngineType) {
-        return templateEngineType.equals(TemplateEngineType.THYMELEAF)
-                || templateEngineType.equals(TemplateEngineType.JTE);
+        return templateEngineType instanceof TemplateEngineType.Thymeleaf || templateEngineType instanceof TemplateEngineType.Jte;
     }
 
     protected void createViteConfig(Path basePath, TemplateEngineType templateEngineType) throws IOException {
         Path path = basePath.resolve("vite.config.js");
         String content = switch (templateEngineType) {
-            case THYMELEAF -> viteConfigForThymeleaf();
-            case JTE -> viteConfigForJte();
+            case TemplateEngineType.Thymeleaf _ -> viteConfigForThymeleaf();
+            case TemplateEngineType.Jte _ -> viteConfigForJte();
         };
         Files.writeString(path, content, StandardOpenOption.CREATE);
     }
@@ -231,39 +231,42 @@ public class ViteLiveReloadInitService implements LiveReloadInitService {
     }
 
     private void updateSpringApplicationProperties(Path base, TemplateEngineType templateEngineType) throws IOException {
-        if (templateEngineType.equals(TemplateEngineType.THYMELEAF)) {
-            PropertiesFilesUtil.writeOrUpdatePropertiesFile(base,
-                    "application-local.properties",
-                    """
-                            spring.thymeleaf.cache=false
-                            spring.web.resources.chain.cache=false
-                            
-                            vite.mode=dev
-                            """);
-            PropertiesFilesUtil.writeOrUpdatePropertiesFile(base,
-                    "application.properties",
-                    """                            
-                            vite.mode=build
-                            """);
-        } else if (templateEngineType.equals(TemplateEngineType.JTE)) {
-            PropertiesFilesUtil.writeOrUpdatePropertiesFile(base,
-                    "application-local.properties",
-                    """
-                            gg.jte.usePrecompiledTemplates=false
-                            gg.jte.development-mode=true
-                            spring.web.resources.chain.cache=false
-                            
-                            vite.mode=dev
-                            """);
-            PropertiesFilesUtil.removePropertyFromPropertiesFile(base, "application.properties", "gg.jte.development-mode");
-            PropertiesFilesUtil.writeOrUpdatePropertiesFile(base,
-                    "application.properties",
-                    """
-                            gg.jte.usePrecompiledTemplates=true
-                            
-                            vite.mode=build
-                            vite.vite-entries-prefix=resources/static
-                            """);
+        switch (templateEngineType) {
+            case TemplateEngineType.Thymeleaf _ -> {
+                PropertiesFilesUtil.writeOrUpdatePropertiesFile(base,
+                        "application-local.properties",
+                        """
+                                spring.thymeleaf.cache=false
+                                spring.web.resources.chain.cache=false
+                                
+                                vite.mode=dev
+                                """);
+                PropertiesFilesUtil.writeOrUpdatePropertiesFile(base,
+                        "application.properties",
+                        """                            
+                                vite.mode=build
+                                """);
+            }
+            case TemplateEngineType.Jte _ -> {
+                PropertiesFilesUtil.writeOrUpdatePropertiesFile(base,
+                        "application-local.properties",
+                        """
+                                gg.jte.usePrecompiledTemplates=false
+                                gg.jte.development-mode=true
+                                spring.web.resources.chain.cache=false
+                                
+                                vite.mode=dev
+                                """);
+                PropertiesFilesUtil.removePropertyFromPropertiesFile(base, "application.properties", "gg.jte.development-mode");
+                PropertiesFilesUtil.writeOrUpdatePropertiesFile(base,
+                        "application.properties",
+                        """
+                                gg.jte.usePrecompiledTemplates=true
+                                
+                                vite.mode=build
+                                vite.vite-entries-prefix=resources/static
+                                """);
+            }
         }
     }
 

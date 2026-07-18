@@ -16,92 +16,89 @@ import java.util.stream.Collectors;
 @Component
 public class TailwindDependencyInitService {
 
-  private final NodeService nodeService;
+    private final NodeService nodeService;
 
-  public TailwindDependencyInitService(NodeService nodeService) {
-    this.nodeService = nodeService;
-  }
-
-  public void generate(LiveReloadInitService liveReloadInitService,
-      ProjectInitializationParameters parameters) {
-
-    if (parameters.tailwindVersion() == TailwindVersion.VERSION_3) {
-      generateForTailwindCss3(liveReloadInitService, parameters);
-      return;
+    public TailwindDependencyInitService(NodeService nodeService) {
+        this.nodeService = nodeService;
     }
 
-    try {
-      List<TailwindDependency> tailwindDependencies = parameters.tailwindDependencies();
-      if (!tailwindDependencies.isEmpty()) {
-        List<String> npmPackages = tailwindDependencies.stream().map(tailwindDependency -> tailwindDependency.npmPackageName(parameters.tailwindVersion()))
-            .toList();
-        Path basePath = liveReloadInitService.getTailwindConfigFileParentPath(parameters);
-          nodeService.installDevDependencies(parameters.packageManager(), basePath, npmPackages);
+    public void generate(LiveReloadInitService liveReloadInitService,
+                         ProjectInitializationParameters parameters) {
 
-        updateTailwindConfigFile(basePath, parameters);
-      }
-    } catch (IOException e) {
-      throw new LiveReloadInitServiceException(e);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-      throw new LiveReloadInitServiceException(e);
-    }
-  }
+        if (parameters.tailwindVersion() == TailwindVersion.VERSION_3) {
+            generateForTailwindCss3(liveReloadInitService, parameters);
+            return;
+        }
 
-  private void updateTailwindConfigFile(Path basePath,
-      ProjectInitializationParameters parameters) throws IOException {
-    Path path = basePath.resolve("src/main/resources/static/css/application.css");
-    byte[] bytes = Files.readAllBytes(path);
-    String s = new String(bytes);
-      s = s.replaceFirst("@source \"../../templates\";", "@source " +
-              getTemplateSources(parameters.templateEngineType()) +
-              ";" + System.lineSeparator()
-        + parameters.tailwindDependencies()
-        .stream()
-        .map(it -> String.format("@plugin \"%s\";", it.pluginName()))
-        .collect(Collectors.joining(System.lineSeparator())));
-    Files.writeString(path, s);
-  }
+        try {
+            List<TailwindDependency> tailwindDependencies = parameters.tailwindDependencies();
+            if (!tailwindDependencies.isEmpty()) {
+                List<String> npmPackages = tailwindDependencies.stream().map(tailwindDependency -> tailwindDependency.npmPackageName(parameters.tailwindVersion()))
+                        .toList();
+                Path basePath = liveReloadInitService.getTailwindConfigFileParentPath(parameters);
+                nodeService.installDevDependencies(parameters.packageManager(), basePath, npmPackages);
 
-    private static String getTemplateSources(TemplateEngineType templateEngineType) {
-        if (templateEngineType == TemplateEngineType.THYMELEAF) {
-            return "\"../../templates\"";
-        } else if (templateEngineType == TemplateEngineType.JTE) {
-            return "\"../../../jte\"";
-        } else {
-            throw new IllegalArgumentException("Unsupported template engine type: " + templateEngineType);
+                updateTailwindConfigFile(basePath, parameters);
+            }
+        } catch (IOException e) {
+            throw new LiveReloadInitServiceException(e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new LiveReloadInitServiceException(e);
         }
     }
 
-  private void generateForTailwindCss3(LiveReloadInitService liveReloadInitService,
-                                       ProjectInitializationParameters parameters) {
-    try {
-      List<TailwindDependency> tailwindDependencies = parameters.tailwindDependencies();
-      if (!tailwindDependencies.isEmpty()) {
-        List<String> npmPackages = tailwindDependencies.stream().map(tailwindDependency -> tailwindDependency.npmPackageName(parameters.tailwindVersion()))
-                .toList();
-        Path basePath = liveReloadInitService.getTailwindConfigFileParentPath(parameters);
-          nodeService.installDevDependencies(parameters.packageManager(), basePath, npmPackages);
-
-        updateTailwindConfigFileVersion3(basePath, parameters);
-      }
-    } catch (IOException e) {
-      throw new LiveReloadInitServiceException(e);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-      throw new LiveReloadInitServiceException(e);
+    private void updateTailwindConfigFile(Path basePath,
+                                          ProjectInitializationParameters parameters) throws IOException {
+        Path path = basePath.resolve("src/main/resources/static/css/application.css");
+        byte[] bytes = Files.readAllBytes(path);
+        String s = new String(bytes);
+        s = s.replaceFirst("@source \"../../templates\";", "@source " +
+                getTemplateSources(parameters.templateEngineType()) +
+                ";" + System.lineSeparator()
+                + parameters.tailwindDependencies()
+                .stream()
+                .map(it -> String.format("@plugin \"%s\";", it.pluginName()))
+                .collect(Collectors.joining(System.lineSeparator())));
+        Files.writeString(path, s);
     }
-  }
 
-  private void updateTailwindConfigFileVersion3(Path basePath,
-                                                ProjectInitializationParameters parameters) throws IOException {
-    Path tailwindConfigFilePath = basePath.resolve("tailwind.config.js");
-    byte[] bytes = Files.readAllBytes(tailwindConfigFilePath);
-    String s = new String(bytes);
-    s = s.replaceFirst("plugins: \\[]", "plugins: [" + parameters.tailwindDependencies()
-            .stream()
-            .map(it -> String.format("require('%s')", it.pluginName()))
-            .collect(Collectors.joining(",")) + "]");
-    Files.writeString(tailwindConfigFilePath, s);
-  }
+    private static String getTemplateSources(TemplateEngineType templateEngineType) {
+        return switch (templateEngineType) {
+            case TemplateEngineType.Jte jte -> "\"../../templates\"";
+            case TemplateEngineType.Thymeleaf thymeleaf -> "\"../../../jte\"";
+        };
+    }
+
+    private void generateForTailwindCss3(LiveReloadInitService liveReloadInitService,
+                                         ProjectInitializationParameters parameters) {
+        try {
+            List<TailwindDependency> tailwindDependencies = parameters.tailwindDependencies();
+            if (!tailwindDependencies.isEmpty()) {
+                List<String> npmPackages = tailwindDependencies.stream().map(tailwindDependency -> tailwindDependency.npmPackageName(parameters.tailwindVersion()))
+                        .toList();
+                Path basePath = liveReloadInitService.getTailwindConfigFileParentPath(parameters);
+                nodeService.installDevDependencies(parameters.packageManager(), basePath, npmPackages);
+
+                updateTailwindConfigFileVersion3(basePath, parameters);
+            }
+        } catch (IOException e) {
+            throw new LiveReloadInitServiceException(e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new LiveReloadInitServiceException(e);
+        }
+    }
+
+    private void updateTailwindConfigFileVersion3(Path basePath,
+                                                  ProjectInitializationParameters parameters) throws IOException {
+        Path tailwindConfigFilePath = basePath.resolve("tailwind.config.js");
+        byte[] bytes = Files.readAllBytes(tailwindConfigFilePath);
+        String s = new String(bytes);
+        s = s.replaceFirst("plugins: \\[]", "plugins: [" + parameters.tailwindDependencies()
+                .stream()
+                .map(it -> String.format("require('%s')", it.pluginName()))
+                .collect(Collectors.joining(",")) + "]");
+        Files.writeString(tailwindConfigFilePath, s);
+    }
 }

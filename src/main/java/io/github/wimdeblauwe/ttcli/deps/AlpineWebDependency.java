@@ -32,9 +32,9 @@ public class AlpineWebDependency implements WebjarsBasedWebDependency {
     @Override
     public String getJsLinksForLayoutTemplate(TemplateEngineType templateEngineType) {
         return switch (templateEngineType) {
-            case THYMELEAF -> """
+            case TemplateEngineType.Thymeleaf _ -> """
                 <script type="text/javascript" th:src="@{/webjars/alpinejs/dist/cdn.min.js}"></script>""";
-            case JTE -> """
+            case TemplateEngineType.Jte _ -> """
                     <script type="text/javascript" src="/webjars/alpinejs/dist/cdn.min.js"></script>""";
         };
     }

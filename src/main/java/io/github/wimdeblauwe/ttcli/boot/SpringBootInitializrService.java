@@ -29,10 +29,9 @@ public class SpringBootInitializrService {
         Set<String> dependencies = new HashSet<>(Set.of("web"));
 
         // Add template engine dependency based on the selected template engine
-        if (templateEngineType == TemplateEngineType.THYMELEAF) {
-            dependencies.add("thymeleaf");
-        } else if (templateEngineType == TemplateEngineType.JTE) {
-            dependencies.add("jte");
+        switch (templateEngineType) {
+            case TemplateEngineType.Thymeleaf _ -> dependencies.add("thymeleaf");
+            case TemplateEngineType.Jte _ -> dependencies.add("jte");
         }
 
         dependencies.addAll(additionalDependencies);

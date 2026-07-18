@@ -19,7 +19,8 @@ public class JteTemplatesInitService {
 
     public void generate(ProjectInitializationParameters parameters) throws IOException {
         Path basePath = parameters.basePath();
-        createDefaultLayoutTemplate(basePath, parameters.webDependencies(), parameters.liveReloadInitServiceParameters());
+        TemplateEngineType.Jte templateEngineType = (TemplateEngineType.Jte) parameters.templateEngineType();
+        createDefaultLayoutTemplate(basePath, parameters.webDependencies(), parameters.liveReloadInitServiceParameters(), templateEngineType);
         createDefaultIndexTemplate(basePath);
         createDefaultApplicationCss(basePath);
         createDotJteRootFile(basePath);
@@ -27,7 +28,7 @@ public class JteTemplatesInitService {
 
     private void createDefaultLayoutTemplate(Path base,
                                              List<WebDependency> webDependencies,
-                                             LiveReloadInitServiceParameters liveReloadInitServiceParameters) throws IOException {
+                                             LiveReloadInitServiceParameters liveReloadInitServiceParameters, TemplateEngineType.Jte templateEngineType) throws IOException {
         Path layoutTemplate = base.resolve("src/main/jte/layout/main.jte");
         Files.createDirectories(layoutTemplate.getParent());
         String source = "/files/templates/jte/layout/main.jte";
@@ -54,7 +55,7 @@ public class JteTemplatesInitService {
         StringBuilder cssLinksForLayoutTemplate = new StringBuilder();
         for (WebDependency webDependency : webDependencies) {
             if (webDependency instanceof WebjarsBasedWebDependency webjarsBasedWebDependency) {
-                String cssForDependency = webjarsBasedWebDependency.getCssLinksForLayoutTemplate(TemplateEngineType.JTE);
+                String cssForDependency = webjarsBasedWebDependency.getCssLinksForLayoutTemplate(templateEngineType);
                 if (cssForDependency != null) {
                     cssLinksForLayoutTemplate
                             .append('\n')
@@ -67,7 +68,7 @@ public class JteTemplatesInitService {
         StringBuilder jsLinksForLayoutTemplate = new StringBuilder();
         for (WebDependency webDependency : webDependencies) {
             if (webDependency instanceof WebjarsBasedWebDependency webjarsBasedWebDependency) {
-                String jsForDependency = webjarsBasedWebDependency.getJsLinksForLayoutTemplate(TemplateEngineType.JTE);
+                String jsForDependency = webjarsBasedWebDependency.getJsLinksForLayoutTemplate(templateEngineType);
                 if (jsForDependency != null) {
                     jsLinksForLayoutTemplate
                             .append('\n')

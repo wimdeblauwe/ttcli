@@ -121,7 +121,7 @@ public class NpmBasedLiveReloadInitService implements LiveReloadInitService {
 
     @Override
     public boolean isApplicableForTemplateEngine(TemplateEngineType templateEngineType) {
-        return templateEngineType.equals(TemplateEngineType.THYMELEAF);
+        return templateEngineType instanceof TemplateEngineType.Thymeleaf;
     }
 
     protected String postcssConfigFilePath() {

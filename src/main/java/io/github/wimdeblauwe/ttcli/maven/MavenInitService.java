@@ -28,7 +28,7 @@ public class MavenInitService {
                                       String springBootVersion,
                                       TemplateEngineType templateEngineType) throws IOException, InterruptedException {
         // Add template engine specific dependencies
-        if (templateEngineType == TemplateEngineType.THYMELEAF) {
+        if (templateEngineType instanceof TemplateEngineType.Thymeleaf(boolean useLayoutDialect) && useLayoutDialect) {
             mavenPomReaderWriter.addDependency("nz.net.ultraq.thymeleaf", "thymeleaf-layout-dialect");
         }
         mavenPomReaderWriter.updateDependencies(dependencies -> {
