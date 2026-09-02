@@ -1,5 +1,8 @@
 # Taming Thymeleaf CLI
 
+> 📕 Want to build a full web application with Spring Boot and Thymeleaf?
+> Read [Taming Thymeleaf](https://www.wimdeblauwe.com/books/taming-thymeleaf/).
+
 The goal of this project is to provide a command line tool to help set up a Spring Boot project with either JTE or
 Thymeleaf as the template engine.
 
