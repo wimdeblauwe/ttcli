@@ -14,6 +14,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static io.github.wimdeblauwe.ttcli.deps.VersionConstants.FRONTEND_MAVEN_PLUGIN_VERSION;
+
 public final class NpmHelper {
 
     /**
@@ -64,7 +66,7 @@ public final class NpmHelper {
                                                                                    """));
         mavenPomReaderWriter.updateProperties(properties -> {
             properties.appendChild(new Comment(" Maven plugins "));
-            properties.appendElement("frontend-maven-plugin.version").text("1.15.4");
+            properties.appendElement("frontend-maven-plugin.version").text(FRONTEND_MAVEN_PLUGIN_VERSION);
             properties.appendElement("frontend-maven-plugin.nodeVersion").text(versions.nodeVersion());
             properties.appendElement(versionPropertyName).text(versions.packageManagerVersion());
         });
