@@ -158,7 +158,7 @@ public class ViteLiveReloadInitService implements LiveReloadInitService {
                     plugins: [
                         springBoot()
                     ],
-                    root: path.join(__dirname, './src/main/resources'),
+                    root: path.join(import.meta.dirname, './src/main/resources'),
                     build: {
                         manifest: true,
                         rollupOptions: {
@@ -166,7 +166,7 @@ public class ViteLiveReloadInitService implements LiveReloadInitService {
                                 '/static/css/application.css'
                             ]
                         },
-                        outDir: path.join(__dirname, `./target/classes/static`),
+                        outDir: path.join(import.meta.dirname, `./target/classes/static`),
                         copyPublicDir: false,
                         emptyOutDir: true
                     },
@@ -201,7 +201,7 @@ public class ViteLiveReloadInitService implements LiveReloadInitService {
                                         }
                         })
                     ],
-                    root: path.join(__dirname, './src/main/'),
+                    root: path.join(import.meta.dirname, './src/main/'),
                     build: {
                         manifest: true,
                         rollupOptions: {
@@ -209,7 +209,7 @@ public class ViteLiveReloadInitService implements LiveReloadInitService {
                                 '/resources/static/css/application.css'
                             ]
                         },
-                        outDir: path.join(__dirname, `./target/classes/static`),
+                        outDir: path.join(import.meta.dirname, `./target/classes/static`),
                         copyPublicDir: false,
                         emptyOutDir: true
                     },
