@@ -42,9 +42,9 @@ public class HtmxWebDependency implements WebjarsBasedWebDependency {
     public String getJsLinksForLayoutTemplate(TemplateEngineType templateEngineType) {
         return switch (templateEngineType) {
             case TemplateEngineType.Thymeleaf _ -> """
-                <script type="text/javascript" th:src="@{/webjars/htmx.org/dist/htmx.min.js}"></script>""";
+                    <script defer th:src="@{/webjars/htmx.org/dist/htmx.min.js}"></script>""";
             case TemplateEngineType.Jte _ -> """
-                    <script type="text/javascript" src="/webjars/htmx.org/dist/htmx.min.js"></script>""";
+                    <script defer src="/webjars/htmx.org/dist/htmx.min.js"></script>""";
         };
     }
 

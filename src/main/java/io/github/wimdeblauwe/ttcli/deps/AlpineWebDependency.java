@@ -14,6 +14,7 @@ public class AlpineWebDependency implements WebjarsBasedWebDependency {
         return "alpinejs";
     }
 
+    //
     @Override
     public String displayName() {
         return "Alpine.js";
@@ -33,9 +34,9 @@ public class AlpineWebDependency implements WebjarsBasedWebDependency {
     public String getJsLinksForLayoutTemplate(TemplateEngineType templateEngineType) {
         return switch (templateEngineType) {
             case TemplateEngineType.Thymeleaf _ -> """
-                <script type="text/javascript" th:src="@{/webjars/alpinejs/dist/cdn.min.js}"></script>""";
+                    <script defer th:src="@{/webjars/alpinejs/dist/cdn.min.js}"></script>""";
             case TemplateEngineType.Jte _ -> """
-                    <script type="text/javascript" src="/webjars/alpinejs/dist/cdn.min.js"></script>""";
+                    <script defer src="/webjars/alpinejs/dist/cdn.min.js"></script>""";
         };
     }
 }
