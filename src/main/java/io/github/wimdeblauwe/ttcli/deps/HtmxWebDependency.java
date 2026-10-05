@@ -24,7 +24,7 @@ public class HtmxWebDependency implements WebjarsBasedWebDependency {
     public List<MavenDependency> getMavenDependencies(String springBootVersion, TemplateEngineType templateEngineType) {
 
         List<MavenDependency> result = new ArrayList<>();
-        result.add(new MavenDependency("org.webjars.npm", "htmx.org", "2.0.10"));
+        result.add(new MavenDependency("org.webjars.npm", "htmx.org", "2.0.11"));
         if (templateEngineType instanceof TemplateEngineType.Thymeleaf) {
             String htmxSpringBootThymeleafVersion = getHtmxSpringBootThymeleafVersion(springBootVersion);
             result.add(new MavenDependency("io.github.wimdeblauwe", "htmx-spring-boot-thymeleaf", htmxSpringBootThymeleafVersion));
