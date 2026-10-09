@@ -81,7 +81,7 @@ public class ViteWithTailwindCssLiveReloadInitService extends ViteLiveReloadInit
                         tailwindcss(),
                         springBoot()
                     ],
-                    root: path.join(__dirname, './src/main/resources'),
+                    root: path.join(import.meta.dirname, './src/main/resources'),
                     build: {
                         manifest: true,
                         rollupOptions: {
@@ -89,7 +89,7 @@ public class ViteWithTailwindCssLiveReloadInitService extends ViteLiveReloadInit
                                 '/static/css/application.css'
                             ]
                         },
-                        outDir: path.join(__dirname, `./target/classes/static`),
+                        outDir: path.join(import.meta.dirname, `./target/classes/static`),
                         copyPublicDir: false,
                         emptyOutDir: true
                     },
@@ -126,7 +126,7 @@ public class ViteWithTailwindCssLiveReloadInitService extends ViteLiveReloadInit
                                         }
                         })
                     ],
-                    root: path.join(__dirname, './src/main/'),
+                    root: path.join(import.meta.dirname, './src/main/'),
                     build: {
                         manifest: true,
                         rollupOptions: {
@@ -134,7 +134,7 @@ public class ViteWithTailwindCssLiveReloadInitService extends ViteLiveReloadInit
                                 '/resources/static/css/application.css'
                             ]
                         },
-                        outDir: path.join(__dirname, `./target/classes/static`),
+                        outDir: path.join(import.meta.dirname, `./target/classes/static`),
                         copyPublicDir: false,
                         emptyOutDir: true
                     },
