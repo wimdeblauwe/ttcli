@@ -89,13 +89,6 @@ public class NodeService {
         packageJsonReaderWriter.write();
     }
 
-    public void setPnpmOnlyBuiltDependencies(Path base,
-                                             List<String> onlyBuiltDependencies) throws IOException {
-        PackageJsonReaderWriter packageJsonReaderWriter = PackageJsonReaderWriter.readFrom(base.resolve("package.json"));
-        packageJsonReaderWriter.setPnpmOnlyBuiltDependencies(onlyBuiltDependencies);
-        packageJsonReaderWriter.write();
-    }
-
     private String checkIfApplicationIsInstalled(String application) throws InterruptedException {
         try {
             String output = ExternalProcessRunner.run(null, List.of(application, "-v"), () -> String.format("Seems the application '%s' is not installed, which is a prerequisite for the ttcli tool.", application));

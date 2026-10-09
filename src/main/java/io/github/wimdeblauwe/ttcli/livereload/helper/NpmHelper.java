@@ -2,7 +2,6 @@ package io.github.wimdeblauwe.ttcli.livereload.helper;
 
 import io.github.wimdeblauwe.ttcli.maven.MavenPomReaderWriter;
 import io.github.wimdeblauwe.ttcli.npm.InstalledApplicationVersions;
-import io.github.wimdeblauwe.ttcli.npm.PackageJsonReaderWriter;
 import io.github.wimdeblauwe.ttcli.npm.PackageManager;
 import org.jsoup.nodes.Comment;
 
@@ -19,19 +18,30 @@ import static io.github.wimdeblauwe.ttcli.deps.VersionConstants.FRONTEND_MAVEN_P
 public final class NpmHelper {
 
     /**
-     * Native packages whose install scripts pnpm 10+ blocks by default. Pre-populating
-     * `pnpm.onlyBuiltDependencies` with these makes the first build run cleanly without manual approval.
+     * Native packages whose install scripts pnpm 10+ blocks by default. Pre-approving these in
+     * `pnpm-workspace.yaml` makes the first build run cleanly without manual approval.
      */
-    public static final List<String> PNPM_ONLY_BUILT_DEPENDENCIES_DEFAULTS = List.of(
+    public static final List<String> PNPM_ALLOW_BUILDS_DEFAULTS = List.of(
             "@tailwindcss/oxide",
             "lightningcss",
             "esbuild"
     );
 
-    public static void applyPnpmOnlyBuiltDependencies(Path packageJsonDir) throws IOException {
-        PackageJsonReaderWriter readerWriter = PackageJsonReaderWriter.readFrom(packageJsonDir.resolve("package.json"));
-        readerWriter.setPnpmOnlyBuiltDependencies(PNPM_ONLY_BUILT_DEPENDENCIES_DEFAULTS);
-        readerWriter.write();
+    /**
+     * Writes a `pnpm-workspace.yaml` next to the `package.json` that allows the build scripts of
+     * {@link #PNPM_ALLOW_BUILDS_DEFAULTS}. pnpm 11+ no longer reads the `pnpm` field of `package.json`
+     * and uses `allowBuilds`; `onlyBuiltDependencies` is kept as well so pnpm 10 keeps working.
+     */
+    public static void applyPnpmAllowBuilds(Path packageJsonDir) throws IOException {
+        StringBuilder builder = new StringBuilder();
+        builder.append("# Packages that are allowed to run their install scripts (pnpm 11+)\n");
+        builder.append("allowBuilds:\n");
+        PNPM_ALLOW_BUILDS_DEFAULTS.forEach(dependency -> builder.append("  '").append(dependency).append("': true\n"));
+        builder.append("\n");
+        builder.append("# Same list for pnpm 10, which does not support `allowBuilds` yet\n");
+        builder.append("onlyBuiltDependencies:\n");
+        PNPM_ALLOW_BUILDS_DEFAULTS.forEach(dependency -> builder.append("  - '").append(dependency).append("'\n"));
+        Files.writeString(packageJsonDir.resolve("pnpm-workspace.yaml"), builder.toString());
     }
 
     public static Map<String, String> rewriteScriptsForPackageManager(PackageManager packageManager,
@@ -165,21 +175,23 @@ public final class NpmHelper {
         }
     }
 
-    public static String pnpmOnlyBuiltDependenciesHelpText() {
+    public static String pnpmAllowBuildsHelpText() {
         return """
                 
-                ## pnpm: `onlyBuiltDependencies`
+                ## pnpm: `allowBuilds`
                 
-                Your `package.json` contains a `pnpm.onlyBuiltDependencies` entry. From pnpm 10, install scripts of
-                dependencies (used by native packages such as `@tailwindcss/oxide`, `lightningcss`, `esbuild` to
-                fetch their native binaries) are blocked by default for security reasons — see
-                https://pnpm.io/settings#onlybuiltdependencies for details.
+                Your project contains a `pnpm-workspace.yaml` with an `allowBuilds` entry. From pnpm 10, install
+                scripts of dependencies (used by native packages such as `@tailwindcss/oxide`, `lightningcss`,
+                `esbuild` to fetch their native binaries) are blocked by default for security reasons — see
+                https://pnpm.io/settings#allowbuilds for details.
                 
                 The list pre-populates the packages used by the generated project so the first build runs without
-                manual approval. You can:
+                manual approval. The same list is repeated under `onlyBuiltDependencies`, which is what pnpm 10
+                reads; pnpm 11 and later only use `allowBuilds`. You can:
                 
-                * Add more packages to the array as you introduce dependencies that need build scripts.
-                * Remove the entry if you prefer pnpm's interactive `pnpm approve-builds` workflow.
+                * Add more packages to the list as you introduce dependencies that need build scripts.
+                * Remove `onlyBuiltDependencies` if everybody on the project uses pnpm 11 or later.
+                * Remove the entries if you prefer pnpm's interactive `pnpm approve-builds` workflow.
                 * Audit the list periodically — anything in it can run arbitrary scripts during install.
                 """;
     }

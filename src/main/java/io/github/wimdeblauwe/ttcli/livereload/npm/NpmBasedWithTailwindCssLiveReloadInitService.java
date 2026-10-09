@@ -43,7 +43,7 @@ public class NpmBasedWithTailwindCssLiveReloadInitService extends NpmBasedLiveRe
                     "../../templates");
 
             if (projectInitializationParameters.packageManager() == PackageManager.PNPM) {
-                NpmHelper.applyPnpmOnlyBuiltDependencies(projectInitializationParameters.basePath());
+                NpmHelper.applyPnpmAllowBuilds(projectInitializationParameters.basePath());
             }
         } catch (IOException e) {
             throw new LiveReloadInitServiceException(e);
