@@ -74,7 +74,7 @@ public class ProjectInitializationService {
         PackageManager packageManager = parameters.packageManager();
         String helpText = liveReloadInitService.getHelpText(packageManager);
         if (packageManager == PackageManager.PNPM) {
-            helpText += NpmHelper.pnpmOnlyBuiltDependenciesHelpText();
+            helpText += NpmHelper.pnpmAllowBuildsHelpText();
         }
         helpTextInitService.addHelpText(basePath, helpText);
 

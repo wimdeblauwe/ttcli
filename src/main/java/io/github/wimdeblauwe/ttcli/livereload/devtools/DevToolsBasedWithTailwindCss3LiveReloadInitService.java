@@ -102,7 +102,7 @@ public class DevToolsBasedWithTailwindCss3LiveReloadInitService implements LiveR
                     "../resources/templates/**/*.{html,js}");
 
             if (packageManager == PackageManager.PNPM) {
-                NpmHelper.applyPnpmOnlyBuiltDependencies(frontendBasePath);
+                NpmHelper.applyPnpmAllowBuilds(frontendBasePath);
             }
         } catch (IOException e) {
             throw new LiveReloadInitServiceException(e);

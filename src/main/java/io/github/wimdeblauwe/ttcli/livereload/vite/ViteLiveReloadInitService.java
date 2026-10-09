@@ -104,7 +104,7 @@ public class ViteLiveReloadInitService implements LiveReloadInitService {
             updateSpringApplicationProperties(basePath, projectInitializationParameters.templateEngineType());
 
             if (packageManager == PackageManager.PNPM) {
-                NpmHelper.applyPnpmOnlyBuiltDependencies(basePath);
+                NpmHelper.applyPnpmAllowBuilds(basePath);
             }
         } catch (IOException e) {
             throw new LiveReloadInitServiceException(e);

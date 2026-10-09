@@ -101,7 +101,7 @@ public class DevToolsBasedWithTailwindCssLiveReloadInitService implements LiveRe
                     "../resources/templates");
 
             if (packageManager == PackageManager.PNPM) {
-                NpmHelper.applyPnpmOnlyBuiltDependencies(frontendBasePath);
+                NpmHelper.applyPnpmAllowBuilds(frontendBasePath);
             }
         } catch (IOException e) {
             throw new LiveReloadInitServiceException(e);
