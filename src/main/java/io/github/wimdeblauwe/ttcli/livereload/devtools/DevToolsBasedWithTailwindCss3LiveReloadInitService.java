@@ -12,6 +12,7 @@ import io.github.wimdeblauwe.ttcli.npm.NodeService;
 import io.github.wimdeblauwe.ttcli.npm.PackageManager;
 import io.github.wimdeblauwe.ttcli.tailwind.TailwindVersion;
 import io.github.wimdeblauwe.ttcli.template.TemplateEngineType;
+import io.github.wimdeblauwe.ttcli.util.ConsoleOutput;
 import org.jsoup.nodes.Comment;
 import org.springframework.stereotype.Component;
 
@@ -135,7 +136,7 @@ public class DevToolsBasedWithTailwindCss3LiveReloadInitService implements LiveR
 
     private void updateMavenPom(MavenPomReaderWriter mavenPomReaderWriter,
                                 InstalledApplicationVersions versions) throws IOException, InterruptedException {
-        System.out.println("👷🏻‍♀️ Updating Maven pom.xml");
+        ConsoleOutput.println(ConsoleOutput.Icon.CONFIGURE, "Updating Maven pom.xml");
         PackageManager packageManager = versions.packageManager();
         String installGoal = packageManager.frontendMavenPluginInstallGoal();
         String runGoal = packageManager.frontendMavenPluginRunGoal();

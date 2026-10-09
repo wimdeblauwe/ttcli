@@ -3,6 +3,7 @@ package io.github.wimdeblauwe.ttcli.livereload.helper;
 import io.github.wimdeblauwe.ttcli.maven.MavenPomReaderWriter;
 import io.github.wimdeblauwe.ttcli.npm.InstalledApplicationVersions;
 import io.github.wimdeblauwe.ttcli.npm.PackageManager;
+import io.github.wimdeblauwe.ttcli.util.ConsoleOutput;
 import org.jsoup.nodes.Comment;
 
 import java.io.IOException;
@@ -57,7 +58,7 @@ public final class NpmHelper {
     public static void updateMavenPom(MavenPomReaderWriter mavenPomReaderWriter,
                                       InstalledApplicationVersions versions,
                                       boolean addReleaseProfile) throws IOException, InterruptedException {
-        System.out.println("👷🏻‍♀️ Updating Maven pom.xml");
+        ConsoleOutput.println(ConsoleOutput.Icon.CONFIGURE, "Updating Maven pom.xml");
         PackageManager packageManager = versions.packageManager();
         String installGoal = packageManager.frontendMavenPluginInstallGoal();
         String runGoal = packageManager.frontendMavenPluginRunGoal();

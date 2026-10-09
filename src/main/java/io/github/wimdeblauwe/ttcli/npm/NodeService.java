@@ -1,6 +1,7 @@
 package io.github.wimdeblauwe.ttcli.npm;
 
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceException;
+import io.github.wimdeblauwe.ttcli.util.ConsoleOutput;
 import io.github.wimdeblauwe.ttcli.util.ExternalProcessException;
 import io.github.wimdeblauwe.ttcli.util.ExternalProcessRunner;
 import org.springframework.stereotype.Component;
@@ -18,7 +19,7 @@ public class NodeService {
     public InstalledApplicationVersions checkIfNodeAndPackageManagerAreInstalled(PackageManager packageManager) throws IOException, InterruptedException {
         String nodeVersion = checkIfApplicationIsInstalled("node");
         String packageManagerVersion = checkIfApplicationIsInstalled(packageManager.executable());
-        System.out.println("🛠️  Using node " + nodeVersion + " with " + packageManager.executable() + " " + packageManagerVersion);
+        ConsoleOutput.println(ConsoleOutput.Icon.INFO, "Using node " + nodeVersion + " with " + packageManager.executable() + " " + packageManagerVersion);
         InstalledApplicationVersions versions = new InstalledApplicationVersions(nodeVersion,
                 packageManager,
                 packageManagerVersion);
@@ -57,7 +58,7 @@ public class NodeService {
     public void installDevDependencies(PackageManager packageManager,
                                        Path base,
                                        List<String> dependencies) throws IOException, InterruptedException {
-        System.out.println("🔨 Installing " + packageManager.executable() + " dependencies");
+        ConsoleOutput.println(ConsoleOutput.Icon.BUILD, "Installing " + packageManager.executable() + " dependencies");
         List<String> parameters = new ArrayList<>();
         parameters.addAll(List.of(packageManager.executable(), "install", "-D"));
         parameters.addAll(dependencies);
@@ -78,7 +79,7 @@ public class NodeService {
 
     public void insertPackageJsonScripts(Path base,
                                          Map<String, String> scripts) throws IOException, InterruptedException {
-        System.out.println("👷‍♂️ Adding build scripts to package.json");
+        ConsoleOutput.println(ConsoleOutput.Icon.PACKAGE, "Adding build scripts to package.json");
         addBuildScriptsToPackageJson(base, scripts);
     }
 

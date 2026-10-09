@@ -12,6 +12,7 @@ import io.github.wimdeblauwe.ttcli.npm.PackageManager;
 import io.github.wimdeblauwe.ttcli.tailwind.TailwindDependency;
 import io.github.wimdeblauwe.ttcli.tailwind.TailwindVersion;
 import io.github.wimdeblauwe.ttcli.template.TemplateEngineType;
+import io.github.wimdeblauwe.ttcli.util.ConsoleOutput;
 import io.github.wimdeblauwe.ttcli.util.InetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,12 +116,12 @@ public class Init {
                     selectedTailwindDependencies,
                     templateEngineType));
 
-            System.out.println("✅ Done generating project at " + basePath.toAbsolutePath());
+            ConsoleOutput.println(ConsoleOutput.Icon.SUCCESS, "Done generating project at " + basePath.toAbsolutePath());
             System.out.println();
             System.out.println("See HELP.md in the generated project for additional information.");
         } catch (Exception e) {
             LOGGER.error("Error during project generation: " + e.getMessage(), e);
-            System.err.println("❌ Error during project generation: " + e.getMessage());
+            ConsoleOutput.printlnError(ConsoleOutput.Icon.ERROR, "Error during project generation: " + e.getMessage());
         }
     }
 
