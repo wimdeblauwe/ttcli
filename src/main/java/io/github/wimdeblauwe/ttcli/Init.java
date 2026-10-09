@@ -1,6 +1,8 @@
 package io.github.wimdeblauwe.ttcli;
 
 import io.github.wimdeblauwe.ttcli.boot.*;
+import io.github.wimdeblauwe.ttcli.deps.HtmxVersion;
+import io.github.wimdeblauwe.ttcli.deps.HtmxWebDependency;
 import io.github.wimdeblauwe.ttcli.deps.TailwindCssWebDependency;
 import io.github.wimdeblauwe.ttcli.deps.WebDependency;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitService;
@@ -90,6 +92,7 @@ public class Init {
 
             List<String> selectedWebDependencyOptions = context.get("web-dependencies");
             List<WebDependency> selectedWebDependencies = webDependencies.stream().filter(webDependency -> selectedWebDependencyOptions.contains(webDependency.id())).toList();
+            selectedWebDependencies = allowHtmxVersionSelection(selectedWebDependencies, springBootVersion, templateEngineType);
 
             boolean hasTailwindCssWebDependency = selectedWebDependencies.stream().anyMatch(webDependency -> webDependency instanceof TailwindCssWebDependency);
             PackageManager packageManager = packageManagerEarly != null
@@ -172,6 +175,30 @@ public class Init {
             case "dev-tools-based" -> hasTailwindCssWebDependency;
             default -> false;
         };
+    }
+
+    private List<WebDependency> allowHtmxVersionSelection(List<WebDependency> selectedWebDependencies,
+                                                          String springBootVersion,
+                                                          TemplateEngineType templateEngineType) {
+        if (selectedWebDependencies.stream().noneMatch(webDependency -> webDependency instanceof HtmxWebDependency)) {
+            return selectedWebDependencies;
+        }
+
+        HtmxVersion htmxVersion;
+        if (HtmxWebDependency.supportsHtmx4(springBootVersion, templateEngineType)) {
+            ComponentFlow.Builder builder = flowBuilder.clone().reset();
+            addHtmxVersionInput(builder);
+            ComponentFlow.ComponentFlowResult flowResult = builder.build().run();
+            htmxVersion = HtmxVersion.valueOf(flowResult.getContext().get("htmx-version"));
+        } else {
+            htmxVersion = HtmxVersion.VERSION_2;
+        }
+
+        return selectedWebDependencies.stream()
+                .map(webDependency -> webDependency instanceof HtmxWebDependency htmxWebDependency
+                        ? htmxWebDependency.withVersion(htmxVersion)
+                        : webDependency)
+                .toList();
     }
 
     private Optional<TailwindVersion> allowTailwindVersionSelection(boolean hasTailwindCssWebDependency) {
@@ -304,6 +331,17 @@ public class Init {
                         "Tailwind 4", TailwindVersion.VERSION_4.name())
                 )
                 .defaultSelect("Tailwind 4")
+                .and();
+    }
+
+    private void addHtmxVersionInput(ComponentFlow.Builder builder) {
+        builder.withSingleItemSelector("htmx-version")
+                .name("htmx version")
+                .selectItems(Map.of(
+                        "htmx 2", HtmxVersion.VERSION_2.name(),
+                        "htmx 4", HtmxVersion.VERSION_4.name())
+                )
+                .defaultSelect("htmx 4")
                 .and();
     }
 
