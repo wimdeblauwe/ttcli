@@ -1,0 +1,12 @@
+{
+  "$schema": "https://context7.com/schema/context7.json",
+  "projectTitle": "Taming Thymeleaf CLI (ttcli)",
+  "description": "Command-line tool that scaffolds Spring Boot projects pre-configured with Thymeleaf or JTE, a live-reload setup (DevTools, NPM or Vite) and web dependencies like Tailwind CSS, Bootstrap, htmx and Alpine.js.",
+  "excludeFolders": [".github", ".mvn", "src"],
+  "excludeFiles": ["CLAUDE.md"],
+  "rules": [
+    "Run `ttcli init` to create a new project; it creates a sub-directory named after the artifactId in the current directory (override with `--baseDir`).",
+    "Always read the HELP.md in the generated project to learn how to start the live-reload setup that was selected.",
+    "Install via Homebrew (`brew install wimdeblauwe/homebrew-ttcli/ttcli`), Chocolatey (`choco install ttcli`), JBang (`jbang run ttcli@wimdeblauwe init`) or the release zips on GitHub."
+  ]
+}
