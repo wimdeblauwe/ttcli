@@ -99,7 +99,8 @@ public class DevToolsBasedWithTailwindCssLiveReloadInitService implements LiveRe
 
             TailwindCssHelper.createApplicationCss(basePath,
                     "src/main/frontend/application.css",
-                    "../resources/templates");
+                    "../resources/templates",
+                    projectInitializationParameters.hasShadleafWebDependency());
 
             if (packageManager == PackageManager.PNPM) {
                 NpmHelper.applyPnpmAllowBuilds(frontendBasePath);

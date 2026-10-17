@@ -42,7 +42,8 @@ public class ViteWithTailwindCssLiveReloadInitService extends ViteLiveReloadInit
 
             TailwindCssHelper.createApplicationCss(basePath,
                     "src/main/resources/static/css/application.css",
-                    "../../templates");
+                    "../../templates",
+                    projectInitializationParameters.hasShadleafWebDependency());
         } catch (IOException e) {
             throw new LiveReloadInitServiceException(e);
         }

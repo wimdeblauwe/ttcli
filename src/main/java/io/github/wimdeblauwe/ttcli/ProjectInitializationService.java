@@ -9,6 +9,7 @@ import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceFactory;
 import io.github.wimdeblauwe.ttcli.livereload.helper.NpmHelper;
 import io.github.wimdeblauwe.ttcli.maven.MavenInitService;
 import io.github.wimdeblauwe.ttcli.npm.PackageManager;
+import io.github.wimdeblauwe.ttcli.shadleaf.ShadleafInitService;
 import io.github.wimdeblauwe.ttcli.tailwind.TailwindDependencyInitService;
 import io.github.wimdeblauwe.ttcli.template.TemplateEngineType;
 import io.github.wimdeblauwe.ttcli.thymeleaf.ThymeleafTemplatesInitService;
@@ -32,6 +33,7 @@ public class ProjectInitializationService {
     private final MavenInitService mavenInitService;
     private final TailwindDependencyInitService tailwindDependencyInitService;
     private final HelpTextInitService helpTextInitService;
+    private final ShadleafInitService shadleafInitService;
 
     public ProjectInitializationService(SpringBootInitializrService initializrService,
                                         JavaCodeInitService javaCodeInitService,
@@ -40,7 +42,8 @@ public class ProjectInitializationService {
                                         JteTemplatesInitService jteTemplatesInitService,
                                         MavenInitService mavenInitService,
                                         TailwindDependencyInitService tailwindDependencyInitService,
-                                        HelpTextInitService helpTextInitService) {
+                                        HelpTextInitService helpTextInitService,
+                                        ShadleafInitService shadleafInitService) {
         this.initializrService = initializrService;
         this.javaCodeInitService = javaCodeInitService;
         this.liveReloadInitServiceFactory = liveReloadInitServiceFactory;
@@ -49,6 +52,7 @@ public class ProjectInitializationService {
         this.mavenInitService = mavenInitService;
         this.tailwindDependencyInitService = tailwindDependencyInitService;
         this.helpTextInitService = helpTextInitService;
+        this.shadleafInitService = shadleafInitService;
     }
 
     public void initialize(ProjectInitializationParameters parameters) throws IOException, InterruptedException {
@@ -79,6 +83,7 @@ public class ProjectInitializationService {
         helpTextInitService.addHelpText(basePath, helpText);
 
         mavenInitService.generate(parameters);
+        shadleafInitService.generate(parameters);
         tailwindDependencyInitService.generate(liveReloadInitService, parameters);
 
         // Generate templates based on the selected template engine
