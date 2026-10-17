@@ -1,6 +1,7 @@
 package io.github.wimdeblauwe.ttcli.thymeleaf;
 
 import io.github.wimdeblauwe.ttcli.ProjectInitializationParameters;
+import io.github.wimdeblauwe.ttcli.deps.ShadleafWebDependency;
 import io.github.wimdeblauwe.ttcli.deps.WebDependency;
 import io.github.wimdeblauwe.ttcli.deps.WebjarsBasedWebDependency;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceParameters;
@@ -38,7 +39,17 @@ public class ThymeleafTemplatesInitService {
                     layoutTemplate);
         }
 
+        boolean hasShadleafWebDependency = webDependencies.stream().anyMatch(webDependency -> webDependency instanceof ShadleafWebDependency);
+        insertShadleafNamespaceAndBodyHeaderToLayoutTemplate(layoutTemplate, hasShadleafWebDependency);
+
         StringBuilder headTags = new StringBuilder();
+        if (hasShadleafWebDependency) {
+            // Shadleaf's stylesheet needs to come before the application stylesheet, so overrides in the application win
+            headTags.append("""
+                    <th:block th:replace="~{sl/layout :: theme-script}"></th:block>
+                    <th:block th:replace="~{sl/layout :: assets}"></th:block>
+                    """);
+        }
         if (!liveReloadInitServiceParameters.initServiceId().equals("vite")
                 && !liveReloadInitServiceParameters.initServiceId().equals("vite-with-tailwind-css")) {
             headTags.append("""
@@ -78,6 +89,25 @@ public class ThymeleafTemplatesInitService {
             }
         }
         insertJsLinksToLayoutTemplate(layoutTemplate, jsLinksForLayoutTemplate.toString());
+    }
+
+    private void insertShadleafNamespaceAndBodyHeaderToLayoutTemplate(Path layoutTemplate,
+                                                                      boolean hasShadleafWebDependency) throws IOException {
+        String layoutTemplateContent = Files.readString(layoutTemplate);
+        String result;
+        if (hasShadleafWebDependency) {
+            result = layoutTemplateContent
+                    .replace("xmlns:th=\"http://www.thymeleaf.org\"",
+                            "xmlns:th=\"http://www.thymeleaf.org\"\n      xmlns:sl=\"https://shadleaf.dev/sl\"")
+                    .replace("<!-- REPLACE WITH BODY HEADER -->", """
+                            <header>
+                                <sl:theme-toggle></sl:theme-toggle>
+                                <sl:button variant="outline">Example button</sl:button>
+                            </header>""");
+        } else {
+            result = layoutTemplateContent.replace("<!-- REPLACE WITH BODY HEADER -->\n", "");
+        }
+        Files.writeString(layoutTemplate, result);
     }
 
     private void insertHeadTagsToLayoutTemplate(Path layoutTemplate,

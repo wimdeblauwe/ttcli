@@ -1,6 +1,7 @@
 package io.github.wimdeblauwe.ttcli;
 
 import io.github.wimdeblauwe.ttcli.boot.SpringBootProjectCreationParameters;
+import io.github.wimdeblauwe.ttcli.deps.ShadleafWebDependency;
 import io.github.wimdeblauwe.ttcli.deps.TailwindCssWebDependency;
 import io.github.wimdeblauwe.ttcli.deps.WebDependency;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceParameters;
@@ -26,6 +27,10 @@ public record ProjectInitializationParameters(Path basePath,
 
     public boolean hasTailwindCssWebDependency() {
         return webDependencies.stream().anyMatch(webDependency -> webDependency instanceof TailwindCssWebDependency);
+    }
+
+    public boolean hasShadleafWebDependency() {
+        return webDependencies.stream().anyMatch(webDependency -> webDependency instanceof ShadleafWebDependency);
     }
 
     public PackageManager packageManager() {
