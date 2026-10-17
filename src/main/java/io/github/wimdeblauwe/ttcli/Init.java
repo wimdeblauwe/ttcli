@@ -324,9 +324,11 @@ public class Init {
     private void addWebDependenciesInput(ComponentFlow.Builder builder,
                                          String springBootVersion,
                                          TemplateEngineType templateEngineType) {
+        List<SelectItem> webDependencyOptions = buildWebDependencyOptions(springBootVersion, templateEngineType);
         builder.withMultiItemSelector("web-dependencies")
                 .name("Web dependencies")
-                .selectItems(buildWebDependencyOptions(springBootVersion, templateEngineType))
+                .selectItems(webDependencyOptions)
+                .max(webDependencyOptions.size())
                 .and();
     }
 
