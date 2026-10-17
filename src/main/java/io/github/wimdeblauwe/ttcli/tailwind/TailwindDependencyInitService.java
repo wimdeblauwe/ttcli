@@ -48,8 +48,8 @@ public class TailwindDependencyInitService {
         }
     }
 
-    private void updateTailwindConfigFile(Path basePath,
-                                          ProjectInitializationParameters parameters) throws IOException {
+    void updateTailwindConfigFile(Path basePath,
+                                  ProjectInitializationParameters parameters) throws IOException {
         Path path = basePath.resolve("src/main/resources/static/css/application.css");
         byte[] bytes = Files.readAllBytes(path);
         String s = new String(bytes);
@@ -65,8 +65,8 @@ public class TailwindDependencyInitService {
 
     private static String getTemplateSources(TemplateEngineType templateEngineType) {
         return switch (templateEngineType) {
-            case TemplateEngineType.Jte jte -> "\"../../templates\"";
-            case TemplateEngineType.Thymeleaf thymeleaf -> "\"../../../jte\"";
+            case TemplateEngineType.Jte jte -> "\"../../../jte\"";
+            case TemplateEngineType.Thymeleaf thymeleaf -> "\"../../templates\"";
         };
     }
 
