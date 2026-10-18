@@ -44,15 +44,75 @@ The questions below are asked in this order. Some are only asked when they apply
 | Artifact                       | Any Maven `artifactId`                                                     | `demo`           | Always                                                                        |
 | Project Name                   | Any name                                                                   | `Demo`           | Always                                                                        |
 | Spring Boot version            | The versions currently offered by start.spring.io                          | start.spring.io default | Always                                                                 |
-| Java version                   | The Java versions currently offered by start.spring.io                     | start.spring.io default | Always                                                                 |
+| Java version                   | The Java versions currently offered by start.spring.io                     | `25` (latest LTS)       | Always                                                                 |
 | Template engine                | Thymeleaf, JTE                                                             | Thymeleaf        | Always                                                                        |
-| Use Thymeleaf Layout Dialect?  | Yes, No                                                                    | Yes              | Thymeleaf is selected                                                         |
-| Live reload implementation     | DevTools based, NPM based, Vite                                            | –                | Always. With JTE, only Vite is available.                                     |
+| Use Thymeleaf Layout Dialect?  | Yes, No                                                                    | No               | Thymeleaf is selected                                                         |
+| Live reload implementation     | DevTools based, NPM based, Vite                                            | – (Vite when non-interactive) | Always. With JTE, only Vite is available.                                     |
 | Package manager                | npm, pnpm                                                                  | npm              | NPM based or Vite is selected, or DevTools based together with Tailwind CSS   |
 | Web dependencies (multi-select)| Alpine.js, Bootstrap, Htmx, Shadleaf, Shoelace, Tailwind CSS               | none             | Always. Shadleaf is only offered with Thymeleaf and Spring Boot 4.1 or newer. |
 | htmx version                   | htmx 2, htmx 4                                                             | htmx 4           | Htmx is selected and either JTE or Spring Boot 4.x is used (otherwise htmx 2) |
 | Tailwind version               | Tailwind 3, Tailwind 4                                                     | Tailwind 4       | Tailwind CSS is selected without Shadleaf (Shadleaf always uses Tailwind 4)   |
 | Tailwind dependencies (multi-select) | @tailwindcss/forms, @tailwindcss/typography, @tailwindcss/container-queries, daisyUI | none | Tailwind CSS is selected                                  |
+
+### Options (non-interactive use)
+
+Every question above can be answered with an option. A question that has an option is not asked, the others are still
+asked as usual. This makes it possible to run `ttcli init` without a terminal, for example from a script or a coding
+agent.
+
+| Option                      | Answers                       | Values                                                                           |
+|-----------------------------|-------------------------------|----------------------------------------------------------------------------------|
+| `--group`                   | Group                         | Any Maven `groupId`                                                              |
+| `--artifact`                | Artifact                      | Letters, digits, `.`, `_` and `-` (it is also the name of the generated directory) |
+| `--name`                    | Project Name                  | Any name. A name with spaces needs double quoting: `--name '"My App"'`           |
+| `--boot-version`            | Spring Boot version           | An id or name offered by start.spring.io, for example `4.1.1`                    |
+| `--java-version`            | Java version                  | An id or name offered by start.spring.io, for example `25`                       |
+| `--template-engine`         | Template engine               | `thymeleaf`, `jte`                                                               |
+| `--thymeleaf-layout-dialect`| Use Thymeleaf Layout Dialect? | `yes`, `no` (Thymeleaf only)                                                     |
+| `--live-reload`             | Live reload implementation    | `vite`, `npm-based`, `dev-tools-based` (JTE: only `vite`)                        |
+| `--package-manager`         | Package manager               | `npm`, `pnpm`                                                                    |
+| `--web-deps`                | Web dependencies              | Comma separated: `alpinejs`, `bootstrap`, `htmx`, `shadleaf`, `shoelace`, `tailwind-css`, or `none` |
+| `--htmx-version`            | htmx version                  | `2`, `4`                                                                         |
+| `--tailwind-version`        | Tailwind version              | `3`, `4`                                                                         |
+| `--tailwind-deps`           | Tailwind dependencies         | Comma separated: `forms`, `typography`, `container-queries`, `daisy-ui`, or `none` |
+| `--baseDir`                 | –                             | Directory in which the `artifactId` directory is created (default `.`)           |
+| `--non-interactive`         | –                             | Flag, see below                                                                  |
+
+Values are case-insensitive and can be abbreviated as long as that is unambiguous, so `--web-deps htmx,alpine,tailwind`
+works and `--live-reload devtools` selects `dev-tools-based`. Run `ttcli help init` for the list of options.
+
+With `--non-interactive`, and also when there is no terminal (for example when the input is redirected), the tool never
+prompts. Every answer without an option gets the default from the Questions table. The live reload implementation has
+no default when prompting, but Vite is used when running non-interactively. The Thymeleaf Layout Dialect is opt in:
+add `--thymeleaf-layout-dialect yes` to use it.
+
+The same rules as in the interactive flow apply, and an option that conflicts with them is an error instead of being
+ignored. For example `--htmx-version` needs `htmx` in `--web-deps`, `shadleaf` needs Thymeleaf and Spring Boot 4.1 or
+newer, and `--htmx-version 4` is not possible with Thymeleaf and Spring Boot 3. Invalid values, unknown options and
+missing values fail with a message listing what is valid, and the exit code is non-zero. Before generating, the tool
+prints a summary of all answers that are used.
+
+Fully non-interactive example:
+
+```
+ttcli init --non-interactive \
+  --group com.example --artifact demo --name Demo \
+  --template-engine thymeleaf --thymeleaf-layout-dialect no \
+  --live-reload vite --package-manager pnpm \
+  --web-deps htmx,alpine,tailwind --htmx-version 4 \
+  --tailwind-version 4 --tailwind-deps forms,typography
+```
+
+The same via JBang. JBang passes everything after the script name unchanged to `ttcli`, including the exit code:
+
+```
+jbang run ttcli@wimdeblauwe init --non-interactive \
+  --group com.example --artifact demo --name Demo \
+  --template-engine thymeleaf --thymeleaf-layout-dialect no \
+  --live-reload vite --package-manager pnpm \
+  --web-deps htmx,alpine,tailwind --htmx-version 4 \
+  --tailwind-version 4 --tailwind-deps forms,typography
+```
 
 ### What gets generated
 

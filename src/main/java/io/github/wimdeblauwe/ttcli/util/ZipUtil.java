@@ -5,10 +5,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public final class ZipUtil {
+    private static final Set<String> EXECUTABLE_FILE_NAMES = Set.of("mvnw", "gradlew");
+
     public static void unzip(byte[] zipContents,
                       Path outputPath) throws IOException {
         try (ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(zipContents))) {
@@ -22,6 +25,10 @@ public final class ZipUtil {
                 } else {
                     Files.createDirectories(entryOutputPath.getParent());
                     writeContents(zipInputStream, entryOutputPath);
+                    if (EXECUTABLE_FILE_NAMES.contains(entryOutputPath.getFileName().toString())) {
+                        // ZipInputStream does not expose unix permissions, so restore them for the known wrapper scripts
+                        entryOutputPath.toFile().setExecutable(true, false);
+                    }
                 }
                 zipInputStream.closeEntry();
             }
