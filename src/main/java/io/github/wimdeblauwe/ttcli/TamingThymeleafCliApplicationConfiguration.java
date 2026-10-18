@@ -1,11 +1,15 @@
 package io.github.wimdeblauwe.ttcli;
 
 import io.github.wimdeblauwe.ttcli.boot.SpringBootInitializrClient;
+import io.github.wimdeblauwe.ttcli.util.ConsoleOutput;
 import org.jline.utils.AttributedString;
 import org.jline.utils.AttributedStyle;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportRuntimeHints;
+import org.springframework.shell.core.command.CommandParser;
+import org.springframework.shell.core.command.CommandRegistry;
+import org.springframework.shell.core.command.DefaultCommandParser;
 import org.springframework.shell.jline.PromptProvider;
 import org.springframework.shell.jline.tui.style.FigureSettings;
 import org.springframework.shell.jline.tui.style.StyleSettings;
@@ -42,6 +46,14 @@ public class TamingThymeleafCliApplicationConfiguration {
                 };
             }
         };
+    }
+
+    @Bean
+    public CommandParser commandParser(CommandRegistry commandRegistry) {
+        return new StrictCommandParser(new DefaultCommandParser(commandRegistry), commandRegistry, message -> {
+            ConsoleOutput.printlnError(ConsoleOutput.Icon.ERROR, message);
+            System.exit(2);
+        });
     }
 
     @Bean
