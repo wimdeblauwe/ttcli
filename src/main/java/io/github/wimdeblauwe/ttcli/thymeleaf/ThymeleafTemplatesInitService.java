@@ -105,7 +105,7 @@ public class ThymeleafTemplatesInitService {
                                 <sl:button variant="outline">Example button</sl:button>
                             </header>""");
         } else {
-            result = layoutTemplateContent.replace("<!-- REPLACE WITH BODY HEADER -->\n", "");
+            result = layoutTemplateContent.replaceFirst("<!-- REPLACE WITH BODY HEADER -->\\R", "");
         }
         Files.writeString(layoutTemplate, result);
     }

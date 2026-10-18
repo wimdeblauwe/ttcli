@@ -1,6 +1,8 @@
 package io.github.wimdeblauwe.ttcli.util;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.ByteArrayOutputStream;
@@ -15,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ZipUtilTest {
 
     @Test
+    @DisabledOnOs(value = OS.WINDOWS, disabledReason = "Windows has no executable file permission")
     void unzipMakesWrapperScriptsExecutable(@TempDir Path tempDir) throws IOException {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         try (ZipOutputStream zip = new ZipOutputStream(bytes)) {
