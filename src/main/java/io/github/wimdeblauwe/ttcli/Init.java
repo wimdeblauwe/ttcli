@@ -3,6 +3,7 @@ package io.github.wimdeblauwe.ttcli;
 import io.github.wimdeblauwe.ttcli.boot.*;
 import io.github.wimdeblauwe.ttcli.deps.HtmxVersion;
 import io.github.wimdeblauwe.ttcli.deps.HtmxWebDependency;
+import io.github.wimdeblauwe.ttcli.deps.ShadleafWebDependency;
 import io.github.wimdeblauwe.ttcli.deps.TailwindCssWebDependency;
 import io.github.wimdeblauwe.ttcli.deps.WebDependency;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitService;
@@ -86,7 +87,7 @@ public class Init {
                     : null;
 
             builder = flowBuilder.clone().reset();
-            addWebDependenciesInput(builder);
+            addWebDependenciesInput(builder, springBootVersion, templateEngineType);
             flow = builder.build();
             flowResult = flow.run();
             context = flowResult.getContext();
@@ -94,12 +95,18 @@ public class Init {
             List<String> selectedWebDependencyOptions = context.get("web-dependencies");
             List<WebDependency> selectedWebDependencies = webDependencies.stream().filter(webDependency -> selectedWebDependencyOptions.contains(webDependency.id())).toList();
             selectedWebDependencies = allowHtmxVersionSelection(selectedWebDependencies, springBootVersion, templateEngineType);
+            boolean hasShadleafWebDependency = selectedWebDependencies.stream().anyMatch(webDependency -> webDependency instanceof ShadleafWebDependency);
+            List<WebDependency> webDependenciesWithoutBundledAlpine = ShadleafWebDependency.removeAlpineIfShadleafIsSelected(selectedWebDependencies);
+            if (webDependenciesWithoutBundledAlpine.size() < selectedWebDependencies.size()) {
+                ConsoleOutput.println(ConsoleOutput.Icon.INFO, "Alpine.js is provided by Shadleaf, not adding it separately.");
+            }
+            selectedWebDependencies = webDependenciesWithoutBundledAlpine;
 
             boolean hasTailwindCssWebDependency = selectedWebDependencies.stream().anyMatch(webDependency -> webDependency instanceof TailwindCssWebDependency);
             PackageManager packageManager = packageManagerEarly != null
                     ? packageManagerEarly
                     : allowPackageManagerSelection(liveReloadId, hasTailwindCssWebDependency);
-            TailwindVersion tailwindVersion = allowTailwindVersionSelection(hasTailwindCssWebDependency).orElse(null);
+            TailwindVersion tailwindVersion = allowTailwindVersionSelection(hasTailwindCssWebDependency, hasShadleafWebDependency).orElse(null);
             List<TailwindDependency> selectedTailwindDependencies = allowTailwindDependenciesSelection(hasTailwindCssWebDependency);
 
             Path basePath = Path.of(baseDir).resolve(artifactId);
@@ -202,8 +209,12 @@ public class Init {
                 .toList();
     }
 
-    private Optional<TailwindVersion> allowTailwindVersionSelection(boolean hasTailwindCssWebDependency) {
-        if (hasTailwindCssWebDependency) {
+    private Optional<TailwindVersion> allowTailwindVersionSelection(boolean hasTailwindCssWebDependency,
+                                                                    boolean hasShadleafWebDependency) {
+        if (hasTailwindCssWebDependency && hasShadleafWebDependency) {
+            // Shadleaf's embedded bundle needs Tailwind 4
+            return Optional.of(TailwindVersion.VERSION_4);
+        } else if (hasTailwindCssWebDependency) {
             ComponentFlow.Builder builder = flowBuilder.clone().reset();
             addTailwindVersionInput(builder);
             ComponentFlow build = builder.build();
@@ -310,15 +321,21 @@ public class Init {
                 .and();
     }
 
-    private void addWebDependenciesInput(ComponentFlow.Builder builder) {
+    private void addWebDependenciesInput(ComponentFlow.Builder builder,
+                                         String springBootVersion,
+                                         TemplateEngineType templateEngineType) {
+        List<SelectItem> webDependencyOptions = buildWebDependencyOptions(springBootVersion, templateEngineType);
         builder.withMultiItemSelector("web-dependencies")
                 .name("Web dependencies")
-                .selectItems(buildWebDependencyOptions())
+                .selectItems(webDependencyOptions)
+                .max(webDependencyOptions.size())
                 .and();
     }
 
-    private List<SelectItem> buildWebDependencyOptions() {
+    private List<SelectItem> buildWebDependencyOptions(String springBootVersion,
+                                                       TemplateEngineType templateEngineType) {
         return webDependencies.stream()
+                .filter(webDependency -> webDependency.isApplicable(springBootVersion, templateEngineType))
                 .map(webDependency -> new DefaultSelectItem(webDependency.displayName(), webDependency.id(), true, false))
                 .sorted(Comparator.comparing(DefaultSelectItem::name))
                 .collect(Collectors.toList());

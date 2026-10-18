@@ -40,7 +40,8 @@ public class NpmBasedWithTailwindCssLiveReloadInitService extends NpmBasedLiveRe
 
             TailwindCssHelper.createApplicationCss(projectInitializationParameters.basePath(),
                     "src/main/resources/static/css/application.css",
-                    "../../templates");
+                    "../../templates",
+                    projectInitializationParameters.hasShadleafWebDependency());
 
             if (projectInitializationParameters.packageManager() == PackageManager.PNPM) {
                 NpmHelper.applyPnpmAllowBuilds(projectInitializationParameters.basePath());

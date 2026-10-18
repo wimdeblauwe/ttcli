@@ -49,9 +49,9 @@ The questions below are asked in this order. Some are only asked when they apply
 | Use Thymeleaf Layout Dialect?  | Yes, No                                                                    | Yes              | Thymeleaf is selected                                                         |
 | Live reload implementation     | DevTools based, NPM based, Vite                                            | –                | Always. With JTE, only Vite is available.                                     |
 | Package manager                | npm, pnpm                                                                  | npm              | NPM based or Vite is selected, or DevTools based together with Tailwind CSS   |
-| Web dependencies (multi-select)| Alpine.js, Bootstrap, Htmx, Shoelace, Tailwind CSS                         | none             | Always                                                                        |
+| Web dependencies (multi-select)| Alpine.js, Bootstrap, Htmx, Shadleaf, Shoelace, Tailwind CSS               | none             | Always. Shadleaf is only offered with Thymeleaf and Spring Boot 4.1 or newer. |
 | htmx version                   | htmx 2, htmx 4                                                             | htmx 4           | Htmx is selected and either JTE or Spring Boot 4.x is used (otherwise htmx 2) |
-| Tailwind version               | Tailwind 3, Tailwind 4                                                     | Tailwind 4       | Tailwind CSS is selected                                                      |
+| Tailwind version               | Tailwind 3, Tailwind 4                                                     | Tailwind 4       | Tailwind CSS is selected without Shadleaf (Shadleaf always uses Tailwind 4)   |
 | Tailwind dependencies (multi-select) | @tailwindcss/forms, @tailwindcss/typography, @tailwindcss/container-queries, daisyUI | none | Tailwind CSS is selected                                  |
 
 ### What gets generated
@@ -153,11 +153,22 @@ The generated `HELP.md` and `package.json` scripts use the package manager you s
 | Alpine.js      | WebJar `org.webjars.npm:alpinejs`, script linked in the layout template                                                 |
 | Bootstrap      | WebJar `org.webjars.npm:bootstrap`, CSS and script linked in the layout template                                        |
 | Htmx           | WebJar `org.webjars.npm:htmx.org` (htmx 2 or 4). With Thymeleaf, also `io.github.wimdeblauwe:htmx-spring-boot-thymeleaf` |
+| Shadleaf       | `io.github.wimdeblauwe:shadleaf-spring-boot-starter`, `sl/layout` fragments, theme toggle and example button in the layout template |
 | Shoelace       | WebJar `org.webjars.npm:shoelace-style__shoelace`, light theme CSS and autoloader script linked in the layout template  |
 | Tailwind CSS   | Installed via npm/pnpm and wired into the selected live reload setup (see below)                                         |
 
 The tool always adds `org.webjars:webjars-locator-lite` (Spring Boot 3.4 and newer) or `org.webjars:webjars-locator`
 (older Spring Boot versions), so WebJar URLs work without a version number.
+
+### Shadleaf
+
+[Shadleaf](https://shadleaf.dev) is only offered with Thymeleaf and Spring Boot 4.1 or newer. It works together with
+other web dependencies:
+
+* Shadleaf ships its own Alpine.js. If you also select Alpine.js, the Alpine.js WebJar is not added, and you can use
+  Alpine in your own markup through Shadleaf's copy.
+* If you also select Tailwind CSS, Tailwind 4 is used without asking. `shadleaf.assets.variant=embedded` is set in
+  `application.properties`, and `application.css` maps Shadleaf's tokens onto Tailwind utilities (e.g. `bg-primary`).
 
 ### htmx versions
 
