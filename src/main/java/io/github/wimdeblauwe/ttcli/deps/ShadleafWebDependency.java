@@ -17,7 +17,7 @@ import java.util.List;
 @Component
 public class ShadleafWebDependency implements WebjarsBasedWebDependency {
 
-    public static final String SHADLEAF_VERSION = "0.10.0";
+    public static final String SHADLEAF_VERSION = "1.1.0";
 
     @Override
     public String id() {

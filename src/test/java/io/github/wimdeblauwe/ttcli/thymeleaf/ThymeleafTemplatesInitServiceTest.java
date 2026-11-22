@@ -1,6 +1,8 @@
 package io.github.wimdeblauwe.ttcli.thymeleaf;
 
 import io.github.wimdeblauwe.ttcli.deps.AlpineWebDependency;
+import io.github.wimdeblauwe.ttcli.deps.HtmxVersion;
+import io.github.wimdeblauwe.ttcli.deps.HtmxWebDependency;
 import io.github.wimdeblauwe.ttcli.deps.ShadleafWebDependency;
 import io.github.wimdeblauwe.ttcli.deps.WebDependency;
 import io.github.wimdeblauwe.ttcli.template.TemplateEngineType;
@@ -38,6 +40,43 @@ class ThymeleafTemplatesInitServiceTest {
         assertThat(themeScriptIndex).isPositive();
         assertThat(themeScriptIndex).isLessThan(assetsIndex);
         assertThat(assetsIndex).isLessThan(applicationCssIndex);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void testGenerate_withShadleafAndHtmx4(boolean useLayoutDialect) throws IOException {
+        String layout = generateLayout("npm-based", List.of(new HtmxWebDependency(), new ShadleafWebDependency()), useLayoutDialect);
+
+        int themeScriptIndex = layout.indexOf("~{sl/layout :: theme-script}");
+        int htmxIndex = layout.indexOf("@{/webjars/htmx.org/dist/htmx.min.js}");
+        int alpineCompatIndex = layout.indexOf("@{/webjars/htmx.org/dist/ext/hx-alpine-compat.min.js}");
+        int assetsIndex = layout.indexOf("~{sl/layout :: assets}");
+        assertThat(themeScriptIndex).isPositive();
+        assertThat(themeScriptIndex).isLessThan(htmxIndex);
+        assertThat(htmxIndex).isLessThan(alpineCompatIndex);
+        assertThat(alpineCompatIndex).isLessThan(assetsIndex);
+        assertThat(layout.indexOf("htmx.min.js")).isEqualTo(layout.lastIndexOf("htmx.min.js"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void testGenerate_withShadleafAndHtmx2(boolean useLayoutDialect) throws IOException {
+        String layout = generateLayout("npm-based", List.of(new HtmxWebDependency().withVersion(HtmxVersion.VERSION_2), new ShadleafWebDependency()), useLayoutDialect);
+
+        assertThat(layout).doesNotContain("hx-alpine-compat");
+        assertThat(layout.indexOf("@{/webjars/htmx.org/dist/htmx.min.js}")).isPositive()
+                .isLessThan(layout.indexOf("~{sl/layout :: assets}"));
+        assertThat(layout.indexOf("htmx.min.js")).isEqualTo(layout.lastIndexOf("htmx.min.js"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void testGenerate_withHtmx4WithoutShadleaf(boolean useLayoutDialect) throws IOException {
+        String layout = generateLayout("npm-based", List.of(new HtmxWebDependency()), useLayoutDialect);
+
+        assertThat(layout).contains("@{/webjars/htmx.org/dist/htmx.min.js}")
+                .doesNotContain("hx-alpine-compat")
+                .doesNotContain("REPLACE WITH");
     }
 
     @ParameterizedTest

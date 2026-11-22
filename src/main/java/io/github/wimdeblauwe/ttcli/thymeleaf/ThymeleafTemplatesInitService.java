@@ -1,6 +1,7 @@
 package io.github.wimdeblauwe.ttcli.thymeleaf;
 
 import io.github.wimdeblauwe.ttcli.ProjectInitializationParameters;
+import io.github.wimdeblauwe.ttcli.deps.HtmxWebDependency;
 import io.github.wimdeblauwe.ttcli.deps.ShadleafWebDependency;
 import io.github.wimdeblauwe.ttcli.deps.WebDependency;
 import io.github.wimdeblauwe.ttcli.deps.WebjarsBasedWebDependency;
@@ -14,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Component
 public class ThymeleafTemplatesInitService {
@@ -42,11 +44,29 @@ public class ThymeleafTemplatesInitService {
         boolean hasShadleafWebDependency = webDependencies.stream().anyMatch(webDependency -> webDependency instanceof ShadleafWebDependency);
         insertShadleafNamespaceAndBodyHeaderToLayoutTemplate(layoutTemplate, hasShadleafWebDependency);
 
+        // With Shadleaf, htmx is loaded before Shadleaf's assets, as those contain the Alpine.js script
+        Optional<HtmxWebDependency> htmxBeforeShadleafAssets = hasShadleafWebDependency
+                ? webDependencies.stream()
+                .filter(HtmxWebDependency.class::isInstance)
+                .map(HtmxWebDependency.class::cast)
+                .findFirst()
+                : Optional.empty();
+
         StringBuilder headTags = new StringBuilder();
         if (hasShadleafWebDependency) {
-            // Shadleaf's stylesheet needs to come before the application stylesheet, so overrides in the application win
             headTags.append("""
                     <th:block th:replace="~{sl/layout :: theme-script}"></th:block>
+                    """);
+            if (htmxBeforeShadleafAssets.isPresent()) {
+                HtmxWebDependency htmx = htmxBeforeShadleafAssets.get();
+                headTags.append(htmx.getJsLinksForLayoutTemplate(thymeleafParameters)).append('\n');
+                String alpineCompat = htmx.getAlpineCompatJsLinkForLayoutTemplate(thymeleafParameters);
+                if (alpineCompat != null) {
+                    headTags.append(alpineCompat).append('\n');
+                }
+            }
+            // Shadleaf's stylesheet needs to come before the application stylesheet, so overrides in the application win
+            headTags.append("""
                     <th:block th:replace="~{sl/layout :: assets}"></th:block>
                     """);
         }
@@ -79,6 +99,9 @@ public class ThymeleafTemplatesInitService {
 
         StringBuilder jsLinksForLayoutTemplate = new StringBuilder();
         for (WebDependency webDependency : webDependencies) {
+            if (htmxBeforeShadleafAssets.isPresent() && webDependency == htmxBeforeShadleafAssets.get()) {
+                continue;
+            }
             if (webDependency instanceof WebjarsBasedWebDependency webjarsBasedWebDependency) {
                 String jsForDependency = webjarsBasedWebDependency.getJsLinksForLayoutTemplate(thymeleafParameters);
                 if (jsForDependency != null) {

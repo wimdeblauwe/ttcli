@@ -76,6 +76,24 @@ public class HtmxWebDependency implements WebjarsBasedWebDependency {
         };
     }
 
+    /**
+     * The {@code hx-alpine-compat} extension of htmx 4, which keeps the state of Alpine components on a swap.
+     * Shadleaf's components use Alpine, so it is needed with Shadleaf. htmx 2 has no such extension.
+     *
+     * @return the script tag, or {@code null} for htmx 2
+     */
+    public String getAlpineCompatJsLinkForLayoutTemplate(TemplateEngineType templateEngineType) {
+        if (htmxVersion != HtmxVersion.VERSION_4) {
+            return null;
+        }
+        return switch (templateEngineType) {
+            case TemplateEngineType.Thymeleaf _ -> """
+                    <script defer th:src="@{/webjars/htmx.org/dist/ext/hx-alpine-compat.min.js}"></script>""";
+            case TemplateEngineType.Jte _ -> """
+                    <script defer src="/webjars/htmx.org/dist/ext/hx-alpine-compat.min.js"></script>""";
+        };
+    }
+
     private String getHtmxVersion() {
         return switch (htmxVersion) {
             case VERSION_2 -> "2.0.11";
