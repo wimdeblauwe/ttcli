@@ -76,6 +76,23 @@ public class HtmxWebDependency implements WebjarsBasedWebDependency {
         };
     }
 
+    /**
+     * The htmx script, followed by the {@code hx-alpine-compat} extension of htmx 4 if {@code withAlpine} is set.
+     * The extension keeps the state of Alpine components on a swap. htmx 2 has no such extension.
+     */
+    public String getJsLinksForLayoutTemplate(TemplateEngineType templateEngineType, boolean withAlpine) {
+        String htmx = getJsLinksForLayoutTemplate(templateEngineType);
+        if (!withAlpine || htmxVersion != HtmxVersion.VERSION_4) {
+            return htmx;
+        }
+        return htmx + '\n' + switch (templateEngineType) {
+            case TemplateEngineType.Thymeleaf _ -> """
+                    <script defer th:src="@{/webjars/htmx.org/dist/ext/hx-alpine-compat.min.js}"></script>""";
+            case TemplateEngineType.Jte _ -> """
+                    <script defer src="/webjars/htmx.org/dist/ext/hx-alpine-compat.min.js"></script>""";
+        };
+    }
+
     private String getHtmxVersion() {
         return switch (htmxVersion) {
             case VERSION_2 -> "2.0.11";
