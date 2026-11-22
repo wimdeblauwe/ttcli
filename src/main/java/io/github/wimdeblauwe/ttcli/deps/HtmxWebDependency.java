@@ -105,7 +105,7 @@ public class HtmxWebDependency implements WebjarsBasedWebDependency {
             if (!springBootVersion.startsWith("4.")) {
                 throw new IllegalArgumentException("htmx 4 requires Spring Boot 4.x, but got: " + springBootVersion);
             }
-            return "6.0.0";
+            return "6.0.1";
         }
 
         String htmxSpringBootThymeleafVersion;
