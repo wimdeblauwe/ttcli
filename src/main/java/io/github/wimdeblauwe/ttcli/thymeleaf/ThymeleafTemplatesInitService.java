@@ -2,6 +2,7 @@ package io.github.wimdeblauwe.ttcli.thymeleaf;
 
 import io.github.wimdeblauwe.ttcli.ProjectInitializationParameters;
 import io.github.wimdeblauwe.ttcli.deps.HtmxWebDependency;
+import io.github.wimdeblauwe.ttcli.deps.LayoutTemplateJsLinks;
 import io.github.wimdeblauwe.ttcli.deps.ShadleafWebDependency;
 import io.github.wimdeblauwe.ttcli.deps.WebDependency;
 import io.github.wimdeblauwe.ttcli.deps.WebjarsBasedWebDependency;
@@ -57,14 +58,8 @@ public class ThymeleafTemplatesInitService {
             headTags.append("""
                     <th:block th:replace="~{sl/layout :: theme-script}"></th:block>
                     """);
-            if (htmxBeforeShadleafAssets.isPresent()) {
-                HtmxWebDependency htmx = htmxBeforeShadleafAssets.get();
-                headTags.append(htmx.getJsLinksForLayoutTemplate(thymeleafParameters)).append('\n');
-                String alpineCompat = htmx.getAlpineCompatJsLinkForLayoutTemplate(thymeleafParameters);
-                if (alpineCompat != null) {
-                    headTags.append(alpineCompat).append('\n');
-                }
-            }
+            // Shadleaf's components use Alpine.js, so hx-alpine-compat is needed with htmx 4
+            htmxBeforeShadleafAssets.ifPresent(htmx -> headTags.append(htmx.getJsLinksForLayoutTemplate(thymeleafParameters, true)).append('\n'));
             // Shadleaf's stylesheet needs to come before the application stylesheet, so overrides in the application win
             headTags.append("""
                     <th:block th:replace="~{sl/layout :: assets}"></th:block>
@@ -97,21 +92,11 @@ public class ThymeleafTemplatesInitService {
         }
         insertCssLinksToLayoutTemplate(layoutTemplate, cssLinksForLayoutTemplate.toString());
 
-        StringBuilder jsLinksForLayoutTemplate = new StringBuilder();
-        for (WebDependency webDependency : webDependencies) {
-            if (htmxBeforeShadleafAssets.isPresent() && webDependency == htmxBeforeShadleafAssets.get()) {
-                continue;
-            }
-            if (webDependency instanceof WebjarsBasedWebDependency webjarsBasedWebDependency) {
-                String jsForDependency = webjarsBasedWebDependency.getJsLinksForLayoutTemplate(thymeleafParameters);
-                if (jsForDependency != null) {
-                    jsLinksForLayoutTemplate
-                            .append('\n')
-                            .append(jsForDependency);
-                }
-            }
-        }
-        insertJsLinksToLayoutTemplate(layoutTemplate, jsLinksForLayoutTemplate.toString());
+        List<WebDependency> webDependenciesForJsLinks = htmxBeforeShadleafAssets
+                .map(htmx -> webDependencies.stream().filter(webDependency -> webDependency != htmx).toList())
+                .orElse(webDependencies);
+        String jsLinksForLayoutTemplate = LayoutTemplateJsLinks.create(webDependenciesForJsLinks, thymeleafParameters);
+        insertJsLinksToLayoutTemplate(layoutTemplate, jsLinksForLayoutTemplate);
     }
 
     private void insertShadleafNamespaceAndBodyHeaderToLayoutTemplate(Path layoutTemplate,

@@ -99,6 +99,29 @@ class ThymeleafTemplatesInitServiceTest {
                 .contains("/webjars/alpinejs/dist/cdn.min.js");
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void testGenerate_withAlpineAndHtmx4(boolean useLayoutDialect) throws IOException {
+        String layout = generateLayout("npm-based", List.of(new AlpineWebDependency(), new HtmxWebDependency()), useLayoutDialect);
+
+        int htmxIndex = layout.indexOf("@{/webjars/htmx.org/dist/htmx.min.js}");
+        int alpineCompatIndex = layout.indexOf("@{/webjars/htmx.org/dist/ext/hx-alpine-compat.min.js}");
+        int alpineIndex = layout.indexOf("@{/webjars/alpinejs/dist/cdn.min.js}");
+        assertThat(htmxIndex).isPositive();
+        assertThat(htmxIndex).isLessThan(alpineCompatIndex);
+        assertThat(alpineCompatIndex).isLessThan(alpineIndex);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void testGenerate_withAlpineAndHtmx2(boolean useLayoutDialect) throws IOException {
+        String layout = generateLayout("npm-based", List.of(new AlpineWebDependency(), new HtmxWebDependency().withVersion(HtmxVersion.VERSION_2)), useLayoutDialect);
+
+        assertThat(layout).contains("@{/webjars/htmx.org/dist/htmx.min.js}")
+                .contains("@{/webjars/alpinejs/dist/cdn.min.js}")
+                .doesNotContain("hx-alpine-compat");
+    }
+
     private String generateLayout(String liveReloadId,
                                   List<WebDependency> webDependencies,
                                   boolean useLayoutDialect) throws IOException {

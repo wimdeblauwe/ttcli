@@ -1,6 +1,7 @@
 package io.github.wimdeblauwe.ttcli.jte;
 
 import io.github.wimdeblauwe.ttcli.ProjectInitializationParameters;
+import io.github.wimdeblauwe.ttcli.deps.LayoutTemplateJsLinks;
 import io.github.wimdeblauwe.ttcli.deps.WebDependency;
 import io.github.wimdeblauwe.ttcli.deps.WebjarsBasedWebDependency;
 import io.github.wimdeblauwe.ttcli.livereload.LiveReloadInitServiceParameters;
@@ -65,18 +66,8 @@ public class JteTemplatesInitService {
         }
         insertCssLinksToLayoutTemplate(layoutTemplate, cssLinksForLayoutTemplate.toString());
 
-        StringBuilder jsLinksForLayoutTemplate = new StringBuilder();
-        for (WebDependency webDependency : webDependencies) {
-            if (webDependency instanceof WebjarsBasedWebDependency webjarsBasedWebDependency) {
-                String jsForDependency = webjarsBasedWebDependency.getJsLinksForLayoutTemplate(templateEngineType);
-                if (jsForDependency != null) {
-                    jsLinksForLayoutTemplate
-                            .append('\n')
-                            .append(jsForDependency);
-                }
-            }
-        }
-        insertJsLinksToLayoutTemplate(layoutTemplate, jsLinksForLayoutTemplate.toString());
+        String jsLinksForLayoutTemplate = LayoutTemplateJsLinks.create(webDependencies, templateEngineType);
+        insertJsLinksToLayoutTemplate(layoutTemplate, jsLinksForLayoutTemplate);
     }
 
     private void insertHeadTagsToLayoutTemplate(Path layoutTemplate,
