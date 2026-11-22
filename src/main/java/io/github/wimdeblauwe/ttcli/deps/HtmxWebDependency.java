@@ -96,7 +96,7 @@ public class HtmxWebDependency implements WebjarsBasedWebDependency {
     private String getHtmxVersion() {
         return switch (htmxVersion) {
             case VERSION_2 -> "2.0.11";
-            case VERSION_4 -> "4.0.0";
+            case VERSION_4 -> "4.0.2";
         };
     }
 
