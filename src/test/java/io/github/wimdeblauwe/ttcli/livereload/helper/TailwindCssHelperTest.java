@@ -27,6 +27,14 @@ class TailwindCssHelperTest {
         assertThat(content).contains("@custom-variant dark (&:where(.dark, .dark *));");
         assertThat(content).contains("@theme inline {");
         assertThat(content).contains("--color-primary: var(--primary);");
+        assertThat(content).contains("--color-sidebar: var(--sidebar);",
+                                     "--color-sidebar-foreground: var(--sidebar-foreground);",
+                                     "--color-sidebar-primary: var(--sidebar-primary);",
+                                     "--color-sidebar-primary-foreground: var(--sidebar-primary-foreground);",
+                                     "--color-sidebar-accent: var(--sidebar-accent);",
+                                     "--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);",
+                                     "--color-sidebar-border: var(--sidebar-border);",
+                                     "--color-sidebar-ring: var(--sidebar-ring);");
         assertThat(content).contains("background-color: var(--background);");
         assertThat(content).contains("border-color: var(--border);");
     }
